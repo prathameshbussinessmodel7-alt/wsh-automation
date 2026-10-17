@@ -36,9 +36,7 @@ jobs:
       - name: Run WSH collector
         run: python wsh_cloud_automation.py
 
-      - name: Commit generated WSH evidence and packages
-        env:
-          GH_TOKEN: ${{ github.token }}
+      -
         run: |
           git config user.name "wsh-data-bot"
           git config user.email "wsh-data-bot@users.noreply.github.com"
