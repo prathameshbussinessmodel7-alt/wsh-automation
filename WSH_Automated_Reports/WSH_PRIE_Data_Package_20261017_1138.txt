@@ -1,0 +1,103 @@
+=== WSH PRIE DATA PACKAGE [Indian Market Structure] - 2026-10-17 11:35:56 ===
+
+
+==================================================
+WSH PRIE: SENSIBULL OPTION-CHAIN INVENTORY (CONTRACT VALIDATED)
+==================================================
+
+
+--- PRIE INDEX TARGET: NIFTY ---
+
+[QUALITY GATE -> FAIL | Index: NIFTY | Zero valid strike rows detected]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1211.20  | -0.31% | Info | INDIAVIX | 14.1 | 0.0 | PCR | 0.6 | Total Call OI | 7.9Cr | Total Put OI | 4.69Cr | PCR | 0.59 | RELIANCE | 1211.2 | 1110 | 1130 | 1150 | 1170 | 1190 | 1210 | 1230 | 1250 | 1270 | 1290 | 1310 | 0 | 20L | 40L | 60L | 80L | 1Cr | 1.2Cr | RELIANCE 1211.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 16 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (10 days) | 23 Nov (37 days) | Strike Range | Reset | Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25 | OI last refreshed time - 16 Oct, 7:30 PM | Data is refreshed every minute. Open Interest data is updat
+
+
+--- PRIE INDEX TARGET: BANKNIFTY ---
+
+[QUALITY GATE -> FAIL | Index: BANKNIFTY | Zero valid strike rows detected]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1211.20  | -0.31% | Info | INDIAVIX | 14.1 | 0.0 | PCR | 0.6 | Total Call OI | 7.9Cr | Total Put OI | 4.69Cr | PCR | 0.59 | RELIANCE | 1211.2 | 1110 | 1130 | 1150 | 1170 | 1190 | 1210 | 1230 | 1250 | 1270 | 1290 | 1310 | 0 | 20L | 40L | 60L | 80L | 1Cr | 1.2Cr | RELIANCE 1211.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 16 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (10 days) | 23 Nov (37 days) | Strike Range | Reset | Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25 | OI last refreshed time - 16 Oct, 7:30 PM | Data is refreshed every minute. Open Interest data is updat
+
+
+--- PRIE INDEX TARGET: FINNIFTY ---
+
+[QUALITY GATE -> FAIL | Index: FINNIFTY | Zero valid strike rows detected]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1211.20  | -0.31% | Info | INDIAVIX | 14.1 | 0.0 | PCR | 0.6 | Total Call OI | 7.9Cr | Total Put OI | 4.69Cr | PCR | 0.59 | RELIANCE | 1211.2 | 1110 | 1130 | 1150 | 1170 | 1190 | 1210 | 1230 | 1250 | 1270 | 1290 | 1310 | 0 | 20L | 40L | 60L | 80L | 1Cr | 1.2Cr | RELIANCE 1211.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 16 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (10 days) | 23 Nov (37 days) | Strike Range | Reset | Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25 | OI last refreshed time - 16 Oct, 7:30 PM | Data is refreshed every minute. Open Interest data is updat
+
+
+--- PRIE INDEX TARGET: SENSEX ---
+
+[QUALITY GATE -> FAIL | Index: SENSEX | Zero valid strike rows detected]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1211.20  | -0.31% | Info | INDIAVIX | 14.1 | 0.0 | PCR | 0.6 | Total Call OI | 7.9Cr | Total Put OI | 4.69Cr | PCR | 0.59 | RELIANCE | 1211.2 | 1110 | 1130 | 1150 | 1170 | 1190 | 1210 | 1230 | 1250 | 1270 | 1290 | 1310 | 0 | 20L | 40L | 60L | 80L | 1Cr | 1.2Cr | RELIANCE 1211.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 16 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (10 days) | 23 Nov (37 days) | Strike Range | Reset | Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25 | OI last refreshed time - 16 Oct, 7:30 PM | Data is refreshed every minute. Open Interest data is updat
+
+
+==================================================
+WSH PRIE: FII/DII PARTICIPANT POSITIONING (4-TAB CONTRACT)
+==================================================
+
+
+--- PRIE FII/DII TAB TARGET: Summary ---
+
+[Table #2 for Summary]
+Index Futures | Indecisive | -2.73L | 6,828
+Index Options | Medium Bearish |  | -7.95L | -1.4L
+
+[Table #3 for Summary]
+Index Futures | Indecisive | 15,892 | -8,182
+Index Options |  | Medium Bullish | 3.28L | 1.41L
+
+[Table #4 for Summary]
+Index Futures |  | Medium Bullish | 2.2L | 602
+Index Options |  | Medium Bullish | 5.48L | 18,057
+
+[QUALITY GATE -> PASS | Tab: Summary | Rows: 6]
+
+
+--- PRIE FII/DII TAB TARGET: Futures and Options ---
+
+[Table #2 for Futures and Options]
+Index Futures | Indecisive | -2.73L | 6,828
+Index Options | Medium Bearish |  | -7.95L | -1.4L
+
+[Table #3 for Futures and Options]
+Index Futures | Indecisive | 15,892 | -8,182
+Index Options |  | Medium Bullish | 3.28L | 1.41L
+
+[Table #4 for Futures and Options]
+Index Futures |  | Medium Bullish | 2.2L | 602
+Index Options |  | Medium Bullish | 5.48L | 18,057
+
+[QUALITY GATE -> PASS | Tab: Futures and Options | Rows: 6]
+
+
+--- PRIE FII/DII TAB TARGET: Cash Market ---
+
+[Table #2 for Cash Market]
+Index Futures | Indecisive | -2.73L | 6,828
+Index Options | Medium Bearish |  | -7.95L | -1.4L
+
+[Table #3 for Cash Market]
+Index Futures | Indecisive | 15,892 | -8,182
+Index Options |  | Medium Bullish | 3.28L | 1.41L
+
+[Table #4 for Cash Market]
+Index Futures |  | Medium Bullish | 2.2L | 602
+Index Options |  | Medium Bullish | 5.48L | 18,057
+
+[QUALITY GATE -> PASS | Tab: Cash Market | Rows: 6]
+
+
+--- PRIE FII/DII TAB TARGET: FII History ---
+
+[Table #2 for FII History]
+Index Futures | Indecisive | -2.73L | 6,828
+Index Options | Medium Bearish |  | -7.95L | -1.4L
+
+[Table #3 for FII History]
+Index Futures | Indecisive | 15,892 | -8,182
+Index Options |  | Medium Bullish | 3.28L | 1.41L
+
+[Table #4 for FII History]
+Index Futures |  | Medium Bullish | 2.2L | 602
+Index Options |  | Medium Bullish | 5.48L | 18,057
+
+[QUALITY GATE -> PASS | Tab: FII History | Rows: 6]

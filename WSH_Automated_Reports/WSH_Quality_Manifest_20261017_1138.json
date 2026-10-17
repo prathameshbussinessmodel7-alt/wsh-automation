@@ -1,0 +1,180 @@
+{
+    "execution_timestamp": "2026-10-17T11:35:56.289584",
+    "datasets": {
+        "option_chain_nifty": {
+            "source": "Sensibull",
+            "status": "FAIL",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_banknifty": {
+            "source": "Sensibull",
+            "status": "FAIL",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_finnifty": {
+            "source": "Sensibull",
+            "status": "FAIL",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_sensex": {
+            "source": "Sensibull",
+            "status": "FAIL",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "fii_dii_summary": {
+            "source": "Sensibull",
+            "status": "PASS",
+            "expected_fields": [
+                "participant",
+                "values",
+                "date"
+            ],
+            "records_extracted": 6,
+            "failure_reasons": []
+        },
+        "fii_dii_futures_and_options": {
+            "source": "Sensibull",
+            "status": "PASS",
+            "expected_fields": [
+                "participant",
+                "values",
+                "date"
+            ],
+            "records_extracted": 6,
+            "failure_reasons": []
+        },
+        "fii_dii_cash_market": {
+            "source": "Sensibull",
+            "status": "PASS",
+            "expected_fields": [
+                "participant",
+                "values",
+                "date"
+            ],
+            "records_extracted": 6,
+            "failure_reasons": []
+        },
+        "fii_dii_fii_history": {
+            "source": "Sensibull",
+            "status": "PASS",
+            "expected_fields": [
+                "participant",
+                "values",
+                "date"
+            ],
+            "records_extracted": 6,
+            "failure_reasons": []
+        },
+        "ccil_money_market": {
+            "source": "CCIL",
+            "status": "FAIL",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "ccil_gsec": {
+            "source": "CCIL",
+            "status": "FAIL",
+            "expected_fields": [
+                "instrument",
+                "volume",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Contamination detected: Gsec table contains Money Market instruments"
+            ]
+        },
+        "ccil_forex": {
+            "source": "CCIL",
+            "status": "FAIL",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "ccil_derivatives": {
+            "source": "CCIL",
+            "status": "FAIL",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "gsse_sovereign_bonds": {
+            "source": "TradingEconomics",
+            "status": "PASS",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 6,
+            "failure_reasons": []
+        },
+        "gsse_macro_calendar": {
+            "source": "TradingEconomics",
+            "status": "PASS",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 327,
+            "failure_reasons": []
+        }
+    }
+}
