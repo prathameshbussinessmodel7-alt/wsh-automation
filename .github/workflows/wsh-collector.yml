@@ -36,7 +36,7 @@ jobs:
       - name: Run WSH collector
         run: python wsh_cloud_automation.py
 
-      -
+      
         
       - name: Upload run artifacts
         if: always()
