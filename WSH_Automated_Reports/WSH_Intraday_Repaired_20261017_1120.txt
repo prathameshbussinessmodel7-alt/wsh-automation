@@ -1,0 +1,67 @@
+=== WSH INSTITUTIONAL REPAIRED PAYLOAD [WSH_Intraday_Repaired] - 2026-10-17 11:19:31 ===
+
+
+
+==================================================
+SENSIBULL REPAIRED STRIKE-LEVEL OI & TISSUE EXTRACTION (ALL INDICES)
+==================================================
+
+
+--- INDEX TARGET: NIFTY ---
+
+[SOURCE STATUS -> Sensibull Deep OI - NIFTY: PASS | Harvested 1 deep strike/OI nodes.]
+Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25
+
+
+--- INDEX TARGET: BANKNIFTY ---
+
+[SOURCE STATUS -> Sensibull Deep OI - BANKNIFTY: PASS | Harvested 1 deep strike/OI nodes.]
+Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25
+
+
+--- INDEX TARGET: FINNIFTY ---
+
+[SOURCE STATUS -> Sensibull Deep OI - FINNIFTY: PASS | Harvested 1 deep strike/OI nodes.]
+Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25
+
+
+--- INDEX TARGET: SENSEX ---
+
+[SOURCE STATUS -> Sensibull Deep OI - SENSEX: PASS | Harvested 1 deep strike/OI nodes.]
+Min | Max | Strikes above and below ATM | Show All | 5 | 10 | 15 | 20 | 25
+
+
+==================================================
+SENSIBULL FII/DII DATA (REPAIRED 4-TAB HARVESTER)
+==================================================
+
+
+--- FII/DII TAB TARGET: Summary ---
+
+[SOURCE STATUS -> Sensibull Tab - Summary: PARTIAL | Falling back to full page text block.]
+Free NSE FII DII Data: Buy/Sell Activity in F&O, Cash - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | Summary | Futures and Options | Cash Market | FII History | Filters | Reset | Participant | FII | Pro | Client | DII | Segment | Index Futures | Stock Futures | Index Options | Stocks | Show Labels | (Strong/Medium/Mild) | How to Interpret this data? | Replay | 16 Oct 2026 | Participant | Segment | Bearish | Bullish | Net OI | Change | FII | Index Futures | Indecisive | -2.73L | 6,828  | Index Options | Medium Bearish | -7.95L | -1.4L  | Pro | Index Futures | Indecisive | 15,892 | -8,182  | Index Options | Medium Bullish | 3.28L | 1.41L  | Client | Index Futures | Medium Bullish | 2.2L | 602  | Index Options | Medium Bullish | 5.48L | 18,057  | 19 Oct 2026 | Market opens at 9:15am | 16 Oct, Fri | NIFTY | 23146.15 | +0.65% | BANKNIFTY | 55844 | +0.06%
+
+
+--- FII/DII TAB TARGET: Futures and Options ---
+
+[SOURCE STATUS -> Sensibull Tab - Futures and Options: PARTIAL | Falling back to full page text block.]
+Free NSE FII DII Data: Buy/Sell Activity in F&O, Cash - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | Summary | Futures and Options | Cash Market | FII History | Filters | Reset | Participant | FII | Pro | Client | DII | Segment | Index Futures | Stock Futures | Index Options | Stocks | Show Labels | (Strong/Medium/Mild) | How to Interpret this data? | Replay | 16 Oct 2026 | Participant | Segment | Bearish | Bullish | Net OI | Change | FII | Index Futures | Indecisive | -2.73L | 6,828  | Index Options | Medium Bearish | -7.95L | -1.4L  | Pro | Index Futures | Indecisive | 15,892 | -8,182  | Index Options | Medium Bullish | 3.28L | 1.41L  | Client | Index Futures | Medium Bullish | 2.2L | 602  | Index Options | Medium Bullish | 5.48L | 18,057  | 19 Oct 2026 | Market opens at 9:15am | 16 Oct, Fri | NIFTY | 23146.15 | +0.65% | BANKNIFTY | 55844 | +0.06%
+
+
+--- FII/DII TAB TARGET: Cash Market ---
+
+[SOURCE STATUS -> Sensibull Tab - Cash Market: PARTIAL | Falling back to full page text block.]
+Free NSE FII DII Data: Buy/Sell Activity in F&O, Cash - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | Summary | Futures and Options | Cash Market | FII History | Filters | Reset | Participant | FII | Pro | Client | DII | Segment | Index Futures | Stock Futures | Index Options | Stocks | Show Labels | (Strong/Medium/Mild) | How to Interpret this data? | Replay | 16 Oct 2026 | Participant | Segment | Bearish | Bullish | Net OI | Change | FII | Index Futures | Indecisive | -2.73L | 6,828  | Index Options | Medium Bearish | -7.95L | -1.4L  | Pro | Index Futures | Indecisive | 15,892 | -8,182  | Index Options | Medium Bullish | 3.28L | 1.41L  | Client | Index Futures | Medium Bullish | 2.2L | 602  | Index Options | Medium Bullish | 5.48L | 18,057  | 19 Oct 2026 | Market opens at 9:15am | 16 Oct, Fri | NIFTY | 23146.15 | +0.65% | BANKNIFTY | 55844 | +0.06%
+
+
+--- FII/DII TAB TARGET: FII History ---
+
+[SOURCE STATUS -> Sensibull Tab - FII History: PARTIAL | Falling back to full page text block.]
+Free NSE FII DII Data: Buy/Sell Activity in F&O, Cash - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | Summary | Futures and Options | Cash Market | FII History | Filters | Reset | Participant | FII | Pro | Client | DII | Segment | Index Futures | Stock Futures | Index Options | Stocks | Show Labels | (Strong/Medium/Mild) | How to Interpret this data? | Replay | 16 Oct 2026 | Participant | Segment | Bearish | Bullish | Net OI | Change | FII | Index Futures | Indecisive | -2.73L | 6,828  | Index Options | Medium Bearish | -7.95L | -1.4L  | Pro | Index Futures | Indecisive | 15,892 | -8,182  | Index Options | Medium Bullish | 3.28L | 1.41L  | Client | Index Futures | Medium Bullish | 2.2L | 602  | Index Options | Medium Bullish | 5.48L | 18,057  | 19 Oct 2026 | Market opens at 9:15am | 16 Oct, Fri | NIFTY | 23146.15 | +0.65% | BANKNIFTY | 55844 | +0.06%
+
+
+==================================================
+TRADINGVIEW REPAIRED EXTRACTION: https://in.tradingview.com/chart/xik75amh/?symbol=NSEIX%3ANIFTY1%21
+==================================================
+
+[SOURCE STATUS -> TradingView - https://in.tradingview.com/chart/xik75amh/?symbol=NSEIX%3ANIFTY1%21: PASS | Captured 2 chart grid components.]
