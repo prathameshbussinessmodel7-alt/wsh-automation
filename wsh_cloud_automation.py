@@ -18,7 +18,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-19_SAFE-GATES_1",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-19_ADAPTIVE-SENSIBULL_2",
             "datasets": {}
         }
 
@@ -238,103 +238,218 @@ def _wsh_html_option_rows(soup):
     return output
 
 
-def extract_sensibull_option_chains(driver, manifest_tracker):
-    """Strict Sensibull extraction: only structured records can pass validation."""
-    indices = ["NIFTY", "BANKNIFTY", "FINNIFTY", "SENSEX"]
-    payload = (
-        "\n\n==================================================\n"
-        "WSH PRIE: SENSIBULL OPTION-CHAIN (STRICT STRUCTURED EXTRACTION)\n"
-        "==================================================\n"
-    )
-    is_trading = is_market_trading_day()
-    pub_state = "PUBLISHED" if is_trading else "MARKET_CLOSED"
+def _wsh_discover_expiry_checkboxes(driver):
+    """Discover expiry checkboxes from the live Sensibull OI-vs-Strike UI.
 
-    for symbol in indices:
-        url = f"https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol={symbol}"
-        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] PRIE Adapter checking Sensibull OI for {symbol}")
-        reasons = []
-        valid_rows = []
+    This intentionally uses visible UI labels rather than assuming a fixed
+    weekly/monthly expiry ladder. Returned dates are candidates and must still
+    be verified against the actual page after selection.
+    """
+    elements = driver.execute_script("""
+      return Array.from(document.querySelectorAll('input[type=checkbox]')).map((el, i) => {
+        const label = el.labels && el.labels.length
+          ? Array.from(el.labels).map(x => x.innerText || '').join(' ')
+          : '';
+        const parent = el.closest('label') || el.parentElement;
+        return {index:i, checked:!!el.checked,
+                text:(label || (parent && parent.innerText) || '').replace(/\\s+/g,' ').trim()};
+      }).filter(x => x.text);
+    """) or []
+    found=[]
+    seen=set()
+    month_map={m.lower():i for i,m in enumerate(
+        ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],1)}
+    today=datetime.date.today()
+    for item in elements:
+        text=str(item.get('text','')).strip()
+        match=re.search(r'\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b(?:\s+(\d{4}))?',text,re.I)
+        if not match:
+            continue
+        day=int(match.group(1)); month=month_map[match.group(2).lower()]
+        year=int(match.group(3)) if match.group(3) else today.year
+        try:
+            expiry=datetime.date(year,month,day)
+        except ValueError:
+            continue
+        if not match.group(3) and expiry < today - datetime.timedelta(days=2):
+            expiry=datetime.date(year+1,month,day)
+        key=expiry.isoformat()
+        if key not in seen:
+            seen.add(key)
+            found.append({'date':key,'label':text,'index':int(item.get('index',-1)),'checked':bool(item.get('checked'))})
+    return found
+
+
+def _wsh_select_single_expiry_checkbox(driver, expiry_date):
+    """Select one discovered expiry and verify the actual checkbox state."""
+    result=driver.execute_script("""
+      const wanted=arguments[0];
+      const inputs=Array.from(document.querySelectorAll('input[type=checkbox]'));
+      function labelText(el) {
+        const label=el.labels && el.labels.length
+          ? Array.from(el.labels).map(x=>x.innerText||'').join(' ')
+          : '';
+        const parent=el.closest('label') || el.parentElement;
+        return (label || (parent && parent.innerText) || '').replace(/\\s+/g,' ').trim();
+      }
+      function dateKey(s) {
+        const m=s.match(/\\b(\\d{1,2})\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\b(?:\\s+(\\d{4}))?/i);
+        if(!m) return null;
+        const months={jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+        const year=m[3] || new Date().getFullYear();
+        return String(year)+'-'+months[m[2].toLowerCase()]+'-'+String(m[1]).padStart(2,'0');
+      }
+      let target=null;
+      for(const el of inputs) if(dateKey(labelText(el))===wanted) {target=el;break;}
+      if(!target) return {ok:false, reason:'No checkbox matched expiry '+wanted};
+      // Click only labels/inputs as required to cause the UI's React handlers.
+      for(const el of inputs) {
+        if(el!==target && el.checked) {
+          const lab=(el.labels && el.labels[0]) || el;
+          lab.click();
+        }
+      }
+      if(!target.checked) {
+        const lab=(target.labels && target.labels[0]) || target;
+        lab.click();
+      }
+      return {ok:target.checked, selected:inputs.filter(x=>x.checked).map(x=>labelText(x)),
+              targetLabel:labelText(target)};
+    """, expiry_date)
+    time.sleep(2)
+    return result or {'ok':False,'reason':'Checkbox selection returned no result'}
+
+
+def _wsh_extract_option_rows_from_current_page(driver):
+    soup=BeautifulSoup(driver.page_source,'html.parser')
+    rows=_wsh_json_option_rows(soup)
+    if not rows:
+        rows=_wsh_html_option_rows(soup)
+    return rows, soup, _wsh_page_diagnostics(driver,soup)
+
+
+def extract_sensibull_oi_vs_strike(driver, manifest_tracker):
+    """Collect OI-vs-Strike separately, discovering expiry checkboxes dynamically.
+
+    If the chart does not expose a validated numeric series in embedded JSON or
+    semantic tables, this adapter records a diagnostic and marks the dataset
+    invalid/partial rather than manufacturing values from bar heights.
+    """
+    symbols=['NIFTY','BANKNIFTY','FINNIFTY','SENSEX']
+    payload='\n\n==================================================\nWSH PRIE: SENSIBULL OI VS STRIKE (DYNAMIC EXPIRY SELECTION)\n==================================================\n'
+    pub_state='PUBLISHED' if is_market_trading_day() else 'MARKET_CLOSED'
+    for symbol in symbols:
+        url=f'https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol={symbol}'
         try:
             driver.get(url)
-            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            # Wait briefly for client-side rendering. JavaScript is enabled by
-            # default in Selenium Chrome; do not infer that a body means data loaded.
+            WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
             time.sleep(5)
-            soup = BeautifulSoup(driver.page_source, "html.parser")
-
-            diagnostics = _wsh_page_diagnostics(driver, soup)
-            valid_rows = _wsh_json_option_rows(soup)
-            if not valid_rows:
-                valid_rows = _wsh_html_option_rows(soup)
-
-            payload += f"\n\n--- PRIE INDEX TARGET: {symbol} ---\n"
-            payload += f"[REQUESTED SYMBOL]: {symbol}\n"
-            payload += f"[SOURCE URL]: {diagnostics['current_url']}\n"
-            payload += f"[PAGE TITLE]: {diagnostics['title']}\n"
-
-            # Fail closed if the site silently serves a different instrument or a JS/error shell.
-            current_url_lower = diagnostics["current_url"].lower()
-            body_lower = diagnostics["body_text"].lower()
-            route_mismatch = ("tradingsymbol=" in url.lower() and
-                              f"tradingsymbol={symbol.lower()}" not in current_url_lower)
-            wrong_instrument = (symbol.lower() not in current_url_lower and
-                                "tradingsymbol=" in url.lower() and
-                                any(token in body_lower for token in ("reliance", "stock options")))
-            if diagnostics["fallback_markers"] or route_mismatch or wrong_instrument:
-                valid_rows = []
-                reasons.append(
-                    "Source returned a fallback/error page or did not preserve the requested symbol; "
-                    "data rejected to prevent cross-instrument contamination. "
-                    f"Fallback markers={diagnostics['fallback_markers']}; route_mismatch={route_mismatch}; "
-                    f"wrong_instrument={wrong_instrument}."
-                )
-
-            if len(valid_rows) >= 8:
-                ext_state, val_state = "SUCCESS", "VALID"
-                payload += (
-                    f"[STATUS -> PUB: {pub_state} | EXT: {ext_state} | "
-                    f"VAL: {val_state} | Valid structured strike rows: {len(valid_rows)}]\n"
-                )
-                payload += "strike | call_oi | put_oi | call_change_oi | put_change_oi\n"
-                for record in valid_rows[:100]:
-                    payload += (
-                        f"{record['strike']:g} | {record['call_oi']:g} | "
-                        f"{record['put_oi']:g} | {record['call_change_oi']:g} | "
-                        f"{record['put_change_oi']:g}\n"
-                    )
-            else:
-                ext_state = "PARTIAL" if valid_rows else ("FAILED" if is_trading else "NOT_ATTEMPTED")
-                val_state = "INVALID" if is_trading else "NOT_RUN"
-                if not reasons:
-                    reasons.append(
-                        f"Strict extraction found {len(valid_rows)} rows; at least 8 structured rows "
-                        "with strike, call/put OI and call/put change-in-OI are required."
-                    )
-                payload += (
-                    f"[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state}]\n"
-                    f"[REASON]: {reasons[0]}\n"
-                    f"[DIAGNOSTIC TEXT]: {soup.get_text(separator=' | ', strip=True)[:700]}\n"
-                )
-
-            manifest_tracker.record_dataset(
-                source="Sensibull",
-                dataset_name=f"option_chain_{symbol.lower()}",
-                pub_state=pub_state,
-                ext_state=ext_state,
-                val_state=val_state,
-                expected_fields=["strike", "call_oi", "put_oi", "call_change_oi", "put_change_oi"],
-                records_extracted=len(valid_rows),
-                failure_reasons=reasons
-            )
+            initial_soup=BeautifulSoup(driver.page_source,'html.parser')
+            diagnostics=_wsh_page_diagnostics(driver,initial_soup)
+            payload+=f'\n\n--- OI VS STRIKE: {symbol} ---\nRequested URL: {url}\nResolved URL: {diagnostics["current_url"]}\nPage title: {diagnostics["title"]}\n'
+            if diagnostics['fallback_markers'] or symbol.lower() not in diagnostics['current_url'].lower():
+                reasons=[f'Fallback/error page or symbol route mismatch: {diagnostics["fallback_markers"]}']
+                manifest_tracker.record_dataset('Sensibull',f'oi_vs_strike_{symbol.lower()}','PUBLISHED','FAILED','INVALID',
+                    ['expiry_selection','strike','call_oi','put_oi'],0,reasons)
+                payload+='[STATUS: FAILED / INVALID]\n[REASON]: '+ '; '.join(reasons)+'\n'
+                continue
+            expiries=_wsh_discover_expiry_checkboxes(driver)
+            if not expiries:
+                reasons=['No expiry checkbox labels with parseable dates were discovered in the rendered page.']
+                manifest_tracker.record_dataset('Sensibull',f'oi_vs_strike_{symbol.lower()}',pub_state,'FAILED','INVALID',
+                    ['expiry_selection','strike','call_oi','put_oi'],0,reasons)
+                payload+='[STATUS: FAILED / INVALID]\n[REASON]: '+reasons[0]+'\n'
+                payload+='[DIAGNOSTIC]: '+diagnostics['body_text'][:600]+'\n'
+                continue
+            payload+='[DISCOVERED EXPIRIES]: '+', '.join(f"{x['date']} ({x['label']})" for x in expiries)+'\n'
+            all_rows=0
+            for expiry in expiries:
+                select_result=_wsh_select_single_expiry_checkbox(driver,expiry['date'])
+                time.sleep(2)
+                rows,soup,diag=_wsh_extract_option_rows_from_current_page(driver)
+                payload+=f"\n[EXPIRY TARGET: {expiry['date']}] selection={json.dumps(select_result,ensure_ascii=False)}\n"
+                if select_result.get('ok') and len(rows)>=8:
+                    all_rows+=len(rows)
+                    payload+=f'[STRUCTURED SERIES ROWS]: {len(rows)}\nstrike | call_oi | put_oi | call_change_oi | put_change_oi\n'
+                    for r in rows[:100]:
+                        payload+=f"{r['strike']:g} | {r['call_oi']:g} | {r['put_oi']:g} | {r['call_change_oi']:g} | {r['put_change_oi']:g}\n"
+                    state='PARTIAL' # UI selection is verified; semantics/source payload still need live acceptance testing.
+                    reasons=['Structured rows found after expiry selection; chart totals and source semantics still require independent cross-check.']
+                else:
+                    state='INVALID'
+                    reasons=[select_result.get('reason') or f'No validated numeric strike series found for {expiry["date"]}; chart may render as SVG/canvas without semantic rows.']
+                    payload+=f'[DATA STATUS: INVALID] {reasons[0]}\n[PAGE DIAGNOSTIC]: {diag["body_text"][:500]}\n'
+                manifest_tracker.record_dataset('Sensibull',f'oi_vs_strike_{symbol.lower()}_{expiry["date"]}',pub_state,
+                    'SUCCESS' if rows else 'PARTIAL',state,['expiry_selection','strike','call_oi','put_oi'],len(rows),reasons)
+            manifest_tracker.record_dataset('Sensibull',f'oi_vs_strike_{symbol.lower()}_index',pub_state,
+                'SUCCESS' if all_rows else 'PARTIAL','PARTIAL' if all_rows else 'INVALID',
+                ['expiry_selection','strike','call_oi','put_oi'],all_rows,
+                [] if all_rows else ['Expiry controls were discovered, but no structured numeric OI series was validated.'])
         except Exception as e:
-            reasons = [f"{type(e).__name__}: {e}"]
-            payload += f"\n[STATUS -> PUB: {pub_state} | EXT: FAILED | VAL: INVALID | Error: {reasons[0]}]\n"
-            manifest_tracker.record_dataset(
-                "Sensibull", f"option_chain_{symbol.lower()}", pub_state, "FAILED",
-                "INVALID", ["strike", "call_oi", "put_oi", "call_change_oi", "put_change_oi"], 0, reasons
-            )
+            reasons=[f'{type(e).__name__}: {e}']
+            payload+=f'\n[OI VS STRIKE ERROR: {symbol}] {reasons[0]}\n'
+            manifest_tracker.record_dataset('Sensibull',f'oi_vs_strike_{symbol.lower()}',pub_state,'FAILED','INVALID',
+                ['expiry_selection','strike','call_oi','put_oi'],0,reasons)
     return payload
 
+
+def extract_sensibull_option_chains(driver, manifest_tracker):
+    """Collect the separate expiry-specific Option Chain page.
+
+    Expiry candidates are discovered from the OI-vs-Strike expiry UI rather than
+    hard-coded. The page is still marked invalid unless structured numeric
+    strike records can be extracted and the symbol/expiry route is preserved.
+    """
+    symbols=['NIFTY','BANKNIFTY','FINNIFTY','SENSEX']
+    payload='\n\n==================================================\nWSH PRIE: SENSIBULL OPTION CHAIN (SEPARATE EXPIRY-SPECIFIC SOURCE)\n==================================================\n'
+    pub_state='PUBLISHED' if is_market_trading_day() else 'MARKET_CLOSED'
+    for symbol in symbols:
+        try:
+            discover_url=f'https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol={symbol}'
+            driver.get(discover_url)
+            WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
+            time.sleep(4)
+            expiry_candidates=_wsh_discover_expiry_checkboxes(driver)
+            if not expiry_candidates:
+                reason='Could not discover expiry dates from the rendered Sensibull expiry checkboxes.'
+                manifest_tracker.record_dataset('Sensibull',f'option_chain_{symbol.lower()}_discovery',pub_state,'FAILED','INVALID',
+                    ['symbol','expiry','strike','call_oi','put_oi'],0,[reason])
+                payload+=f'\n--- OPTION CHAIN {symbol} ---\n[STATUS: FAILED / INVALID] {reason}\n'
+                continue
+            payload+=f'\n--- OPTION CHAIN INDEX: {symbol} ---\n[DISCOVERED EXPIRIES]: '+', '.join(x['date'] for x in expiry_candidates)+'\n'
+            for expiry in expiry_candidates:
+                url=f'https://web.sensibull.com/option-chain?view=all&tradingsymbol={symbol}&expiry={expiry["date"]}'
+                driver.get(url)
+                WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
+                time.sleep(5)
+                rows,soup,diag=_wsh_extract_option_rows_from_current_page(driver)
+                current=diag['current_url'].lower()
+                route_ok=(f'tradingsymbol={symbol.lower()}' in current and f'expiry={expiry["date"]}' in current)
+                payload+=f'\n[REQUESTED CONTRACT]: {symbol} {expiry["date"]}\n[REQUESTED URL]: {url}\n[RESOLVED URL]: {diag["current_url"]}\n[PAGE TITLE]: {diag["title"]}\n'
+                if diag['fallback_markers'] or not route_ok:
+                    state='INVALID'; ext='FAILED'
+                    reasons=[f'Fallback/error page or symbol/expiry route mismatch; markers={diag["fallback_markers"]}; route_ok={route_ok}.']
+                    rows=[]
+                elif len(rows)>=8:
+                    # Do not overstate VALID until cross-checks against displayed totals are implemented.
+                    state='PARTIAL'; ext='SUCCESS'
+                    reasons=['Structured strike rows found; expiry totals, lot-size semantics and live-page reconciliation still require acceptance testing.']
+                    payload+='strike | call_oi | put_oi | call_change_oi | put_change_oi\n'
+                    for r in rows[:100]:
+                        payload+=f"{r['strike']:g} | {r['call_oi']:g} | {r['put_oi']:g} | {r['call_change_oi']:g} | {r['put_change_oi']:g}\n"
+                else:
+                    state='INVALID'; ext='PARTIAL' if rows else 'FAILED'
+                    reasons=[f'Only {len(rows)} structured strike rows found; at least 8 required.']
+                    payload+='[DIAGNOSTIC]: '+diag['body_text'][:600]+'\n'
+                payload+=f'[STATUS: EXT={ext} | VAL={state} | ROWS={len(rows)}]\n[REASON]: '+ '; '.join(reasons)+'\n'
+                manifest_tracker.record_dataset('Sensibull',f'option_chain_{symbol.lower()}_{expiry["date"]}',pub_state,ext,state,
+                    ['symbol','expiry','strike','call_oi','put_oi','call_change_oi','put_change_oi'],len(rows),reasons)
+        except Exception as e:
+            reasons=[f'{type(e).__name__}: {e}']
+            payload+=f'\n[OPTION CHAIN ERROR: {symbol}] {reasons[0]}\n'
+            manifest_tracker.record_dataset('Sensibull',f'option_chain_{symbol.lower()}_adapter',pub_state,'FAILED','INVALID',
+                ['symbol','expiry','strike','call_oi','put_oi'],0,reasons)
+    return payload
 
 # ==========================================================
 # 2. SENSIBULL FII/DII PARTICIPANT POSITIONING ADAPTER (PRIE)
@@ -593,6 +708,7 @@ def execute_wsh_institutional_pipeline():
     try:
         prie_payload = f"=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - {timestamp_str} ===\\n"
         prie_payload += extract_sensibull_option_chains(driver, manifest)
+        prie_payload += extract_sensibull_oi_vs_strike(driver, manifest)
         prie_payload += extract_sensibull_fii_dii_tabs(driver, manifest)
 
         gsse_payload = f"=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - {timestamp_str} ===\\n"
@@ -615,7 +731,7 @@ def execute_wsh_institutional_pipeline():
         with open(__file__, "rb") as source_file:
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
-            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-19_SAFE-GATES_1\n")
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-19_ADAPTIVE-SENSIBULL_2\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as e:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
