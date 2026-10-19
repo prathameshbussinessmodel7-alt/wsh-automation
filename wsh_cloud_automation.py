@@ -3,6 +3,7 @@ import time
 import datetime
 import json
 import re
+import hashlib
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -17,6 +18,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-19_SAFE-GATES_1",
             "datasets": {}
         }
 
@@ -43,6 +45,29 @@ def is_market_trading_day():
     """Returns False if today is Saturday or Sunday, preventing false extraction failures."""
     current_day = datetime.datetime.now().weekday() # 5 = Saturday, 6 = Sunday
     return current_day < 5
+
+def _wsh_page_diagnostics(driver, soup):
+    """Return visible diagnostics useful for detecting fallback/error pages."""
+    body_text = re.sub(r"\s+", " ", soup.get_text(" ", strip=True)).strip()
+    markers = ("javascript is disabled", "enable javascript", "access denied", "captcha",
+               "verify you are human", "temporarily unavailable", "something went wrong")
+    found = [marker for marker in markers if marker in body_text.lower()]
+    return {
+        "current_url": getattr(driver, "current_url", ""),
+        "title": getattr(driver, "title", ""),
+        "body_text": body_text[:900],
+        "fallback_markers": found,
+    }
+
+
+def _wsh_has_expected_table_schema(table, required_groups):
+    """True only when table headers match each required field group."""
+    rows = table.find_all("tr")
+    if not rows:
+        return False
+    headers = {_wsh_norm_key(c.get_text(" ", strip=True)) for c in rows[0].find_all(["th", "td"])}
+    return all(any(_wsh_norm_key(alias) in headers for alias in aliases) for aliases in required_groups)
+
 
 # ==========================================================
 # 1. SENSIBULL OPTION CHAIN ADAPTER (PRIE)
@@ -237,13 +262,32 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
             time.sleep(5)
             soup = BeautifulSoup(driver.page_source, "html.parser")
 
+            diagnostics = _wsh_page_diagnostics(driver, soup)
             valid_rows = _wsh_json_option_rows(soup)
             if not valid_rows:
                 valid_rows = _wsh_html_option_rows(soup)
 
             payload += f"\n\n--- PRIE INDEX TARGET: {symbol} ---\n"
-            payload += f"[SOURCE URL]: {driver.current_url}\n"
-            payload += f"[PAGE TITLE]: {driver.title}\n"
+            payload += f"[REQUESTED SYMBOL]: {symbol}\n"
+            payload += f"[SOURCE URL]: {diagnostics['current_url']}\n"
+            payload += f"[PAGE TITLE]: {diagnostics['title']}\n"
+
+            # Fail closed if the site silently serves a different instrument or a JS/error shell.
+            current_url_lower = diagnostics["current_url"].lower()
+            body_lower = diagnostics["body_text"].lower()
+            route_mismatch = ("tradingsymbol=" in url.lower() and
+                              f"tradingsymbol={symbol.lower()}" not in current_url_lower)
+            wrong_instrument = (symbol.lower() not in current_url_lower and
+                                "tradingsymbol=" in url.lower() and
+                                any(token in body_lower for token in ("reliance", "stock options")))
+            if diagnostics["fallback_markers"] or route_mismatch or wrong_instrument:
+                valid_rows = []
+                reasons.append(
+                    "Source returned a fallback/error page or did not preserve the requested symbol; "
+                    "data rejected to prevent cross-instrument contamination. "
+                    f"Fallback markers={diagnostics['fallback_markers']}; route_mismatch={route_mismatch}; "
+                    f"wrong_instrument={wrong_instrument}."
+                )
 
             if len(valid_rows) >= 8:
                 ext_state, val_state = "SUCCESS", "VALID"
@@ -261,10 +305,11 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
             else:
                 ext_state = "PARTIAL" if valid_rows else ("FAILED" if is_trading else "NOT_ATTEMPTED")
                 val_state = "INVALID" if is_trading else "NOT_RUN"
-                reasons.append(
-                    f"Strict extraction found {len(valid_rows)} rows; at least 8 structured rows "
-                    "with strike, call/put OI and call/put change-in-OI are required."
-                )
+                if not reasons:
+                    reasons.append(
+                        f"Strict extraction found {len(valid_rows)} rows; at least 8 structured rows "
+                        "with strike, call/put OI and call/put change-in-OI are required."
+                    )
                 payload += (
                     f"[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state}]\n"
                     f"[REASON]: {reasons[0]}\n"
@@ -350,9 +395,22 @@ def extract_sensibull_fii_dii_tabs(driver, manifest_tracker):
                                 rows_captured += 1
                                 if row_index > 0 and any(value.strip() for value in r_data):
                                     data_rows += 1
-                    if data_rows:
+                    header_text = " ".join(
+                        _wsh_norm_key(c.get_text(" ", strip=True))
+                        for tbl in tables[:3]
+                        for row in tbl.find_all("tr")[:1]
+                        for c in row.find_all(["th", "td"])
+                    )
+                    has_participant = any(k in header_text for k in ("participant", "clienttype", "category", "participanttype"))
+                    has_flow = any(k in header_text for k in ("net", "long", "short", "buy", "sell", "oi", "openinterest", "value"))
+                    has_date = any(k in header_text for k in ("date", "day", "expiry"))
+                    if data_rows and has_participant and has_flow and has_date:
                         ext_state, val_state, reasons = "SUCCESS", "PARTIAL", [
-                            "Rows were extracted, but participant/date/net-flow schema has not been independently verified."
+                            "Recognized participant/flow/date-like headers; source-specific semantics and units still require review."
+                        ]
+                    elif data_rows:
+                        ext_state, val_state, reasons = "SUCCESS", "INVALID", [
+                            "Rows exist, but required participant, flow and date-like headers were not all detected."
                         ]
                     else:
                         ext_state, val_state, reasons = "PARTIAL", "INVALID", [
@@ -425,8 +483,14 @@ def extract_ccil_multi_tabs(driver, manifest_tracker):
                     elif len(table_text) < 20:
                         ext_state, val_state = "SUCCESS", "INVALID"
                         reasons = ["Extracted table is empty."]
+                    elif not any(_wsh_has_expected_table_schema(tbl, (("instrument", "security", "tenor", "product", "currency", "market"), ("rate", "yield", "price", "value", "amount", "quote"))) for tbl in tables):
+                        ext_state, val_state = "SUCCESS", "INVALID"
+                        reasons = ["Table content exists, but no table header matched expected instrument/market and rate/value fields; not accepted as valid CCIL data."]
+                        for idx, tbl in enumerate(tables):
+                            payload += f"\n[Diagnostic table #{idx + 1} for {tab_name}; NOT VALIDATED]\n"
+                            payload += re.sub(r"\s+", " ", tbl.get_text(" ", strip=True))[:1200] + "\n"
                     else:
-                        ext_state, val_state, reasons = "SUCCESS", "VALID", []
+                        ext_state, val_state, reasons = "SUCCESS", "PARTIAL", ["Header pattern matched, but source-specific CCIL market isolation and units still require verification."]
                         for idx, tbl in enumerate(tables):
                             payload += f"\n[Table #{idx + 1} for {tab_name}]\n"
                             for row in tbl.find_all('tr'):
@@ -546,8 +610,18 @@ def execute_wsh_institutional_pipeline():
     with open(os.path.join(folder_path, f"WSH_GSSE_Data_Package_{run_date_str}.txt"), "w", encoding="utf-8") as f:
         f.write(gsse_payload)
         
+    # Record the exact script fingerprint in a small provenance file for run-to-code auditing.
+    try:
+        with open(__file__, "rb") as source_file:
+            source_hash = hashlib.sha256(source_file.read()).hexdigest()
+        with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-19_SAFE-GATES_1\n")
+            fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
+    except Exception as e:
+        print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
+
     manifest.save_manifest(folder_path)
-    print(f"\n[PIPELINE COMPLETE] Multi-dimensional institutional packages generated successfully.")
+    print(f"\n[PIPELINE COMPLETE] Collection completed; inspect per-dataset validation states before using data.")
 
 if __name__ == "__main__":
     execute_wsh_institutional_pipeline()
