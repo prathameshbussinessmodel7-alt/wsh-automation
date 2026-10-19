@@ -295,10 +295,10 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
 # 2. SENSIBULL FII/DII PARTICIPANT POSITIONING ADAPTER (PRIE)
 # ==========================================================
 def extract_sensibull_fii_dii_tabs(driver, manifest_tracker):
-    payload = f"\n\n==================================================\n"
-    payload += f"WSH PRIE: FII/DII PARTICIPANT POSITIONING (TAB FINGERPRINTING)\n"
-    payload += f"==================================================\n"
-    
+    payload = "\n\n==================================================\n"
+    payload += "WSH PRIE: FII/DII PARTICIPANT POSITIONING (TAB FINGERPRINTING)\n"
+    payload += "==================================================\n"
+
     tabs = ["Summary", "Futures and Options", "Cash Market", "FII History"]
     seen_content_signatures = set()
     pub_state = "PUBLISHED" if is_market_trading_day() else "MARKET_CLOSED"
@@ -307,53 +307,79 @@ def extract_sensibull_fii_dii_tabs(driver, manifest_tracker):
         driver.get("https://web.sensibull.com/fii-dii-data")
         WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         time.sleep(6)
-        
+
         for tab_name in tabs:
             payload += f"\n\n--- PRIE FII/DII TAB TARGET: {tab_name} ---\n"
+            dataset_key = f"fii_dii_{tab_name.lower().replace(' ', '_')}"
             try:
-                tab_xpath = f"//*[self::button or self::a or self::div or self::span][normalize-space(text())='{tab_name}']"
-                tab_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
+                tab_xpath = (
+                    f"//*[self::button or self::a or self::div or self::span]"
+                    f"[normalize-space(text())='{tab_name}']"
+                )
+                tab_element = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, tab_xpath))
+                )
                 driver.execute_script("arguments[0].click();", tab_element)
                 time.sleep(4)
-                
-                soup = BeautifulSoup(driver.page_source, 'html.parser')
-                tables = soup.find_all('table')
-                
-                rows_captured = 0
-                table_signature = ""
-                if tables:
-                    table_signature = tables[0].get_text(strip=True)[:150]
-                    
-                    # Cross-Tab Fingerprinting Contamination Check
-                    if table_signature in seen_content_signatures and tab_name != "Summary":
-                        ext_state, val_state = "SUCCESS", "QUARANTINED"
-                        reasons = ["Cross-tab fingerprint match: Identical table leaked across tabs."]
-                        payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state} | Reason: {reasons[0]}]\n"
-                    else:
-                        seen_content_signatures.add(table_signature)
-                        ext_state, val_state, reasons = "SUCCESS", "VALID", []
-                        payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state}]\n"
-                        for idx, tbl in enumerate(tables):
-                            payload += f"\n[Table #{idx + 1} for {tab_name}]\n"
-                            for row in tbl.find_all('tr'):
-                                cols = row.find_all(['td', 'th'])
-                                r_data = [c.get_text(strip=True) for c in cols]
-                                if r_data:
-                                    payload += " | ".join(r_data) + "\n"
-                                    rows_captured += 1
-                else:
-                    ext_state, val_state = "FAILED", "INVALID"
-                    reasons = ["No tables rendered."]
-                    payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state}]\n"
-                
-                manifest_tracker.record_dataset("Sensibull", f"fii_dii_{tab_name.lower().replace(' ', '_')}", pub_state, ext_state, val_state, ["participant", "net_flow", "date"], rows_captured, reasons)
 
+                soup = BeautifulSoup(driver.page_source, "html.parser")
+                tables = soup.find_all("table")
+                rows_captured = 0
+                data_rows = 0
+                signature_parts = []
+
+                for tbl in tables:
+                    signature_parts.append(re.sub(r"\s+", " ", tbl.get_text(" ", strip=True)).strip())
+                table_signature = "||".join(signature_parts)
+
+                if not tables or not table_signature.strip("| "):
+                    ext_state, val_state = "FAILED", "INVALID"
+                    reasons = ["No non-empty tables rendered."]
+                elif table_signature in seen_content_signatures and tab_name != "Summary":
+                    ext_state, val_state = "SUCCESS", "QUARANTINED"
+                    reasons = ["Cross-tab fingerprint match: all rendered table content duplicates an earlier tab."]
+                else:
+                    seen_content_signatures.add(table_signature)
+                    for idx, tbl in enumerate(tables):
+                        payload += f"\n[Table #{idx + 1} for {tab_name}]\n"
+                        for row_index, row in enumerate(tbl.find_all("tr")):
+                            cols = row.find_all(["td", "th"])
+                            r_data = [c.get_text(" ", strip=True) for c in cols]
+                            if r_data:
+                                payload += " | ".join(r_data) + "\n"
+                                rows_captured += 1
+                                if row_index > 0 and any(value.strip() for value in r_data):
+                                    data_rows += 1
+                    if data_rows:
+                        ext_state, val_state, reasons = "SUCCESS", "PARTIAL", [
+                            "Rows were extracted, but participant/date/net-flow schema has not been independently verified."
+                        ]
+                    else:
+                        ext_state, val_state, reasons = "PARTIAL", "INVALID", [
+                            "Tables rendered but no data rows were found."
+                        ]
+
+                payload += (
+                    f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | "
+                    f"VAL: {val_state} | Rows: {rows_captured}]\n"
+                )
+                if reasons:
+                    payload += "[REASON]: " + "; ".join(reasons) + "\n"
+
+                manifest_tracker.record_dataset(
+                    "Sensibull", dataset_key, pub_state, ext_state, val_state,
+                    ["participant", "net_flow", "date"], rows_captured, reasons
+                )
             except Exception as e:
-                manifest_tracker.record_dataset("Sensibull", f"fii_dii_{tab_name.lower().replace(' ', '_')}", pub_state, "FAILED", "INVALID", ["participant"], 0, [str(e)])
-                
+                reasons = [f"{type(e).__name__}: {e}"]
+                payload += f"[STATUS -> PUB: {pub_state} | EXT: FAILED | VAL: INVALID | REASON: {reasons[0]}]\n"
+                manifest_tracker.record_dataset(
+                    "Sensibull", dataset_key, pub_state, "FAILED", "INVALID",
+                    ["participant", "net_flow", "date"], 0, reasons
+                )
     except Exception as e:
-        payload += f"\n[Portal Error: {str(e)}]\n"
-        
+        payload += f"\n[Portal Error: {type(e).__name__}: {e}]\n"
+
     return payload
 
 # ==========================================================
@@ -429,33 +455,57 @@ def extract_ccil_multi_tabs(driver, manifest_tracker):
 # 4. TRADINGECONOMICS ADAPTER (GSSE)
 # ==========================================================
 def extract_tradingeconomics_page(driver, url, dataset_key, manifest_tracker):
-    payload = f"\n\n==================================================\n"
+    payload = "\n\n==================================================\n"
     payload += f"WSH GSSE: TRADINGECONOMICS EXTRACTION: {url}\n"
-    payload += f"==================================================\n"
+    payload += "==================================================\n"
     pub_state = "PUBLISHED"
     try:
         driver.get(url)
+        WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         time.sleep(5)
-        
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        tables = soup.find_all('table')
-        
-        if tables:
-            payload += f"\n[STATUS -> PUB: {pub_state} | EXT: SUCCESS | VAL: VALID | Tables: {len(tables)}]\n"
-            for idx, tbl in enumerate(tables):
-                payload += f"\n[Table #{idx + 1}]\n"
-                for row in tbl.find_all('tr'):
-                    cols = row.find_all(['td', 'th'])
-                    r_data = [c.get_text(strip=True) for c in cols]
-                    if r_data:
-                        payload += " | ".join(r_data) + "\n"
-            manifest_tracker.record_dataset("TradingEconomics", dataset_key, pub_state, "SUCCESS", "VALID", ["indicator", "actual", "previous"], len(tables))
+
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        tables = soup.find_all("table")
+        rows_captured = 0
+        data_rows = 0
+
+        for idx, tbl in enumerate(tables):
+            payload += f"\n[Table #{idx + 1}]\n"
+            rows = tbl.find_all("tr")
+            for row_index, row in enumerate(rows):
+                cols = row.find_all(["td", "th"])
+                r_data = [c.get_text(" ", strip=True) for c in cols]
+                if r_data:
+                    payload += " | ".join(r_data) + "\n"
+                    rows_captured += 1
+                    if row_index > 0 and any(value.strip() for value in r_data):
+                        data_rows += 1
+
+        if data_rows > 0:
+            ext_state, val_state = "SUCCESS", "PARTIAL"
+            reasons = [
+                "Table rows extracted; indicator/actual/previous fields and source-specific record schema still require validation."
+            ]
+            payload += (
+                f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state} | "
+                f"Tables: {len(tables)} | Data rows: {data_rows}]\n"
+            )
         else:
-            manifest_tracker.record_dataset("TradingEconomics", dataset_key, pub_state, "FAILED", "INVALID", ["indicator"], 0, ["No tables found"])
-            
+            ext_state, val_state = ("FAILED", "INVALID") if not tables else ("PARTIAL", "INVALID")
+            reasons = ["No usable table data rows found."]
+            payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state} | Data rows: 0]\n"
+
+        manifest_tracker.record_dataset(
+            "TradingEconomics", dataset_key, pub_state, ext_state, val_state,
+            ["indicator", "actual", "previous"], rows_captured, reasons
+        )
     except Exception as e:
-        manifest_tracker.record_dataset("TradingEconomics", dataset_key, pub_state, "FAILED", "INVALID", ["indicator"], 0, [str(e)])
-        
+        reasons = [f"{type(e).__name__}: {e}"]
+        payload += f"\n[STATUS -> PUB: {pub_state} | EXT: FAILED | VAL: INVALID | REASON: {reasons[0]}]\n"
+        manifest_tracker.record_dataset(
+            "TradingEconomics", dataset_key, pub_state, "FAILED", "INVALID",
+            ["indicator", "actual", "previous"], 0, reasons
+        )
     return payload
 
 # ==========================================================
@@ -476,17 +526,17 @@ def execute_wsh_institutional_pipeline():
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
     driver = webdriver.Chrome(options=chrome_options)
+    try:
+        prie_payload = f"=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - {timestamp_str} ===\\n"
+        prie_payload += extract_sensibull_option_chains(driver, manifest)
+        prie_payload += extract_sensibull_fii_dii_tabs(driver, manifest)
 
-    prie_payload = f"=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - {timestamp_str} ===\n"
-    prie_payload += extract_sensibull_option_chains(driver, manifest)
-    prie_payload += extract_sensibull_fii_dii_tabs(driver, manifest)
-    
-    gsse_payload = f"=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - {timestamp_str} ===\n"
-    gsse_payload += extract_ccil_multi_tabs(driver, manifest)
-    gsse_payload += extract_tradingeconomics_page(driver, "https://tradingeconomics.com/bonds", "gsse_sovereign_bonds", manifest)
-    gsse_payload += extract_tradingeconomics_page(driver, "https://tradingeconomics.com/calendar", "gsse_macro_calendar", manifest)
-
-    driver.quit()
+        gsse_payload = f"=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - {timestamp_str} ===\\n"
+        gsse_payload += extract_ccil_multi_tabs(driver, manifest)
+        gsse_payload += extract_tradingeconomics_page(driver, "https://tradingeconomics.com/bonds", "gsse_sovereign_bonds", manifest)
+        gsse_payload += extract_tradingeconomics_page(driver, "https://tradingeconomics.com/calendar", "gsse_macro_calendar", manifest)
+    finally:
+        driver.quit()
 
     run_date_str = datetime.datetime.now().strftime('%Y%m%d_%H%M')
     
