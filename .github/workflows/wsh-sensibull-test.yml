@@ -2,7 +2,9 @@ name: WSH Sensibull Decoder Test
 
 on:
   workflow_dispatch:
-
+  push:
+    branches:
+      - wsh-collector-rnd
 permissions:
   contents: read
 
