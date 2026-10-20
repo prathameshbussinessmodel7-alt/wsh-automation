@@ -4,6 +4,9 @@ import datetime
 import json
 import re
 import hashlib
+import base64
+import gzip
+import math
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,7 +21,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-19_ADAPTIVE-SENSIBULL_2",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-20_WS-CAPTURE_1",
             "datasets": {}
         }
 
@@ -67,6 +70,178 @@ def _wsh_has_expected_table_schema(table, required_groups):
         return False
     headers = {_wsh_norm_key(c.get_text(" ", strip=True)) for c in rows[0].find_all(["th", "td"])}
     return all(any(_wsh_norm_key(alias) in headers for alias in aliases) for aliases in required_groups)
+
+
+# ==========================================================
+# SENSIBULL WEBSOCKET BINARY FRAME CAPTURE + VALIDATION
+# ==========================================================
+_WSH_GZIP_MAGIC = b"\x1f\x8b\x08"
+_WSH_REQUIRED_WS_FIELDS = (
+    "instrument_token", "last_price", "oi", "oi_change",
+    "oi_change_quantity", "volume", "best_buy_price", "best_sell_price"
+)
+
+
+def _wsh_unpack_ws_payload(payload_text):
+    """Decode Chrome DevTools WebSocket payloadData candidates safely.
+
+    Chrome versions may expose binary payloadData as base64 or a text-like
+    representation. Only bytes containing a valid GZIP member are accepted.
+    """
+    if not isinstance(payload_text, str) or not payload_text:
+        return None
+    candidates = []
+    try:
+        candidates.append(base64.b64decode(payload_text, validate=False))
+    except Exception:
+        pass
+    try:
+        compact = re.sub(r"\s+", "", payload_text)
+        if compact and len(compact) % 2 == 0 and re.fullmatch(r"[0-9a-fA-F]+", compact):
+            candidates.append(bytes.fromhex(compact))
+    except Exception:
+        pass
+    candidates.append(payload_text.encode("latin-1", errors="ignore"))
+    for raw in candidates:
+        offset = raw.find(_WSH_GZIP_MAGIC)
+        if offset < 0:
+            continue
+        try:
+            decoded = gzip.decompress(raw[offset:])
+            data = json.loads(decoded.decode("utf-8"))
+            if isinstance(data, dict) and isinstance(data.get("chain"), dict):
+                return {"raw": raw, "gzip_offset": offset, "data": data}
+        except (OSError, EOFError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+    return None
+
+
+def _wsh_ws_chain_rows(data):
+    """Normalize a decoded Sensibull option-chain message and validate fields."""
+    chain = data.get("chain")
+    if not isinstance(chain, dict):
+        return [], ["Decoded message has no chain object"]
+    rows, issues, seen = [], [], set()
+    for strike_text, sides in chain.items():
+        try:
+            strike = float(strike_text)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(strike) or strike <= 0 or not isinstance(sides, dict):
+            continue
+        row = {"strike": strike}
+        for side in ("call", "put"):
+            obj = sides.get(side)
+            if not isinstance(obj, dict):
+                issues.append(f"strike {strike:g}: missing {side} object")
+                continue
+            missing = [field for field in _WSH_REQUIRED_WS_FIELDS if field not in obj]
+            if missing:
+                issues.append(f"strike {strike:g} {side}: missing {','.join(missing)}")
+            for key, value in obj.items():
+                row[f"{side}_{key}"] = value
+        if strike not in seen:
+            seen.add(strike)
+            rows.append(row)
+    rows.sort(key=lambda x: x["strike"])
+    if len(rows) < 8:
+        issues.append(f"Only {len(rows)} unique strike rows; minimum acceptance threshold is 8")
+    return rows, issues
+
+
+def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, output_folder="WSH_Automated_Reports"):
+    """Capture option-chain frames emitted by the authenticated Sensibull page.
+
+    This does not perform or bypass Zerodha authentication. If the GitHub runner
+    is not authenticated, or the market is closed and no suitable frame arrives,
+    it records an explicit failure/partial status instead of substituting stale
+    or fabricated values.
+    """
+    dataset_key = f"sensibull_ws_{symbol.lower()}_{expiry}"
+    captured_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    result = {"symbol": symbol, "requested_expiry": expiry, "captured_at_utc": captured_at,
+              "status": "NOT_CAPTURED", "frames_seen": 0, "rows": [], "summary": {}, "reasons": []}
+    try:
+        logs = driver.get_log("performance")
+    except Exception as exc:
+        logs = []
+        result["reasons"].append(f"Chrome performance log unavailable: {type(exc).__name__}: {exc}")
+    parsed = []
+    for entry in logs:
+        try:
+            envelope = json.loads(entry.get("message", "{}"))
+            message = envelope.get("message", {})
+            if message.get("method") != "Network.webSocketFrameReceived":
+                continue
+            params = message.get("params", {})
+            response = params.get("response", {})
+            result["frames_seen"] += 1
+            if int(response.get("opcode", 0)) != 2:
+                continue
+            decoded = _wsh_unpack_ws_payload(response.get("payloadData", ""))
+            if decoded:
+                parsed.append(decoded)
+        except (ValueError, TypeError, KeyError):
+            continue
+    # Some browser versions deliver frames after the first log drain. Wait and drain once more.
+    deadline = time.time() + 3
+    while time.time() < deadline and not parsed:
+        time.sleep(0.5)
+        try:
+            logs = driver.get_log("performance")
+        except Exception:
+            logs = []
+        for entry in logs:
+            try:
+                envelope = json.loads(entry.get("message", "{}"))
+                message = envelope.get("message", {})
+                if message.get("method") != "Network.webSocketFrameReceived":
+                    continue
+                response = message.get("params", {}).get("response", {})
+                result["frames_seen"] += 1
+                if int(response.get("opcode", 0)) == 2:
+                    decoded = _wsh_unpack_ws_payload(response.get("payloadData", ""))
+                    if decoded:
+                        parsed.append(decoded)
+            except (ValueError, TypeError, KeyError):
+                continue
+    matching = []
+    for item in parsed:
+        data = item["data"]
+        encoded_expiry = item["raw"][:item["gzip_offset"]]
+        expiry_match = re.search(rb"20\d{6}", encoded_expiry)
+        encoded = expiry_match.group(0).decode("ascii") if expiry_match else None
+        if encoded and encoded != expiry.replace("-", ""):
+            continue
+        rows, issues = _wsh_ws_chain_rows(data)
+        if rows and not issues:
+            matching.append((item, data, rows, encoded))
+    if matching:
+        item, data, rows, encoded = max(matching, key=lambda x: len(x[2]))
+        result.update({"status": "STRUCTURE_PASS", "rows": rows,
+                       "encoded_expiry": encoded,
+                       "summary": {key: data.get(key) for key in ("atm_strike", "atm_iv", "atm_iv_change", "atm_iv_percentile", "pcr", "max_pain_strike", "atm_ivp_type", "future_price")},
+                       "binary_message_sha256": hashlib.sha256(item["raw"]).hexdigest(),
+                       "decompressed_json_sha256": hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
+                       "reasons": []})
+        os.makedirs(output_folder, exist_ok=True)
+        safe_expiry = expiry.replace("-", "")
+        outfile = os.path.join(output_folder, f"WSH_Sensibull_WS_{symbol}_{safe_expiry}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+        with open(outfile, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        result["output_file"] = outfile
+        pub = "MARKET_CLOSED" if not is_market_trading_day() else "PUBLISHED"
+        val = "PARTIAL" if pub == "MARKET_CLOSED" else "PARTIAL"
+        reason = ["Payload structure validated. This does not establish market freshness; market status must be confirmed separately."]
+        manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, pub, "SUCCESS", val,
+            ["symbol", "expiry", "strike", "call_oi", "put_oi", "call_change_oi", "put_change_oi"], len(rows), reason)
+    else:
+        reason = result["reasons"] or ["No binary WebSocket frame decoded into a matching GZIP-compressed option-chain payload. This can occur without an authenticated Sensibull session or when the market is closed."]
+        result["reasons"] = reason
+        pub = "MARKET_CLOSED" if not is_market_trading_day() else "PUBLISHED"
+        manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, pub, "FAILED", "INVALID",
+            ["symbol", "expiry", "strike", "call_oi", "put_oi"], 0, reason)
+    return result
 
 
 # ==========================================================
@@ -422,6 +597,11 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
                 driver.get(url)
                 WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
                 time.sleep(5)
+                # Capture binary WebSocket payloads from this page in addition to HTML.
+                ws_result = capture_sensibull_ws_option_chain(driver, symbol, expiry["date"], manifest_tracker)
+                payload += (f"\n[WEBSOCKET CAPTURE]: status={ws_result['status']} "
+                            f"frames_seen={ws_result['frames_seen']} rows={len(ws_result['rows'])} "
+                            f"reasons={'; '.join(ws_result['reasons'])}\n")
                 rows,soup,diag=_wsh_extract_option_rows_from_current_page(driver)
                 current=diag['current_url'].lower()
                 route_ok=(f'tradingsymbol={symbol.lower()}' in current and f'expiry={expiry["date"]}' in current)
@@ -703,8 +883,14 @@ def execute_wsh_institutional_pipeline():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    # Required for Chrome DevTools Network.webSocketFrameReceived events.
+    chrome_options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     driver = webdriver.Chrome(options=chrome_options)
+    try:
+        driver.execute_cdp_cmd("Network.enable", {})
+    except Exception as exc:
+        print(f"[WEBSOCKET CAPTURE WARNING] CDP Network.enable failed: {exc}")
     try:
         prie_payload = f"=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - {timestamp_str} ===\\n"
         prie_payload += extract_sensibull_option_chains(driver, manifest)
@@ -731,7 +917,7 @@ def execute_wsh_institutional_pipeline():
         with open(__file__, "rb") as source_file:
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
-            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-19_ADAPTIVE-SENSIBULL_2\n")
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-20_WS-CAPTURE_1\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as e:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
