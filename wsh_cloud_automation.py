@@ -149,6 +149,24 @@ def _wsh_ws_chain_rows(data):
     return rows, issues
 
 
+
+def _wsh_clear_performance_logs(driver):
+    """Drain old performance events so a new contract capture starts clean."""
+    try:
+        driver.get_log("performance")
+        return True
+    except Exception:
+        return False
+
+
+def _wsh_contract_route_matches(driver, symbol, expiry):
+    """Require the browser to remain on the requested option-chain route."""
+    current = str(getattr(driver, "current_url", "")).lower()
+    wanted_symbol = f"tradingsymbol={symbol.lower()}"
+    wanted_expiry = f"expiry={expiry.lower()}"
+    return wanted_symbol in current and wanted_expiry in current, current
+
+
 def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, output_folder="WSH_Automated_Reports"):
     """Capture option-chain frames emitted by the authenticated Sensibull page.
 
@@ -159,8 +177,16 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
     """
     dataset_key = f"sensibull_ws_{symbol.lower()}_{expiry}"
     captured_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    route_ok, current_url = _wsh_contract_route_matches(driver, symbol, expiry)
     result = {"symbol": symbol, "requested_expiry": expiry, "captured_at_utc": captured_at,
+              "page_url_at_capture": current_url, "route_identity_check": "PASS" if route_ok else "FAIL",
               "status": "NOT_CAPTURED", "frames_seen": 0, "rows": [], "summary": {}, "reasons": []}
+    if not route_ok:
+        reason = f"Current page route does not match requested contract {symbol} {expiry}: {current_url}"
+        result["reasons"] = [reason]
+        manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, "PUBLISHED", "FAILED", "INVALID",
+            ["symbol", "expiry", "strike", "call_oi", "put_oi"], 0, [reason])
+        return result
     try:
         logs = driver.get_log("performance")
     except Exception as exc:
@@ -211,15 +237,19 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
         encoded_expiry = item["raw"][:item["gzip_offset"]]
         expiry_match = re.search(rb"20\d{6}", encoded_expiry)
         encoded = expiry_match.group(0).decode("ascii") if expiry_match else None
-        if encoded and encoded != expiry.replace("-", ""):
+        # Contract acceptance is strict: an absent expiry is not a match.
+        if not encoded or encoded != expiry.replace("-", ""):
             continue
         rows, issues = _wsh_ws_chain_rows(data)
         if rows and not issues:
             matching.append((item, data, rows, encoded))
     if matching:
         item, data, rows, encoded = max(matching, key=lambda x: len(x[2]))
-        result.update({"status": "STRUCTURE_PASS", "rows": rows,
+        result.update({"status": "EXPIRY_MATCHED_STRUCTURE_PASS", "rows": rows,
                        "encoded_expiry": encoded,
+                       "identity_limitations": ["Expiry matched to the requested contract.",
+                           "Underlying identity is not independently proven by the decoded payload unless the payload itself exposes it.",
+                           "Freshness is not proven by structural validation; compare capture time and live source state."],
                        "summary": {key: data.get(key) for key in ("atm_strike", "atm_iv", "atm_iv_change", "atm_iv_percentile", "pcr", "max_pain_strike", "atm_ivp_type", "future_price")},
                        "binary_message_sha256": hashlib.sha256(item["raw"]).hexdigest(),
                        "decompressed_json_sha256": hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
@@ -232,7 +262,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
         result["output_file"] = outfile
         pub = "MARKET_CLOSED" if not is_market_trading_day() else "PUBLISHED"
         val = "PARTIAL" if pub == "MARKET_CLOSED" else "PARTIAL"
-        reason = ["Payload structure validated. This does not establish market freshness; market status must be confirmed separately."]
+        reason = ["Payload structure and encoded expiry validated. Underlying identity is not independently proven unless exposed by the payload; market freshness must be confirmed separately."]
         manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, pub, "SUCCESS", val,
             ["symbol", "expiry", "strike", "call_oi", "put_oi", "call_change_oi", "put_change_oi"], len(rows), reason)
     else:
@@ -594,6 +624,8 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
             payload+=f'\n--- OPTION CHAIN INDEX: {symbol} ---\n[DISCOVERED EXPIRIES]: '+', '.join(x['date'] for x in expiry_candidates)+'\n'
             for expiry in expiry_candidates:
                 url=f'https://web.sensibull.com/option-chain?view=all&tradingsymbol={symbol}&expiry={expiry["date"]}'
+                # Prevent frames from a previously visited index/expiry contaminating this capture.
+                _wsh_clear_performance_logs(driver)
                 driver.get(url)
                 WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
                 time.sleep(5)
