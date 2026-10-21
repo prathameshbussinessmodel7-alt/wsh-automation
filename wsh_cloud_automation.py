@@ -561,6 +561,12 @@ def extract_sensibull_oi_vs_strike(driver, manifest_tracker):
             expiries=_wsh_discover_expiry_checkboxes(driver)
             if not expiries:
                 reasons=['No expiry checkbox labels with parseable dates were discovered in the rendered page.']
+                # Emit evidence directly to Actions logs; package-only diagnostics are easy to miss.
+                try:
+                    checkbox_evidence = driver.execute_script("""return Array.from(document.querySelectorAll('input[type=checkbox]')).map((el)=>({checked:!!el.checked, text:((el.labels&&el.labels.length)?Array.from(el.labels).map(x=>x.innerText||'').join(' '):((el.closest('label')||el.parentElement||{}).innerText||'')).replace(/\\s+/g,' ').trim()})).slice(0,40);""") or []
+                except Exception as diag_exc:
+                    checkbox_evidence = [{'diagnostic_error': f'{type(diag_exc).__name__}: {diag_exc}'}]
+                print(f"[WSH ACQUISITION DIAGNOSTIC] adapter=oi_vs_strike symbol={symbol} requested_url={url!r} resolved_url={diagnostics['current_url']!r} title={diagnostics['title']!r} fallback_markers={diagnostics['fallback_markers']!r} checkbox_count={len(checkbox_evidence)} checkbox_evidence={json.dumps(checkbox_evidence, ensure_ascii=False)[:2500]} body_excerpt={diagnostics['body_text'][:700]!r}")
                 manifest_tracker.record_dataset('Sensibull',f'oi_vs_strike_{symbol.lower()}',pub_state,'FAILED','INVALID',
                     ['expiry_selection','strike','call_oi','put_oi'],0,reasons)
                 payload+='[STATUS: FAILED / INVALID]\n[REASON]: '+reasons[0]+'\n'
@@ -617,6 +623,14 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
             expiry_candidates=_wsh_discover_expiry_checkboxes(driver)
             if not expiry_candidates:
                 reason='Could not discover expiry dates from the rendered Sensibull expiry checkboxes.'
+                try:
+                    checkbox_evidence = driver.execute_script("""return Array.from(document.querySelectorAll('input[type=checkbox]')).map((el)=>({checked:!!el.checked, text:((el.labels&&el.labels.length)?Array.from(el.labels).map(x=>x.innerText||'').join(' '):((el.closest('label')||el.parentElement||{}).innerText||'')).replace(/\\s+/g,' ').trim()})).slice(0,40);""") or []
+                except Exception as diag_exc:
+                    checkbox_evidence = [{'diagnostic_error': f'{type(diag_exc).__name__}: {diag_exc}'}]
+                current_url = str(getattr(driver, 'current_url', ''))
+                current_title = str(getattr(driver, 'title', ''))
+                body_excerpt = re.sub(r'\s+', ' ', BeautifulSoup(driver.page_source, 'html.parser').get_text(' ', strip=True))[:700]
+                print(f"[WSH ACQUISITION DIAGNOSTIC] adapter=option_chain_discovery symbol={symbol} requested_url={discover_url!r} resolved_url={current_url!r} title={current_title!r} checkbox_count={len(checkbox_evidence)} checkbox_evidence={json.dumps(checkbox_evidence, ensure_ascii=False)[:2500]} body_excerpt={body_excerpt!r}")
                 manifest_tracker.record_dataset('Sensibull',f'option_chain_{symbol.lower()}_discovery',pub_state,'FAILED','INVALID',
                     ['symbol','expiry','strike','call_oi','put_oi'],0,[reason])
                 payload+=f'\n--- OPTION CHAIN {symbol} ---\n[STATUS: FAILED / INVALID] {reason}\n'
@@ -634,6 +648,7 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
                 payload += (f"\n[WEBSOCKET CAPTURE]: status={ws_result['status']} "
                             f"frames_seen={ws_result['frames_seen']} rows={len(ws_result['rows'])} "
                             f"reasons={'; '.join(ws_result['reasons'])}\n")
+                print(f"[WSH WEBSOCKET RESULT] symbol={symbol} expiry={expiry['date']} status={ws_result['status']} route_identity={ws_result.get('route_identity_check')} frames_seen={ws_result.get('frames_seen')} rows={len(ws_result.get('rows', []))} reasons={json.dumps(ws_result.get('reasons', []), ensure_ascii=False)}")
                 rows,soup,diag=_wsh_extract_option_rows_from_current_page(driver)
                 current=diag['current_url'].lower()
                 route_ok=(f'tradingsymbol={symbol.lower()}' in current and f'expiry={expiry["date"]}' in current)
@@ -955,6 +970,12 @@ def execute_wsh_institutional_pipeline():
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
 
     manifest.save_manifest(folder_path)
+    from collections import Counter
+    validation_counts = Counter(item.get('validation_status', 'UNKNOWN') for item in manifest.manifest.get('datasets', {}).values())
+    print(f"[WSH QUALITY SUMMARY] dataset_count={len(manifest.manifest.get('datasets', {}))} validation_counts={json.dumps(dict(validation_counts), sort_keys=True)}")
+    for dataset_name, item in manifest.manifest.get('datasets', {}).items():
+        if item.get('validation_status') != 'VALID':
+            print(f"[WSH DATASET NONPASS] dataset={dataset_name} extraction={item.get('extraction_status')} validation={item.get('validation_status')} records={item.get('records_extracted')} reasons={json.dumps(item.get('failure_reasons', []), ensure_ascii=False)}")
     print(f"\n[PIPELINE COMPLETE] Collection completed; inspect per-dataset validation states before using data.")
 
 if __name__ == "__main__":
