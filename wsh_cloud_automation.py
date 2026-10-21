@@ -618,6 +618,22 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
         try:
             discover_url=f'https://web.sensibull.com/option-chain?view=all&tradingsymbol={symbol}'
             driver.get(discover_url)
+            # Non-invasive browser-runtime probe: distinguish JS execution from app boot/access failures.
+            try:
+                runtime_probe = driver.execute_script("""return {
+                    user_agent: (navigator && navigator.userAgent) || '',
+                    webdriver: !!(navigator && navigator.webdriver),
+                    window_type: typeof window,
+                    document_type: typeof document,
+                    ready_state: document ? document.readyState : 'unavailable',
+                    script_count: document ? document.scripts.length : -1,
+                    title: document ? document.title : '',
+                    body_text: document && document.body ? (document.body.innerText || '').slice(0,900) : '',
+                    url: location ? location.href : ''
+                };""")
+                print(f"[WSH BROWSER RUNTIME] symbol={symbol} requested_url={discover_url!r} resolved_url={getattr(driver, 'current_url', '')!r} probe={json.dumps(runtime_probe, ensure_ascii=False)[:3500]}")
+            except Exception as runtime_exc:
+                print(f"[WSH BROWSER RUNTIME ERROR] symbol={symbol} requested_url={discover_url!r} resolved_url={getattr(driver, 'current_url', '')!r} error={type(runtime_exc).__name__}: {runtime_exc}")
             WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
             time.sleep(4)
             expiry_candidates=_wsh_discover_expiry_checkboxes(driver)
