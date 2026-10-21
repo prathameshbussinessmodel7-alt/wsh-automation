@@ -607,7 +607,7 @@ def extract_sensibull_oi_vs_strike(driver, manifest_tracker):
 def extract_sensibull_option_chains(driver, manifest_tracker):
     """Collect the separate expiry-specific Option Chain page.
 
-    Expiry candidates are discovered from the OI-vs-Strike expiry UI rather than
+    Expiry candidates are discovered from the option-chain page's rendered UI rather than
     hard-coded. The page is still marked invalid unless structured numeric
     strike records can be extracted and the symbol/expiry route is preserved.
     """
@@ -616,7 +616,7 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
     pub_state='PUBLISHED' if is_market_trading_day() else 'MARKET_CLOSED'
     for symbol in symbols:
         try:
-            discover_url=f'https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol={symbol}'
+            discover_url=f'https://web.sensibull.com/option-chain?view=all&tradingsymbol={symbol}'
             driver.get(discover_url)
             WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
             time.sleep(4)
