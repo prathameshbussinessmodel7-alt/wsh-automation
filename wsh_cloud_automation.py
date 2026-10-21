@@ -21,7 +21,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-20_WS-CAPTURE_1",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-21_EXPIRY-FALLBACK_1",
             "datasets": {}
         }
 
@@ -627,9 +627,12 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
                     document_type: typeof document,
                     ready_state: document ? document.readyState : 'unavailable',
                     script_count: document ? document.scripts.length : -1,
+                    script_sources: document ? Array.from(document.scripts).map(s => s.src || '[inline]').slice(0,20) : [],
+                    resource_scripts: (performance && performance.getEntriesByType) ? performance.getEntriesByType('resource').filter(r => /\.js([?#]|$)|javascript/i.test(r.name)).map(r => ({name:r.name,duration_ms:Math.round(r.duration),transfer_size:r.transferSize||0})).slice(-20) : [],
                     title: document ? document.title : '',
                     body_text: document && document.body ? (document.body.innerText || '').slice(0,900) : '',
-                    url: location ? location.href : ''
+                    url: location ? location.href : '',
+                    js_execution_probe: (function(){ try { return (1+1===2) ? 'PASS' : 'FAIL'; } catch(e) { return 'ERROR'; } })()
                 };""")
                 print(f"[WSH BROWSER RUNTIME] symbol={symbol} requested_url={discover_url!r} resolved_url={getattr(driver, 'current_url', '')!r} probe={json.dumps(runtime_probe, ensure_ascii=False)[:3500]}")
             except Exception as runtime_exc:
@@ -637,8 +640,39 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
             WebDriverWait(driver,20).until(EC.presence_of_element_located((By.TAG_NAME,'body')))
             time.sleep(4)
             expiry_candidates=_wsh_discover_expiry_checkboxes(driver)
+            expiry_discovery_source='checkboxes'
             if not expiry_candidates:
-                reason='Could not discover expiry dates from the rendered Sensibull expiry checkboxes.'
+                # Fallback: Sensibull may expose the current option-chain snapshot as
+                # server-rendered text even when its expiry checkbox React UI did not boot.
+                # Discover only dates actually present in the page; never inject a fixed ladder.
+                try:
+                    visible_text = driver.execute_script("return (document.body && document.body.innerText) || ''") or ''
+                except Exception:
+                    visible_text = BeautifulSoup(driver.page_source, 'html.parser').get_text(' ', strip=True)
+                month_map={m.lower():i for i,m in enumerate(
+                    ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],1)}
+                today=datetime.date.today()
+                seen_dates=set()
+                for match in re.finditer(r'\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:\s+(20\d{2}))?\b', visible_text, re.I):
+                    day=int(match.group(1)); month=month_map[match.group(2).lower()]
+                    year=int(match.group(3)) if match.group(3) else today.year
+                    try:
+                        expiry_date=datetime.date(year, month, day)
+                    except ValueError:
+                        continue
+                    if not match.group(3) and expiry_date < today - datetime.timedelta(days=2):
+                        expiry_date=datetime.date(year+1, month, day)
+                    if expiry_date < today - datetime.timedelta(days=2):
+                        continue
+                    iso=expiry_date.isoformat()
+                    if iso not in seen_dates:
+                        seen_dates.add(iso)
+                        expiry_candidates.append({'date':iso,'label':match.group(0),'index':-1,'checked':False})
+                if expiry_candidates:
+                    expiry_discovery_source='visible_page_text_fallback'
+                    print(f"[WSH EXPIRY FALLBACK] symbol={symbol} source={expiry_discovery_source} candidates={json.dumps(expiry_candidates, ensure_ascii=False)}")
+            if not expiry_candidates:
+                reason='Could not discover expiry dates from either rendered expiry checkboxes or visible page text.'
                 try:
                     checkbox_evidence = driver.execute_script("""return Array.from(document.querySelectorAll('input[type=checkbox]')).map((el)=>({checked:!!el.checked, text:((el.labels&&el.labels.length)?Array.from(el.labels).map(x=>x.innerText||'').join(' '):((el.closest('label')||el.parentElement||{}).innerText||'')).replace(/\\s+/g,' ').trim()})).slice(0,40);""") or []
                 except Exception as diag_exc:
@@ -651,7 +685,7 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
                     ['symbol','expiry','strike','call_oi','put_oi'],0,[reason])
                 payload+=f'\n--- OPTION CHAIN {symbol} ---\n[STATUS: FAILED / INVALID] {reason}\n'
                 continue
-            payload+=f'\n--- OPTION CHAIN INDEX: {symbol} ---\n[DISCOVERED EXPIRIES]: '+', '.join(x['date'] for x in expiry_candidates)+'\n'
+            payload+=f'\n--- OPTION CHAIN INDEX: {symbol} ---\n[EXPIRY DISCOVERY SOURCE]: {expiry_discovery_source}\n[DISCOVERED EXPIRIES]: '+', '.join(x['date'] for x in expiry_candidates)+'\n'
             for expiry in expiry_candidates:
                 url=f'https://web.sensibull.com/option-chain?view=all&tradingsymbol={symbol}&expiry={expiry["date"]}'
                 # Prevent frames from a previously visited index/expiry contaminating this capture.
@@ -941,7 +975,9 @@ def execute_wsh_institutional_pipeline():
     manifest = InstitutionalQualityManifest()
     
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--start-maximized")
@@ -980,7 +1016,7 @@ def execute_wsh_institutional_pipeline():
         with open(__file__, "rb") as source_file:
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
-            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-20_WS-CAPTURE_1\n")
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-21_EXPIRY-FALLBACK_1\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as e:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
