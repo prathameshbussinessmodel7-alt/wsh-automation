@@ -1,0 +1,89 @@
+
+name: WSH Diagnostics v7 Offline Quote Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - wsh-collector-rnd
+    paths:
+      - '.github/workflows/wsh-diagnostics-v7-offline-audit.yml'
+      - 'wsh_cloud_automation_ws_diagnostics_v6.py'
+      - 'test_wsh_ws_regression_v6.py'
+      - 'wsh_v7_quote_audit_replay.py'
+      - 'WSH-collector-39948804037.zip'
+      - 'requirements.txt'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsh-diagnostics-v7-offline-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout experimental branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install collector dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Verify required audit files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          required = [
+              "wsh_cloud_automation_ws_diagnostics_v6.py",
+              "test_wsh_ws_regression_v6.py",
+              "wsh_v7_quote_audit_replay.py",
+              "WSH-collector-39948804037.zip",
+              "requirements.txt",
+          ]
+
+          missing = [name for name in required if not Path(name).is_file()]
+          if missing:
+              raise SystemExit(
+                  "AUDIT BLOCKED: required files missing: " + ", ".join(missing)
+              )
+
+          print("AUDIT_INPUT_CHECK_PASS: all required files are present.")
+          PY
+
+      - name: Compile diagnostic candidate and regression test
+        run: |
+          python -m py_compile wsh_cloud_automation_ws_diagnostics_v6.py
+          python -m py_compile test_wsh_ws_regression_v6.py
+          python -m py_compile wsh_v7_quote_audit_replay.py
+
+      - name: Run baseline regression test
+        run: python test_wsh_ws_regression_v6.py
+
+      - name: Run v7 quote audit against preserved payloads
+        run: python wsh_v7_quote_audit_replay.py
+
+      - name: Upload audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wsh-v7-quote-audit-${{ github.run_id }}
+          path: |
+            WSH_V7_Audit_Evidence/
+            wsh_cloud_automation_ws_diagnostics_v6.py
+            test_wsh_ws_regression_v6.py
+            wsh_v7_quote_audit_replay.py
+            WSH-collector-39948804037.zip
+          if-no-files-found: warn
+          retention-days: 7
