@@ -21,7 +21,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_3",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_4_QUOTE_AUDIT_V7",
             "datasets": {}
         }
 
@@ -152,19 +152,34 @@ def _wsh_ws_chain_rows(data):
 
 
 def _wsh_quote_and_field_diagnostics(rows):
-    """Diagnose required-field, null, zero-quote and numeric defects without repairing values."""
+    """Audit quote integrity and preserve row/field evidence without repairing source values.
+
+    v7 adds per-field quote-state counts and raw-value evidence so a zero quote,
+    explicit null, absent key, malformed value, and negative value cannot be
+    conflated in downstream debugging.
+    """
     findings = {"one_sided_zero_quotes": [], "both_sides_zero": [],
                 "crossed_quotes": [], "negative_value_fields": [],
                 "explicit_null_counts": {}, "absent_field_counts": {},
                 "invalid_numeric_fields": [], "required_field_defects": [],
-                "rows_examined": len(rows)}
+                "quote_field_audit": {}, "rows_examined": len(rows),
+                "diagnostic_schema_version": "WSH_QUOTE_AUDIT_V7"}
     numeric_fields = ("last_price", "oi", "oi_change", "oi_change_quantity", "volume",
                       "best_buy_price", "best_sell_price")
     nonnegative_fields = {"last_price", "oi", "volume", "best_buy_price", "best_sell_price"}
+    quote_fields = ("best_buy_price", "best_sell_price")
+
+    def bump(field_key, state):
+        bucket = findings["quote_field_audit"].setdefault(
+            field_key, {"present": 0, "absent": 0, "explicit_null": 0,
+                        "zero": 0, "positive": 0, "negative": 0,
+                        "malformed_or_nonfinite": 0})
+        bucket[state] += 1
+
     for index, row in enumerate(rows):
         strike = row.get("strike")
         for side in ("call", "put"):
-            # Required contract fields must be present and non-null; zero is not substituted for missing data.
+            # Required contract fields must be present and non-null; zero is never substituted.
             for field in _WSH_REQUIRED_WS_FIELDS:
                 key = f"{side}_{field}"
                 if key not in row:
@@ -173,21 +188,55 @@ def _wsh_quote_and_field_diagnostics(rows):
                 elif row[key] is None:
                     findings["explicit_null_counts"][key] = findings["explicit_null_counts"].get(key, 0) + 1
                     findings["required_field_defects"].append({"row": index, "strike": strike, "field": key, "defect": "explicit_null"})
+
             bid_key, ask_key = f"{side}_best_buy_price", f"{side}_best_sell_price"
             bid, ask = row.get(bid_key), row.get(ask_key)
-            if isinstance(bid, (int, float)) and not isinstance(bid, bool) and isinstance(ask, (int, float)) and not isinstance(ask, bool):
+            # Keep state counts separate for every raw quote field.
+            for field, key, value in (("best_buy_price", bid_key, bid), ("best_sell_price", ask_key, ask)):
+                if key not in row:
+                    bump(key, "absent")
+                elif value is None:
+                    bump(key, "present")
+                    bump(key, "explicit_null")
+                elif isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                    bump(key, "present")
+                    bump(key, "malformed_or_nonfinite")
+                    findings["invalid_numeric_fields"].append({"row": index, "strike": strike, "field": key, "value_repr": repr(value)[:120]})
+                else:
+                    bump(key, "present")
+                    if value == 0:
+                        bump(key, "zero")
+                    elif value > 0:
+                        bump(key, "positive")
+                    else:
+                        bump(key, "negative")
+                        findings["negative_value_fields"].append({"row": index, "strike": strike, "field": key, "value": value})
+
+            bid_numeric = isinstance(bid, (int, float)) and not isinstance(bid, bool) and math.isfinite(bid)
+            ask_numeric = isinstance(ask, (int, float)) and not isinstance(ask, bool) and math.isfinite(ask)
+            if bid_numeric and ask_numeric:
                 if bid > 0 and ask == 0:
                     findings["one_sided_zero_quotes"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask, "classification": "positive_bid_zero_ask"})
                 elif bid == 0 and ask > 0:
                     findings["one_sided_zero_quotes"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask, "classification": "zero_bid_positive_ask"})
                 elif bid == 0 and ask == 0:
-                    findings["both_sides_zero"].append({"row": index, "strike": strike, "side": side})
+                    findings["both_sides_zero"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask, "classification": "both_quotes_zero"})
                 if bid > 0 and ask > 0 and bid > ask:
-                    findings["crossed_quotes"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask})
+                    findings["crossed_quotes"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask, "classification": "crossed_bid_above_ask"})
+            else:
+                # A quote pair that cannot be evaluated is explicitly represented, not treated as clean.
+                if (bid_key not in row or bid is None or not bid_numeric or
+                        ask_key not in row or ask is None or not ask_numeric):
+                    findings.setdefault("unevaluable_quote_pairs", []).append({
+                        "row": index, "strike": strike, "side": side,
+                        "bid_present": bid_key in row, "bid_raw": repr(bid)[:120],
+                        "ask_present": ask_key in row, "ask_raw": repr(ask)[:120],
+                        "classification": "missing_null_or_non_numeric_quote"})
+
         for side in ("call", "put"):
             for field in numeric_fields:
                 key = f"{side}_{field}"
-                if key not in row or row[key] is None:
+                if field in quote_fields or key not in row or row[key] is None:
                     continue
                 value = row[key]
                 if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
@@ -200,6 +249,7 @@ def _wsh_quote_and_field_diagnostics(rows):
     findings["negative_value_count"] = len(findings["negative_value_fields"])
     findings["invalid_numeric_count"] = len(findings["invalid_numeric_fields"])
     findings["required_field_defect_count"] = len(findings["required_field_defects"])
+    findings["unevaluable_quote_pair_count"] = len(findings.get("unevaluable_quote_pairs", []))
     return findings
 
 
@@ -1162,7 +1212,7 @@ def execute_wsh_institutional_pipeline():
         with open(__file__, "rb") as source_file:
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
-            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_3\n")
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_4_QUOTE_AUDIT_V7\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as e:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
