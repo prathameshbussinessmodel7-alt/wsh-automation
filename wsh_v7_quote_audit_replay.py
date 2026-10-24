@@ -6,7 +6,9 @@ report while retaining identity and freshness as unverified unless proven by
 independent source evidence.
 """
 from __future__ import annotations
-import importlib.util
+import ast
+import math
+import re
 import json
 import pathlib
 import sys
@@ -18,14 +20,28 @@ BASELINE_ZIP = pathlib.Path("WSH-collector-39948804037.zip")
 OUTDIR = pathlib.Path("WSH_V7_Audit_Evidence")
 
 def load_candidate():
-    spec = importlib.util.spec_from_file_location("wsh_candidate_v7", CANDIDATE)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Cannot load candidate module: {CANDIDATE}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    for name in ("_wsh_quote_and_field_diagnostics",):
-        if not hasattr(module, name):
-            raise RuntimeError(f"Candidate missing required diagnostic function: {name}")
+    # Extract only the pure diagnostic function; offline replay must not need
+    # Selenium, Chrome, or a live browser runtime.
+    source = CANDIDATE.read_text(encoding="utf-8")
+    compile(source, str(CANDIDATE), "exec")
+    tree = ast.parse(source, filename=str(CANDIDATE))
+    node = next((item for item in tree.body
+                 if isinstance(item, ast.FunctionDef)
+                 and item.name == "_wsh_quote_and_field_diagnostics"), None)
+    if node is None:
+        raise RuntimeError("Candidate missing _wsh_quote_and_field_diagnostics")
+    namespace = {
+        "math": math,
+        "_WSH_REQUIRED_WS_FIELDS": (
+            "instrument_token", "last_price", "oi", "oi_change",
+            "oi_change_quantity", "volume", "best_buy_price", "best_sell_price"
+        ),
+    }
+    exec(compile(ast.Module(body=[node], type_ignores=[]), str(CANDIDATE), "exec"), namespace)
+    class DiagnosticModule:
+        pass
+    module = DiagnosticModule()
+    module._wsh_quote_and_field_diagnostics = namespace["_wsh_quote_and_field_diagnostics"]
     return module
 
 def main():
@@ -66,12 +82,28 @@ def main():
                     raise ValueError("payload 'rows' is not a list")
                 findings = module._wsh_quote_and_field_diagnostics(rows)
                 dataset = str(payload.get("symbol") or pathlib.Path(name).name)
+                # Never reuse the payload's stored status as a quote-quality verdict:
+                # it may have been assigned by an older collector version.
+                blocking_counts = {
+                    "one_sided_zero_quotes": findings.get("one_sided_zero_count", 0),
+                    "both_sides_zero_quotes": findings.get("both_sides_zero_count", 0),
+                    "crossed_quotes": findings.get("crossed_quote_count", 0),
+                    "negative_value_fields": findings.get("negative_value_count", 0),
+                    "invalid_numeric_fields": findings.get("invalid_numeric_count", 0),
+                    "required_field_defects": findings.get("required_field_defect_count", 0),
+                }
+                quote_blockers = {key: value for key, value in blocking_counts.items() if value > 0}
+                quote_quality_status = "BLOCKED" if quote_blockers else "PASS"
+                # PASS here means only that these specific quote/field checks found
+                # no defects. It is not instrument identity, freshness, or acceptance.
                 report["datasets"][dataset] = {
                     "source_file": pathlib.Path(name).name,
                     "requested_expiry": payload.get("requested_expiry"),
                     "captured_at_utc": payload.get("captured_at_utc"),
                     "route_identity_check": payload.get("route_identity_check"),
-                    "status": payload.get("status"),
+                    "source_stored_status_untrusted_for_reaudit": payload.get("status"),
+                    "recomputed_quote_quality_status": quote_quality_status,
+                    "quote_blockers": quote_blockers,
                     "rows_examined": len(rows),
                     "diagnostics": findings,
                     "identity_status": "UNVERIFIED",
@@ -94,6 +126,12 @@ def main():
         "identity_status": "UNVERIFIED",
         "freshness_status": "UNVERIFIED",
         "institutional_acceptance": "NOT_GRANTED",
+        "quote_quality_blocked_datasets": sum(
+            1 for item in report["datasets"].values()
+            if item.get("recomputed_quote_quality_status") == "BLOCKED"),
+        "quote_quality_pass_datasets": sum(
+            1 for item in report["datasets"].values()
+            if item.get("recomputed_quote_quality_status") == "PASS"),
         "report": str(report_path),
     }
     (OUTDIR / "WSH_V7_Quote_Audit_Summary.json").write_text(
@@ -103,6 +141,9 @@ def main():
     if report["errors"] or len(report["datasets"]) != 4:
         print("AUDIT_RESULT=PARTIAL_OR_FAILED")
         sys.exit(2)
+    blocked = summary["quote_quality_blocked_datasets"]
+    print(f"QUOTE_QUALITY_GATE: {blocked} dataset(s) BLOCKED; {summary['quote_quality_pass_datasets']} dataset(s) passed quote/field checks only.")
+    print("IDENTITY_FRESHNESS_GATE: UNVERIFIED; institutional acceptance NOT_GRANTED.")
     print("AUDIT_RESULT=COMPLETE_OFFLINE_ONLY")
 
 if __name__ == "__main__":
