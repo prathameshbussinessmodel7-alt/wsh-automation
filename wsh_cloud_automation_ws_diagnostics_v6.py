@@ -1222,3 +1222,4 @@ def execute_wsh_institutional_pipeline():
 
 if __name__ == "__main__":
     execute_wsh_institutional_pipeline()
+
