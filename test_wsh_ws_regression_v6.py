@@ -23,6 +23,12 @@ EXPECTED = {
     "NIFTY":     {"rows": 81, "one_sided": 0, "both_zero": 0, "nulls": 0},
     "SENSEX":    {"rows": 81, "one_sided": 0, "both_zero": 136, "nulls": 34},
 }
+EXPECTED_QUALITY = {
+    "BANKNIFTY": "PASS",
+    "FINNIFTY": "BLOCKED",
+    "NIFTY": "PASS",
+    "SENSEX": "BLOCKED",
+}
 REQUIRED_FIELDS = (
     "instrument_token", "last_price", "oi", "oi_change",
     "oi_change_quantity", "volume", "best_buy_price", "best_sell_price"
@@ -127,12 +133,20 @@ def main():
                 raise AssertionError(f"{symbol}: missing independent identity must remain UNVERIFIED, got {identity['status']}")
             if freshness["status"] != "UNVERIFIED":
                 raise AssertionError(f"{symbol}: missing per-quote source timestamps must remain UNVERIFIED, got {freshness['status']}")
+            blockers = any(got[key] > 0 for key in ("one_sided", "both_zero", "nulls"))
+            computed_quality = "BLOCKED" if blockers else "PASS"
+            if computed_quality != EXPECTED_QUALITY[symbol]:
+                raise AssertionError(
+                    f"{symbol}: expected quote-quality disposition {EXPECTED_QUALITY[symbol]}, got {computed_quality}"
+                )
+            got["quote_quality"] = computed_quality
 
     if set(observed) != set(EXPECTED):
         raise AssertionError(f"Expected all four indices; found {sorted(observed)}")
     print("REGRESSION_PASS: candidate syntax valid; all four baseline payloads replayed.")
     for symbol in ("NIFTY", "BANKNIFTY", "FINNIFTY", "SENSEX"):
         print(f"{symbol}: {json.dumps(observed[symbol], sort_keys=True)}")
+    print("QUOTE_QUALITY_GATE_PASS: FINNIFTY/SENSEX blocked; NIFTY/BANKNIFTY pass quote/field checks only.")
     print("ACCEPTANCE_GUARD_PASS: identity and freshness remain UNVERIFIED; no institutional acceptance granted.")
 
 if __name__ == "__main__":
