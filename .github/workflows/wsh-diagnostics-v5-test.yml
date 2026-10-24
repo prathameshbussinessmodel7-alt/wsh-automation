@@ -3,6 +3,9 @@ name: WSH Diagnostics v5 Isolated Test
 
 'on':
   workflow_dispatch:
+  push:
+    branches:
+      - wsh-collector-rnd
 
 permissions:
   contents: read
