@@ -21,7 +21,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_2",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_3",
             "datasets": {}
         }
 
@@ -154,11 +154,13 @@ def _wsh_ws_chain_rows(data):
 def _wsh_quote_and_field_diagnostics(rows):
     """Diagnose required-field, null, zero-quote and numeric defects without repairing values."""
     findings = {"one_sided_zero_quotes": [], "both_sides_zero": [],
+                "crossed_quotes": [], "negative_value_fields": [],
                 "explicit_null_counts": {}, "absent_field_counts": {},
                 "invalid_numeric_fields": [], "required_field_defects": [],
                 "rows_examined": len(rows)}
     numeric_fields = ("last_price", "oi", "oi_change", "oi_change_quantity", "volume",
                       "best_buy_price", "best_sell_price")
+    nonnegative_fields = {"last_price", "oi", "volume", "best_buy_price", "best_sell_price"}
     for index, row in enumerate(rows):
         strike = row.get("strike")
         for side in ("call", "put"):
@@ -180,6 +182,8 @@ def _wsh_quote_and_field_diagnostics(rows):
                     findings["one_sided_zero_quotes"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask, "classification": "zero_bid_positive_ask"})
                 elif bid == 0 and ask == 0:
                     findings["both_sides_zero"].append({"row": index, "strike": strike, "side": side})
+                if bid > 0 and ask > 0 and bid > ask:
+                    findings["crossed_quotes"].append({"row": index, "strike": strike, "side": side, "bid": bid, "ask": ask})
         for side in ("call", "put"):
             for field in numeric_fields:
                 key = f"{side}_{field}"
@@ -188,8 +192,12 @@ def _wsh_quote_and_field_diagnostics(rows):
                 value = row[key]
                 if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
                     findings["invalid_numeric_fields"].append({"row": index, "strike": strike, "field": key, "value_repr": repr(value)[:120]})
+                elif field in nonnegative_fields and value < 0:
+                    findings["negative_value_fields"].append({"row": index, "strike": strike, "field": key, "value": value})
     findings["one_sided_zero_count"] = len(findings["one_sided_zero_quotes"])
     findings["both_sides_zero_count"] = len(findings["both_sides_zero"])
+    findings["crossed_quote_count"] = len(findings["crossed_quotes"])
+    findings["negative_value_count"] = len(findings["negative_value_fields"])
     findings["invalid_numeric_count"] = len(findings["invalid_numeric_fields"])
     findings["required_field_defect_count"] = len(findings["required_field_defects"])
     return findings
@@ -427,6 +435,8 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
             or quote_diagnostics["both_sides_zero_count"]
             or quote_diagnostics["invalid_numeric_count"]
             or quote_diagnostics["required_field_defect_count"]
+            or quote_diagnostics["crossed_quote_count"]
+            or quote_diagnostics["negative_value_count"]
         )
         # Route/expiry/structure success must never imply instrument identity or freshness success.
         result.update({"status": "STRUCTURAL_DATA_ISSUES" if has_quote_defects else "EXPIRY_MATCHED_STRUCTURE_PASS",
@@ -460,6 +470,10 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
             reason.append(f"Required-field blocker: {quote_diagnostics['required_field_defect_count']} missing or explicit-null required fields; raw values preserved.")
         if quote_diagnostics["invalid_numeric_count"]:
             reason.append(f"Quote integrity blocker: {quote_diagnostics['invalid_numeric_count']} invalid numeric field values; raw values preserved.")
+        if quote_diagnostics["crossed_quote_count"]:
+            reason.append(f"Quote integrity blocker: {quote_diagnostics['crossed_quote_count']} crossed bid/ask quotes (bid greater than ask); raw values preserved.")
+        if quote_diagnostics["negative_value_count"]:
+            reason.append(f"Quote integrity blocker: {quote_diagnostics['negative_value_count']} negative values in fields expected to be non-negative; raw values preserved.")
         reason.append(f"Underlying identity diagnostic: {identity_diagnostics['status']} — {identity_diagnostics['reason']}")
         reason.append(f"Quote freshness diagnostic: {freshness_diagnostics['status']} — {freshness_diagnostics['reason']}")
         manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, pub, "SUCCESS", val,
@@ -1123,12 +1137,12 @@ def execute_wsh_institutional_pipeline():
     except Exception as exc:
         print(f"[WEBSOCKET CAPTURE WARNING] CDP Network.enable failed: {exc}")
     try:
-        prie_payload = f"=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - {timestamp_str} ===\\n"
+        prie_payload = f"=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - {timestamp_str} ===\n"
         prie_payload += extract_sensibull_option_chains(driver, manifest)
         prie_payload += extract_sensibull_oi_vs_strike(driver, manifest)
         prie_payload += extract_sensibull_fii_dii_tabs(driver, manifest)
 
-        gsse_payload = f"=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - {timestamp_str} ===\\n"
+        gsse_payload = f"=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - {timestamp_str} ===\n"
         gsse_payload += extract_ccil_multi_tabs(driver, manifest)
         gsse_payload += extract_tradingeconomics_page(driver, "https://tradingeconomics.com/bonds", "gsse_sovereign_bonds", manifest)
         gsse_payload += extract_tradingeconomics_page(driver, "https://tradingeconomics.com/calendar", "gsse_macro_calendar", manifest)
@@ -1148,7 +1162,7 @@ def execute_wsh_institutional_pipeline():
         with open(__file__, "rb") as source_file:
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
-            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_2\n")
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-24_WS-CAPTURE_3\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as e:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
