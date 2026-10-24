@@ -6,7 +6,7 @@ on:
     branches:
       - wsh-collector-rnd
     paths:
-      - '.github/workflows/wsh-diagnostics-v5-test.yml'
+      - '.github/workflows/wsh-diagnostics-v6-test.yml'
       - 'wsh_cloud_automation_ws_diagnostics_v6.py'
       - 'test_wsh_ws_regression_v6.py'
       - 'WSH-collector-39948804037.zip'
