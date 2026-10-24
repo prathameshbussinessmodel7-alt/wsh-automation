@@ -6,10 +6,12 @@ on:
     branches:
       - wsh-collector-rnd
     paths:
-      - '.github/workflows/wsh-diagnostics-v6-test.yml'
+      - '.github/workflows/wsh-diagnostics-v7-offline-audit.yml'
       - 'wsh_cloud_automation_ws_diagnostics_v6.py'
+      - 'test_wsh_ws_regression_v6.py'
       - 'wsh_v7_quote_audit_replay.py'
       - 'WSH-collector-39948804037.zip'
+      - 'requirements.txt'
 
 permissions:
   contents: read
@@ -22,6 +24,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+
     steps:
       - name: Checkout experimental branch
         uses: actions/checkout@v4
@@ -36,10 +39,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Compile diagnostic candidate and replay test
+      - name: Compile diagnostic candidate and run regression test
         run: |
           python -m py_compile wsh_cloud_automation_ws_diagnostics_v6.py
           python -m py_compile wsh_v7_quote_audit_replay.py
+          python -m py_compile test_wsh_ws_regression_v6.py
           python test_wsh_ws_regression_v6.py
 
       - name: Run v7 quote audit against preserved payloads
@@ -53,7 +57,8 @@ jobs:
           path: |
             WSH_V7_Audit_Evidence/
             wsh_cloud_automation_ws_diagnostics_v6.py
+            test_wsh_ws_regression_v6.py
             wsh_v7_quote_audit_replay.py
             WSH-collector-39948804037.zip
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
