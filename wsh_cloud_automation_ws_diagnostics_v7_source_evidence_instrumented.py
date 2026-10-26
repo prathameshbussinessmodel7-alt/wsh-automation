@@ -117,6 +117,38 @@ def _wsh_unpack_ws_payload(payload_text):
 
 
 
+def _wsh_record_failed_frame_evidence(evidence, payload, opcode, decode_diag):
+    """Record bounded evidence for failed frames without retaining unbounded payloads.
+
+    Exact payload hashes/lengths are always retained when the payload is a string.
+    Up to three failed-frame samples retain the complete representation only when
+    it is at most 16 KiB; larger representations are truncated and explicitly marked.
+    """
+    samples = evidence.setdefault("failed_frame_samples", [])
+    if len(samples) >= 3:
+        evidence["failed_frame_samples_omitted"] = evidence.get("failed_frame_samples_omitted", 0) + 1
+        return
+    is_text = isinstance(payload, str)
+    encoded = payload.encode("utf-8") if is_text else b""
+    max_chars = 16 * 1024
+    representation = payload if is_text and len(payload) <= max_chars else (payload[:max_chars] if is_text else None)
+    samples.append({
+        "frame_id": f"ws-failed-{evidence.get('websocket_events', 0)}",
+        "source": "Chrome DevTools Network.webSocketFrameReceived.params.response.payloadData",
+        "opcode": opcode,
+        "payload_data_type": type(payload).__name__,
+        "payload_data_length_characters": len(payload) if is_text else None,
+        "payload_data_utf8_length_bytes": len(encoded) if is_text else None,
+        "payload_data_sha256_utf8": hashlib.sha256(encoded).hexdigest() if is_text else None,
+        "payload_data_representation_sample": representation,
+        "payload_data_representation_complete": bool(is_text and len(payload) <= max_chars),
+        "payload_data_truncated": bool(is_text and len(payload) > max_chars),
+        "decoder_failure_stage": decode_diag.get("failure_stage"),
+        "decoder_failure_reason": decode_diag.get("failure_reason") or decode_diag.get("failure_stage"),
+        "candidate_representations_tried": decode_diag.get("candidate_representations_tried", []),
+    })
+
+
 def _wsh_unpack_ws_payload_with_diagnostics(payload_text):
     """Decode one frame and report stage outcomes without logging its contents."""
     diag = {
@@ -529,7 +561,8 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
               "frame_evidence": {"websocket_events": 0, "binary_frames": 0, "text_frames": 0,
                                  "other_opcode_frames": 0, "payload_missing_or_wrong_type": 0,
                                  "decode_successes": 0, "decode_failures_by_stage": {},
-                                 "sample_frames": []}}
+                                 "sample_frames": [], "failed_frame_samples": [],
+                                 "failed_frame_samples_omitted": 0}}
     if not route_ok:
         reason = f"Current page route does not match requested contract {symbol} {expiry}: {current_url}"
         result["reasons"] = [reason]
@@ -595,6 +628,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
             else:
                 stage = decode_diag["failure_stage"] or "UNKNOWN"
                 evidence["decode_failures_by_stage"][stage] = evidence["decode_failures_by_stage"].get(stage, 0) + 1
+                _wsh_record_failed_frame_evidence(evidence, payload, opcode, decode_diag)
         except (ValueError, TypeError, KeyError):
             continue
     # Some browser versions deliver frames after the first log drain. Wait and drain once more.
@@ -657,6 +691,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
                 else:
                     stage = decode_diag["failure_stage"] or "UNKNOWN"
                     evidence["decode_failures_by_stage"][stage] = evidence["decode_failures_by_stage"].get(stage, 0) + 1
+                _wsh_record_failed_frame_evidence(evidence, payload, opcode, decode_diag)
             except (ValueError, TypeError, KeyError):
                 continue
     evidence = result["frame_evidence"]
