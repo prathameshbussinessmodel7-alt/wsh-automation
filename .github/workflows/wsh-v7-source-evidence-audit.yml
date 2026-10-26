@@ -1,0 +1,54 @@
+
+name: WSH V7 Source Evidence Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - wsh-collector-rnd
+    paths:
+      - 'wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py'
+      - 'wsh_v7_source_evidence_audit.py'
+      - '.github/workflows/wsh-v7-source-evidence-audit.yml'
+      - 'WSH-collector-39948804037.zip'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsh-v7-source-evidence-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Static source-evidence audit (no live collection)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out experimental branch
+        uses: actions/checkout@v4
+        with:
+          ref: wsh-collector-rnd
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile candidate and audit script
+        run: |
+          python -m py_compile wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py
+          python -m py_compile wsh_v7_source_evidence_audit.py
+
+      - name: Audit instrumentation and preserved evidence
+        run: python wsh_v7_source_evidence_audit.py
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wsh-v7-source-evidence-audit-${{ github.run_id }}
+          path: WSH_V7_Source_Evidence_Audit/
+          if-no-files-found: error
+          retention-days: 14
