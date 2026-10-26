@@ -566,6 +566,19 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
             if not isinstance(payload, str) or not payload:
                 evidence["payload_missing_or_wrong_type"] += 1
             decoded, decode_diag = _wsh_unpack_ws_payload_with_diagnostics(payload)
+            if decoded:
+                decoded["capture_boundary_evidence"] = {
+                    "source": "Chrome DevTools Network.webSocketFrameReceived.params.response.payloadData",
+                    "opcode": opcode,
+                    "payload_data_type": type(payload).__name__,
+                    "payload_data_length_characters": len(payload) if isinstance(payload, str) else None,
+                    "payload_data_utf8_length_bytes": len(payload.encode("utf-8")) if isinstance(payload, str) else None,
+                    "payload_data_sha256_utf8": hashlib.sha256(payload.encode("utf-8")).hexdigest() if isinstance(payload, str) else None,
+                    "payload_data_representation": payload if isinstance(payload, str) else None,
+                    "decoder_selected_representation": decode_diag.get("selected_representation"),
+                    "decoder_selected_bytes_length": len(decoded.get("raw", b"")),
+                    "decoder_selected_bytes_sha256": hashlib.sha256(decoded.get("raw", b"")).hexdigest(),
+                }
             if len(evidence["sample_frames"]) < 20:
                 evidence["sample_frames"].append({
                     "opcode": opcode,
@@ -615,6 +628,19 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
                 if not isinstance(payload, str) or not payload:
                     evidence["payload_missing_or_wrong_type"] += 1
                 decoded, decode_diag = _wsh_unpack_ws_payload_with_diagnostics(payload)
+                if decoded:
+                    decoded["capture_boundary_evidence"] = {
+                        "source": "Chrome DevTools Network.webSocketFrameReceived.params.response.payloadData",
+                        "opcode": opcode,
+                        "payload_data_type": type(payload).__name__,
+                        "payload_data_length_characters": len(payload) if isinstance(payload, str) else None,
+                        "payload_data_utf8_length_bytes": len(payload.encode("utf-8")) if isinstance(payload, str) else None,
+                        "payload_data_sha256_utf8": hashlib.sha256(payload.encode("utf-8")).hexdigest() if isinstance(payload, str) else None,
+                        "payload_data_representation": payload if isinstance(payload, str) else None,
+                        "decoder_selected_representation": decode_diag.get("selected_representation"),
+                        "decoder_selected_bytes_length": len(decoded.get("raw", b"")),
+                        "decoder_selected_bytes_sha256": hashlib.sha256(decoded.get("raw", b"")).hexdigest(),
+                    }
                 if len(evidence["sample_frames"]) < 20:
                     evidence["sample_frames"].append({
                         "opcode": opcode,
@@ -705,9 +731,10 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
             "encoded_expiry": encoded,
             "frames_seen": result["frames_seen"],
             "frame_evidence": result["frame_evidence"],
-            "selected_frame_sha256": hashlib.sha256(item["raw"]).hexdigest(),
+            "capture_boundary_evidence": item.get("capture_boundary_evidence", {}),
+            "decoder_selected_bytes_sha256": hashlib.sha256(item["raw"]).hexdigest(),
             "decompressed_source_json_sha256": hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
-            "source_frame_bytes_base64": base64.b64encode(item["raw"]).decode("ascii"),
+            "decoder_selected_bytes_base64": base64.b64encode(item["raw"]).decode("ascii"),
             "decoded_source_object": data,
             "normalized_rows": rows,
             "note": "Source object and normalized rows are both preserved without repairs. Compare chain[strike][call|put] fields against normalized rows to locate any mapping loss. Identity and freshness remain separately gated."
