@@ -1,0 +1,213 @@
+{
+    "execution_timestamp": "2026-10-27T07:41:33.878597",
+    "datasets": {
+        "option_chain_nifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_banknifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_finnifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_sensex": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "fii_dii_summary": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "VALID",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 7,
+            "failure_reasons": []
+        },
+        "fii_dii_futures_and_options": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: Identical table leaked across tabs."
+            ]
+        },
+        "fii_dii_cash_market": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: Identical table leaked across tabs."
+            ]
+        },
+        "fii_dii_fii_history": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: Identical table leaked across tabs."
+            ]
+        },
+        "ccil_money_market": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "ccil_gsec": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Contamination detected: Gsec table contains Money Market instruments."
+            ]
+        },
+        "ccil_forex": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "ccil_derivatives": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "gsse_sovereign_bonds": {
+            "source": "TradingEconomics",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "VALID",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 6,
+            "failure_reasons": []
+        },
+        "gsse_macro_calendar": {
+            "source": "TradingEconomics",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "VALID",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 600,
+            "failure_reasons": []
+        }
+    }
+}
