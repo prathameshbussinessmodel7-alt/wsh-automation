@@ -20,6 +20,12 @@ CANDIDATE = ROOT / "wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instr
 BASELINE = ROOT / "WSH-collector-39948804037.zip"
 OUTDIR = ROOT / "WSH_V7_Source_Evidence_Audit"
 REPORT = OUTDIR / "source_evidence_audit.json"
+FAILED_FRAME_TEST = ROOT / "test_wsh_v7_failed_frame_evidence.py"
+ISOLATED_WORKFLOW = ROOT / ".github" / "workflows" / "wsh-v7-instrumented-isolated-test.yml"
+if not ISOLATED_WORKFLOW.exists() and (ROOT / "wsh-v7-instrumented-isolated-test-updated.yml").exists():
+    ISOLATED_WORKFLOW = ROOT / "wsh-v7-instrumented-isolated-test-updated.yml"
+elif not ISOLATED_WORKFLOW.exists() and (ROOT / "wsh-v7-instrumented-isolated-test.yml").exists():
+    ISOLATED_WORKFLOW = ROOT / "wsh-v7-instrumented-isolated-test.yml"
 
 REQUIRED_MARKERS = {
     "diagnostic_unpack_helper": "_wsh_unpack_ws_payload_with_diagnostics",
@@ -167,6 +173,65 @@ def main() -> None:
                 "Could not confirm every expected acceptance-gate phrase statically; inspect candidate diff manually."
             )
 
+    # Verify that the failed-frame regression test file exists, contains all expected
+    # cases/assertions, and is actually invoked by the isolated GitHub Actions workflow.
+    expected_test_markers = {
+        "malformed_payload_case": "malformed payload records length/hash/original sample/failure stage",
+        "oversized_payload_case": "oversized payload sample capped at 16 KiB",
+        "non_string_payload_case": "None/bytes/integer payloads handled without fabricated representation",
+        "sample_count_cap_case": "failed-frame samples capped at 3 and omitted count increments",
+        "exact_limit_boundary_case": "payload exactly at 16 KiB boundary remains complete",
+        "no_live_collection_guard": "no browser/network/live collection",
+    }
+    test_source = ""
+    if not FAILED_FRAME_TEST.exists():
+        errors.append(f"Missing failed-frame regression test file: {FAILED_FRAME_TEST.name}")
+    else:
+        test_source = FAILED_FRAME_TEST.read_text(encoding="utf-8")
+        try:
+            compile(test_source, str(FAILED_FRAME_TEST), "exec")
+            ast.parse(test_source, filename=str(FAILED_FRAME_TEST))
+            test_syntax_ok = True
+        except (SyntaxError, ValueError) as exc:
+            test_syntax_ok = False
+            errors.append(f"Failed-frame regression test syntax invalid: {type(exc).__name__}: {exc}")
+        report["instrumentation_checks"]["failed_frame_test_file_syntax"] = {
+            "status": "PASS" if test_syntax_ok else "FAIL",
+            "evidence": FAILED_FRAME_TEST.name,
+        }
+        for check, marker in expected_test_markers.items():
+            passed = marker in test_source
+            report["instrumentation_checks"][f"failed_frame_test_{check}"] = {
+                "status": "PASS" if passed else "FAIL",
+                "evidence": marker,
+            }
+            if not passed:
+                errors.append(f"Failed-frame regression test case missing: {marker}")
+        # The test must extract only the helper AST node and must not import the collector.
+        isolated_helper_only = (
+            '"_wsh_record_failed_frame_evidence"' in test_source
+            and 'exec(compile(mod, "<isolated-failed-frame-evidence-helper>", "exec"), ns)' in test_source
+            and "import wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented" not in test_source
+        )
+        report["instrumentation_checks"]["failed_frame_test_isolated_helper_only"] = {
+            "status": "PASS" if isolated_helper_only else "FAIL",
+            "evidence": "Test extracts the evidence helper AST node; does not import candidate module.",
+        }
+        if not isolated_helper_only:
+            errors.append("Failed-frame regression test is not demonstrably isolated from collector import.")
+
+    if not ISOLATED_WORKFLOW.exists():
+        errors.append(f"Missing isolated workflow: {ISOLATED_WORKFLOW.relative_to(ROOT)}")
+    else:
+        workflow_source = ISOLATED_WORKFLOW.read_text(encoding="utf-8")
+        workflow_invokes_test = "python test_wsh_v7_failed_frame_evidence.py" in workflow_source
+        report["instrumentation_checks"]["isolated_workflow_invokes_failed_frame_tests"] = {
+            "status": "PASS" if workflow_invokes_test else "FAIL",
+            "evidence": "python test_wsh_v7_failed_frame_evidence.py",
+        }
+        if not workflow_invokes_test:
+            errors.append("Isolated workflow does not invoke the failed-frame regression test file.")
+
     if not BASELINE.exists():
         errors.append(f"Missing preserved baseline archive: {BASELINE.name}")
     else:
@@ -251,6 +316,7 @@ def main() -> None:
 
     report["interpretation"].extend([
         "Current candidate evidence fields are checked separately from historical archive contents.",
+        "The failed-frame regression test source and its invocation from the isolated workflow are explicitly checked; this is a static check and does not substitute for observing the test run logs.",
         "The current candidate records bounded failed-frame evidence samples with exact payload length/hash and explicit completeness/truncation flags; this is static verification only.",
         "This audit checks static instrumentation markers and inventories preserved archive evidence; it does not prove live frame capture correctness.",
         "The candidate is compiled but never imported or executed. No Selenium session, browser, network request, or live market collection is started.",
