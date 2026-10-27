@@ -7,6 +7,7 @@ on:
       - wsh-collector-rnd
     paths:
       - 'wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py'
+      - 'test_wsh_v7_failed_frame_evidence.py'
       - '.github/workflows/wsh-v7-instrumented-isolated-test.yml'
 
 permissions:
@@ -119,6 +120,9 @@ jobs:
 
           print("ISOLATED_TESTS_PASS: 5 synthetic decoder cases; live collection was not executed.")
           PY
+
+      - name: Run bounded failed-frame evidence tests (isolated helper only)
+        run: python test_wsh_v7_failed_frame_evidence.py
 
       - name: Confirm this workflow did not run the live collector
         run: echo 'LIVE_COLLECTION=NOT_RUN'
