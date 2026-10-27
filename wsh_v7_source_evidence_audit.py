@@ -181,6 +181,7 @@ def main() -> None:
         "non_string_payload_case": "None/bytes/integer payloads handled without fabricated representation",
         "sample_count_cap_case": "failed-frame samples capped at 3 and omitted count increments",
         "exact_limit_boundary_case": "payload exactly at 16 KiB boundary remains complete",
+        "multibyte_utf8_byte_cap_case": "multibyte payload sample capped at 16 KiB UTF-8 bytes",
         "no_live_collection_guard": "no browser/network/live collection",
     }
     test_source = ""
