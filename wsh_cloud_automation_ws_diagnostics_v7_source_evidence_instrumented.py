@@ -691,7 +691,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
                 else:
                     stage = decode_diag["failure_stage"] or "UNKNOWN"
                     evidence["decode_failures_by_stage"][stage] = evidence["decode_failures_by_stage"].get(stage, 0) + 1
-                _wsh_record_failed_frame_evidence(evidence, payload, opcode, decode_diag)
+                    _wsh_record_failed_frame_evidence(evidence, payload, opcode, decode_diag)
             except (ValueError, TypeError, KeyError):
                 continue
     evidence = result["frame_evidence"]
