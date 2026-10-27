@@ -41,9 +41,24 @@ assert len(s["payload_data_representation_sample"]) == 16 * 1024
 assert s["payload_data_length_characters"] == len(payload)
 assert s["payload_data_sha256_utf8"] == hashlib.sha256(payload.encode("utf-8")).hexdigest()
 assert s["payload_data_representation_complete"] is False and s["payload_data_truncated"] is True
-print("PASS: oversized payload sample capped at 16 KiB with exact hash/length and truncation flags")
+assert s["payload_data_representation_sample_utf8_length_bytes"] <= 16 * 1024
+print("PASS: oversized payload sample capped at 16 KiB UTF-8 bytes with exact hash/length and truncation flags")
 
-# 3: non-string payload is handled without throwing or fabricating payload data.
+# 3: multibyte text is capped by UTF-8 bytes, not Python character count.
+evidence = {"failed_frame_samples": [], "failed_frame_samples_omitted": 0}
+payload = "€" * (16 * 1024)  # 3 UTF-8 bytes per character; character-count cap would exceed 16 KiB.
+record(evidence, payload, 2, diag("JSON_PARSE"))
+s = evidence["failed_frame_samples"][0]
+sample = s["payload_data_representation_sample"]
+assert len(sample.encode("utf-8")) <= 16 * 1024
+assert s["payload_data_representation_sample_utf8_length_bytes"] == len(sample.encode("utf-8"))
+assert s["payload_data_length_characters"] == len(payload)
+assert s["payload_data_utf8_length_bytes"] == len(payload.encode("utf-8"))
+assert s["payload_data_sha256_utf8"] == hashlib.sha256(payload.encode("utf-8")).hexdigest()
+assert s["payload_data_representation_complete"] is False and s["payload_data_truncated"] is True
+print("PASS: multibyte payload sample capped at 16 KiB UTF-8 bytes")
+
+# 4: non-string payload is handled without throwing or fabricating payload data.
 for value in (None, b"binary-frame", 123):
     evidence = {"failed_frame_samples": [], "failed_frame_samples_omitted": 0}
     record(evidence, value, 2, diag("PAYLOAD_TYPE_OR_EMPTY"))
@@ -54,7 +69,7 @@ for value in (None, b"binary-frame", 123):
     assert s["payload_data_representation_complete"] is False
 print("PASS: None/bytes/integer payloads handled without fabricated representation")
 
-# 4: sample count is capped at three; additional failures are counted as omitted.
+# 5: sample count is capped at three; additional failures are counted as omitted.
 evidence = {"failed_frame_samples": [], "failed_frame_samples_omitted": 0}
 for i in range(5):
     record(evidence, f"bad-{i}", 2, diag())
@@ -62,7 +77,7 @@ assert len(evidence["failed_frame_samples"]) == 3
 assert evidence["failed_frame_samples_omitted"] == 2
 print("PASS: failed-frame samples capped at 3 and omitted count increments")
 
-# 5: exact cap boundary is complete, not truncated.
+# 6: exact cap boundary is complete, not truncated.
 evidence = {"failed_frame_samples": [], "failed_frame_samples_omitted": 0}
 payload = "Y" * (16 * 1024)
 record(evidence, payload, 2, diag())
@@ -71,4 +86,4 @@ assert len(s["payload_data_representation_sample"]) == 16 * 1024
 assert s["payload_data_representation_complete"] is True and s["payload_data_truncated"] is False
 print("PASS: payload exactly at 16 KiB boundary remains complete")
 
-print("FAILED_FRAME_EVIDENCE_TESTS_PASS: 5 cases; collector not imported; no browser/network/live collection.")
+print("FAILED_FRAME_EVIDENCE_TESTS_PASS: 6 cases; collector not imported; no browser/network/live collection.")
