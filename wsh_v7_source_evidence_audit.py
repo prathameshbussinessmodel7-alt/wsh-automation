@@ -128,7 +128,7 @@ def main() -> None:
             "failed_frame_helper": "def _wsh_record_failed_frame_evidence(",
             "failed_frame_samples_collection": '"failed_frame_samples"',
             "failed_frame_sample_cap": "len(samples) >= 3",
-            "failed_frame_payload_cap": "max_chars = 16 * 1024",
+            "failed_frame_payload_cap": "max_sample_bytes = 16 * 1024",
             "failed_frame_hash": "payload_data_sha256_utf8",
             "failed_frame_failure_stage": "decoder_failure_stage",
             "failed_frame_truncation_flag": "payload_data_truncated",
