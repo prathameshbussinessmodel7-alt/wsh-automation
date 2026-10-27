@@ -1,0 +1,70 @@
+=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - 2026-10-27 15:43:10 ===
+
+
+==================================================
+WSH PRIE: SENSIBULL OPTION-CHAIN (MULTI-DIMENSIONAL AUDIT)
+==================================================
+
+
+--- PRIE INDEX TARGET: NIFTY ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: INVALID | Reason: Zero valid strike rows found; extracted UI controls or empty grid]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1196.20  | -0.47% | Info | INDIAVIX | 16.4 | -0.8 | PCR | 0.5 | Total Call OI | 2.97Cr | Total Put OI | 1.54Cr | PCR | 0.52 | RELIANCE | 1196.2 | 1100 | 1120 | 1140 | 1160 | 1180 | 1200 | 1220 | 1240 | 1260 | 1280 | 1300 | 0 | 10L | 20L | 30L | 40L | 50L | 60L | RELIANCE 1196.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 27 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (Today) | 23 Nov (27 days) | Stri
+
+
+--- PRIE INDEX TARGET: BANKNIFTY ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: INVALID | Reason: Zero valid strike rows found; extracted UI controls or empty grid]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1196.20  | -0.47% | Info | INDIAVIX | 16.4 | -0.8 | PCR | 0.5 | Total Call OI | 2.97Cr | Total Put OI | 1.54Cr | PCR | 0.52 | RELIANCE | 1196.2 | 1100 | 1120 | 1140 | 1160 | 1180 | 1200 | 1220 | 1240 | 1260 | 1280 | 1300 | 0 | 10L | 20L | 30L | 40L | 50L | 60L | RELIANCE 1196.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 27 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (Today) | 23 Nov (27 days) | Stri
+
+
+--- PRIE INDEX TARGET: FINNIFTY ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: INVALID | Reason: Zero valid strike rows found; extracted UI controls or empty grid]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1196.20  | -0.47% | Info | INDIAVIX | 16.4 | -0.8 | PCR | 0.5 | Total Call OI | 2.97Cr | Total Put OI | 1.54Cr | PCR | 0.52 | RELIANCE | 1196.2 | 1100 | 1120 | 1140 | 1160 | 1180 | 1200 | 1220 | 1240 | 1260 | 1280 | 1300 | 0 | 10L | 20L | 30L | 40L | 50L | 60L | RELIANCE 1196.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 27 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (Today) | 23 Nov (27 days) | Stri
+
+
+--- PRIE INDEX TARGET: SENSEX ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: INVALID | Reason: Zero valid strike rows found; extracted UI controls or empty grid]
+[DEBUG FALLBACK TEXT]: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull | If you're seeing this message, that means  | JavaScript has been disabled on your browser |  , please  | enable JS |  to make this app work. | Home | Analyse | Positions | Watchlist | Login with your broker for real-time prices and trading. | Login | OI Change | Open Interest | Multistrike OI | Option OI vs Time | Fut OI vs Time | RELIANCE |   | 1196.20  | -0.47% | Info | INDIAVIX | 16.4 | -0.8 | PCR | 0.5 | Total Call OI | 2.97Cr | Total Put OI | 1.54Cr | PCR | 0.52 | RELIANCE | 1196.2 | 1100 | 1120 | 1140 | 1160 | 1180 | 1200 | 1220 | 1240 | 1260 | 1280 | 1300 | 0 | 10L | 20L | 30L | 40L | 50L | 60L | RELIANCE 1196.2 | Put OI | Increase | Decrease | Call OI | Increase | Decrease | Show OI change | New | Replay Change | Date | 27 Oct 2026 | 9:15 AM | 7:30 PM | Last 5 mins | Last 10 mins | Last 15 mins | Last 30 mins | Last 1 Hr | Last 2 Hrs | Last 3 Hrs | Full Day | Expiries Included | 27 Oct (Today) | 23 Nov (27 days) | Stri
+
+
+==================================================
+WSH PRIE: FII/DII PARTICIPANT POSITIONING (TAB FINGERPRINTING)
+==================================================
+
+
+--- PRIE FII/DII TAB TARGET: Summary ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: VALID]
+
+[Table #1 for Summary]
+Segment | Bearish | Bullish | Net OI | Change
+
+[Table #2 for Summary]
+Index Futures | Indecisive | -2.21L | 56,048
+Index Options | Medium Bearish |  | -8.61L | -1.13L
+
+[Table #3 for Summary]
+Index Futures | Medium Bearish |  | -12,749 | -41,760
+Index Options |  | Mild Bullish | 1.47L | 68,302
+
+[Table #4 for Summary]
+Index Futures | Indecisive | 1.94L | -13,156
+Index Options |  | Medium Bullish | 8.14L | 41,745
+
+
+--- PRIE FII/DII TAB TARGET: Futures and Options ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED | Reason: Cross-tab fingerprint match: Identical table leaked across tabs.]
+
+
+--- PRIE FII/DII TAB TARGET: Cash Market ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED | Reason: Cross-tab fingerprint match: Identical table leaked across tabs.]
+
+
+--- PRIE FII/DII TAB TARGET: FII History ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED | Reason: Cross-tab fingerprint match: Identical table leaked across tabs.]
