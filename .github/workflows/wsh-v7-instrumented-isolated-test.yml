@@ -1,0 +1,128 @@
+name: WSH V7 Instrumented Isolated Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - wsh-collector-rnd
+    paths:
+      - 'wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py'
+      - 'test_wsh_v7_failed_frame_evidence.py'
+      - '.github/workflows/wsh-v7-instrumented-isolated-test.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsh-v7-instrumented-isolated-test-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  isolated-decoder-tests:
+    name: Syntax and synthetic decoder tests (no live collection)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out experimental branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify candidate exists
+        run: test -f wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py
+
+      - name: Compile candidate without executing it
+        run: python -m py_compile wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py
+
+      - name: Run synthetic tests against isolated diagnostic helper
+        shell: bash
+        run: |
+          python - <<'PY'
+          import ast
+          import base64
+          import gzip
+          import hashlib
+          import json
+          import re
+          from pathlib import Path
+
+          source_path = Path("wsh_cloud_automation_ws_diagnostics_v7_source_evidence_instrumented.py")
+          source = source_path.read_text(encoding="utf-8")
+          tree = ast.parse(source, filename=str(source_path))
+          function_node = next(
+              (node for node in tree.body
+               if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+               and node.name == "_wsh_unpack_ws_payload_with_diagnostics"),
+              None,
+          )
+          assert function_node is not None, "diagnostic decoder helper not found"
+
+          # Execute only the helper AST node. Do not import the collector or execute __main__.
+          isolated_tree = ast.Module(body=[function_node], type_ignores=[])
+          ast.fix_missing_locations(isolated_tree)
+          namespace = {
+              "base64": base64,
+              "gzip": gzip,
+              "hashlib": hashlib,
+              "json": json,
+              "re": re,
+              "_WSH_GZIP_MAGIC": b"\x1f\x8b\x08",
+          }
+          exec(compile(isolated_tree, "<isolated-diagnostic-helper>", "exec"), namespace)
+          decode = namespace["_wsh_unpack_ws_payload_with_diagnostics"]
+
+          def encoded_frame(obj):
+              raw = gzip.compress(json.dumps(obj, separators=(",", ":")).encode("utf-8"))
+              return raw
+
+          valid_obj = {"chain": {"22000": {"call": {"oi": 123}, "put": {"oi": 456}}}}
+          raw = encoded_frame(valid_obj)
+
+          # Case 1: base64 representation successfully decodes a GZIP JSON chain.
+          result, diag = decode(base64.b64encode(raw).decode("ascii"))
+          assert result is not None, f"base64 valid frame failed: {diag}"
+          assert result["data"] == valid_obj, "decoded JSON differs from synthetic input"
+          assert diag.get("selected_representation") == "base64", diag
+          assert diag.get("failure_stage") is None, diag
+          print("PASS: base64 GZIP/JSON chain decode")
+
+          # Case 2: hex representation successfully decodes the same kind of frame.
+          result, diag = decode(raw.hex())
+          assert result is not None, f"hex valid frame failed: {diag}"
+          assert result["data"] == valid_obj, "hex-decoded JSON differs from synthetic input"
+          assert diag.get("selected_representation") == "hex", diag
+          print("PASS: hex GZIP/JSON chain decode")
+
+          # Case 3: malformed input fails closed with a clear diagnostic stage.
+          result, diag = decode("not-a-websocket-frame")
+          assert result is None, "malformed frame was unexpectedly accepted"
+          assert diag.get("failure_stage") == "GZIP_SIGNATURE_NOT_FOUND", diag
+          print("PASS: malformed frame rejected with GZIP_SIGNATURE_NOT_FOUND")
+
+          # Case 4: valid GZIP JSON without dict-valued 'chain' is rejected by schema gate.
+          wrong_schema_raw = encoded_frame({"other": []})
+          result, diag = decode(base64.b64encode(wrong_schema_raw).decode("ascii"))
+          assert result is None, "wrong-schema payload was unexpectedly accepted"
+          assert diag.get("failure_stage") == "CHAIN_SCHEMA", diag
+          print("PASS: wrong schema rejected with CHAIN_SCHEMA")
+
+          # Case 5: non-string/empty input fails closed and does not throw.
+          for bad_value in (None, ""):
+              result, diag = decode(bad_value)
+              assert result is None, f"invalid payload {bad_value!r} was unexpectedly accepted"
+              assert diag.get("failure_stage") == "PAYLOAD_TYPE_OR_EMPTY", diag
+          print("PASS: empty and non-string inputs rejected safely")
+
+          print("ISOLATED_TESTS_PASS: 5 synthetic decoder cases; live collection was not executed.")
+          PY
+
+      - name: Run bounded failed-frame evidence tests (isolated helper only)
+        run: python test_wsh_v7_failed_frame_evidence.py
+
+      - name: Confirm this workflow did not run the live collector
+        run: echo 'LIVE_COLLECTION=NOT_RUN'
