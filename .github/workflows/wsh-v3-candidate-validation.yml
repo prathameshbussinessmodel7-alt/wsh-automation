@@ -1,3 +1,4 @@
+
 name: WSH V3 Candidate Validation
 
 on:
@@ -12,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout experimental branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: wsh-collector-rnd
@@ -25,7 +26,7 @@ jobs:
       - name: Install candidate dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install beautifulsoup4 selenium
+          python -m pip install beautifulsoup4 selenium requests
 
       - name: Record candidate source hash
         run: |
