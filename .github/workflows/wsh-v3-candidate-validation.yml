@@ -23,11 +23,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install candidate dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install beautifulsoup4 selenium requests
-
       - name: Record candidate source hash
         run: |
           sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py \
@@ -41,7 +36,13 @@ jobs:
 
       - name: Run V3 integration tests
         run: |
-          set -o pipefail
+          set -euo pipefail
+
+          python -m pip install --upgrade pip
+          python -m pip install beautifulsoup4 selenium requests
+
+          python -c "from bs4 import BeautifulSoup; print('BeautifulSoup dependency: PASS')"
+
           python -u test_wsh_candidate_v3_integration.py 2>&1 \
             | tee V3_INTEGRATION_TEST_RESULTS.txt
 
