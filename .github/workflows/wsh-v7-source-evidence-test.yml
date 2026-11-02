@@ -1,0 +1,69 @@
+
+name: WSH v7 Source Evidence Isolated Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - wsh-collector-rnd
+    paths:
+      - 'wsh_cloud_automation_ws_diagnostics_v7_source_evidence.py'
+      - 'test_wsh_ws_regression_v6.py'
+      - '.github/workflows/wsh-v7-source-evidence-test.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsh-v7-source-evidence-isolated-test
+  cancel-in-progress: false
+
+jobs:
+  isolated-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout experimental branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Compile candidate without executing it
+        run: |
+          python -m py_compile wsh_cloud_automation_ws_diagnostics_v7_source_evidence.py
+
+      - name: Run existing WebSocket regression tests
+        run: |
+          python test_wsh_ws_regression_v6.py
+
+      - name: Confirm candidate entry point is guarded
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+
+          path = Path("wsh_cloud_automation_ws_diagnostics_v7_source_evidence.py")
+          source = path.read_text(encoding="utf-8")
+          tree = ast.parse(source)
+
+          guarded = False
+          for node in ast.walk(tree):
+              if not isinstance(node, ast.If):
+                  continue
+              test = ast.dump(node.test)
+              if "__name__" in test and "__main__" in test:
+                  guarded = True
+                  break
+
+          assert guarded, "Expected __main__ execution guard was not found."
+          print("PASS: main execution is guarded; candidate was not executed.")
+          PY

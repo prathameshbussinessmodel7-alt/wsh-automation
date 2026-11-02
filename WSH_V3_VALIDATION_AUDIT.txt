@@ -1,0 +1,32 @@
+WSH V3 VALIDATION PACKAGE AUDIT
+
+Candidate source SHA256:
+03a8e00844ce78cac4b33e613e49c647502da5c64f3a7d2bd862e6f68b3c7adf
+
+Test source SHA256:
+649749448fccc8322a5066af986a23e2adb6c38268a478ebbaf288e95e46d28d
+
+Workflow SHA256:
+c86baf9bdf4e81c29f7c967bd03126c30a7634e5e9724e1faec40f20f0c24b50
+
+Production collector in the supplied clean repository ZIP:
+File: wsh_cloud_automation.py
+Size: 59303 bytes
+SHA256: 5f4f63a67f664b5c6bfbff74d86afc2ba9e07e0cf66510bd90c5f91dc40763c5
+
+The production collector was not modified or included in this patch package.
+
+Checks performed:
+- Python compile() on candidate and test module: PASS
+- Offline V3 integration test suite: 6/6 PASS
+- Workflow YAML parse: PASS
+- Workflow points to candidate and test files in repository root: PASS
+- Workflow uses workflow_dispatch only: PASS
+- Workflow does not invoke wsh_cloud_automation.py: PASS
+
+Limitations:
+- Tests are offline/synthetic.
+- GitHub Actions execution has not yet been run by the user.
+- No live Chrome, Sensibull authentication, market feed, or production execution
+  was performed.
+- Production approval is NOT granted by this package.

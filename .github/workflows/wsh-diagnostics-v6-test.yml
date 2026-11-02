@@ -1,0 +1,51 @@
+name: WSH Diagnostics v6 Isolated Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - wsh-collector-rnd
+    paths:
+      - '.github/workflows/wsh-diagnostics-v6-test.yml'
+      - 'wsh_cloud_automation_ws_diagnostics_v6.py'
+      - 'test_wsh_ws_regression_v6.py'
+      - 'WSH-collector-39948804037.zip'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsh-diagnostics-v6-isolated
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout experimental branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile diagnostic candidate
+        run: python -m py_compile wsh_cloud_automation_ws_diagnostics_v6.py
+
+      - name: Run baseline regression test
+        run: python test_wsh_ws_regression_v6.py
+
+      - name: Upload diagnostic and regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wsh-diagnostics-v6-evidence-${{ github.run_id }}
+          path: |
+            wsh_cloud_automation_ws_diagnostics_v6.py
+            test_wsh_ws_regression_v6.py
+            WSH-collector-39948804037.zip
+          if-no-files-found: error
+          retention-days: 7
