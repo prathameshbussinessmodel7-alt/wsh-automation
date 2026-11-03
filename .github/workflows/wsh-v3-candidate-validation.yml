@@ -1,3 +1,4 @@
+
 name: WSH V3 Candidate Validation
 
 on:
@@ -7,12 +8,13 @@ permissions:
   contents: read
 
 jobs:
-  validate-v3-candidate:
-    name: V3 Integration and Controlled Runtime Tests
+  candidate-validation:
+    name: V3 Integration, Runtime and WebSocket Identity Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout repository
+      - name: Checkout R&D candidate
         uses: actions/checkout@v4
         with:
           ref: wsh-collector-rnd
@@ -27,43 +29,46 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install beautifulsoup4 selenium requests
 
-      - name: Record candidate source hash
+      - name: Verify dependencies
         run: |
-          sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py \
-            | tee V3_SOURCE_SHA256.txt
+          python -c "import bs4, selenium, requests; print('Dependencies PASS')"
+
+      - name: Record candidate source fingerprint
+        run: |
+          sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py | tee V3_SOURCE_SHA256.txt
 
       - name: Compile candidate and all tests
         run: |
           python -m py_compile \
             wsh_cloud_automation_isolation_manifest_candidate_v3.py \
             test_wsh_candidate_v3_integration.py \
-            test_wsh_candidate_v3_runtime.py
-
-      - name: Verify dependencies
-        run: |
-          python -c "from bs4 import BeautifulSoup; print('BeautifulSoup dependency: PASS')"
-          python -c "import selenium, requests; print('Browser and HTTP dependencies: PASS')"
+            test_wsh_candidate_v3_runtime.py \
+            test_wsh_v3_ws_identity_freshness.py
 
       - name: Run V3 integration tests
         run: |
-          set -euo pipefail
-          python -u test_wsh_candidate_v3_integration.py 2>&1 \
-            | tee V3_INTEGRATION_TEST_RESULTS.txt
+          set -o pipefail
+          python -m unittest -v test_wsh_candidate_v3_integration 2>&1 | tee V3_INTEGRATION_TEST_RESULTS.txt
 
       - name: Run V3 controlled runtime tests
         run: |
-          set -euo pipefail
-          python -u test_wsh_candidate_v3_runtime.py 2>&1 \
-            | tee V3_RUNTIME_TEST_RESULTS.txt
+          set -o pipefail
+          python -m unittest -v test_wsh_candidate_v3_runtime 2>&1 | tee V3_CONTROLLED_RUNTIME_TEST_RESULTS.txt
+
+      - name: Run V3.1 WebSocket identity and freshness tests
+        run: |
+          set -o pipefail
+          python -m unittest -v test_wsh_v3_ws_identity_freshness 2>&1 | tee V3_WS_IDENTITY_FRESHNESS_TEST_RESULTS.txt
 
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: WSH-V3-Controlled-Runtime-Validation-Evidence
+          name: WSH-V3.1-Extended-Validation-Evidence
           path: |
             V3_SOURCE_SHA256.txt
             V3_INTEGRATION_TEST_RESULTS.txt
-            V3_RUNTIME_TEST_RESULTS.txt
+            V3_CONTROLLED_RUNTIME_TEST_RESULTS.txt
+            V3_WS_IDENTITY_FRESHNESS_TEST_RESULTS.txt
           if-no-files-found: warn
           retention-days: 30
