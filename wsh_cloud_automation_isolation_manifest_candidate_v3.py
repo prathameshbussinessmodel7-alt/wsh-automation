@@ -83,6 +83,9 @@ def _wsh_has_expected_table_schema(table, required_groups):
 # SENSIBULL WEBSOCKET BINARY FRAME CAPTURE + VALIDATION
 # ==========================================================
 _WSH_GZIP_MAGIC = b"\x1f\x8b\x08"
+_WSH_WS_MAX_SOURCE_AGE_SECONDS = 120
+_WSH_WS_FUTURE_CLOCK_TOLERANCE_SECONDS = 5
+_WSH_WS_OBSERVATION_WINDOW_SECONDS = 8.0
 _WSH_REQUIRED_WS_FIELDS = (
     "instrument_token", "last_price", "oi", "oi_change",
     "oi_change_quantity", "volume", "best_buy_price", "best_sell_price"
@@ -174,56 +177,160 @@ def _wsh_contract_route_matches(driver, symbol, expiry):
     return wanted_symbol in current and wanted_expiry in current, current
 
 
-def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, output_folder="WSH_Automated_Reports"):
-    """Capture option-chain frames emitted by the authenticated Sensibull page.
+def _wsh_normalize_identity(value):
+    """Normalize an explicit source identity value for strict comparison."""
+    return re.sub(r"[^A-Z0-9]", "", str(value).upper())
 
-    This does not perform or bypass Zerodha authentication. If the GitHub runner
-    is not authenticated, or the market is closed and no suitable frame arrives,
-    it records an explicit failure/partial status instead of substituting stale
-    or fabricated values.
+
+def _wsh_find_payload_identity(data):
+    """Inspect metadata outside the strike chain for explicit underlying identity."""
+    identity_keys = {
+        "symbol", "underlying", "tradingsymbol", "underlying_symbol",
+        "underlying_name", "instrument_name", "exchange_symbol",
+    }
+    found = []
+
+    def walk(obj, path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                normalized_key = re.sub(r"[^a-z0-9]", "", str(key).lower())
+                if key == "chain":
+                    continue
+                current_path = f"{path}.{key}" if path else str(key)
+                if normalized_key in identity_keys and isinstance(value, (str, int)):
+                    found.append({"path": current_path, "value": str(value)})
+                elif isinstance(value, (dict, list)):
+                    walk(value, current_path)
+        elif isinstance(obj, list):
+            for index, value in enumerate(obj):
+                if isinstance(value, (dict, list)):
+                    walk(value, f"{path}[{index}]")
+
+    walk(data)
+    # Stable de-duplication without losing source paths.
+    unique = []
+    seen = set()
+    for item in found:
+        marker = (item["path"], item["value"])
+        if marker not in seen:
+            seen.add(marker)
+            unique.append(item)
+    return unique
+
+
+def _wsh_parse_source_timestamp(value):
+    """Parse supported source timestamps; return UTC epoch seconds or None."""
+    if isinstance(value, (int, float)) and math.isfinite(float(value)):
+        numeric = float(value)
+        if numeric >= 1e12:
+            numeric /= 1000.0
+        if numeric >= 1e9:
+            return numeric
+        return None
+    if isinstance(value, str):
+        candidate = value.strip()
+        if not candidate:
+            return None
+        try:
+            numeric = float(candidate)
+            return _wsh_parse_source_timestamp(numeric)
+        except ValueError:
+            pass
+        try:
+            parsed = datetime.datetime.fromisoformat(candidate.replace("Z", "+00:00"))
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=datetime.timezone.utc)
+            return parsed.astimezone(datetime.timezone.utc).timestamp()
+        except ValueError:
+            return None
+    return None
+
+
+def _wsh_find_payload_timestamps(data):
+    """Find explicit source timestamp fields outside option-chain strike records."""
+    timestamp_keys = {
+        "timestamp", "lastupdated", "updatedat", "lastupdatetime",
+        "exchangetimestamp", "datatimestamp", "markettimestamp",
+        "servertime", "updatedtimestamp",
+    }
+    found = []
+
+    def walk(obj, path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                normalized_key = re.sub(r"[^a-z0-9]", "", str(key).lower())
+                if key == "chain":
+                    continue
+                current_path = f"{path}.{key}" if path else str(key)
+                if normalized_key in timestamp_keys:
+                    epoch = _wsh_parse_source_timestamp(value)
+                    found.append({
+                        "path": current_path,
+                        "value": value if isinstance(value, (str, int, float)) else str(value),
+                        "epoch": epoch,
+                    })
+                elif isinstance(value, (dict, list)):
+                    walk(value, current_path)
+        elif isinstance(obj, list):
+            for index, value in enumerate(obj):
+                if isinstance(value, (dict, list)):
+                    walk(value, f"{path}[{index}]")
+
+    walk(data)
+    return [item for item in found if item["epoch"] is not None]
+
+
+def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, output_folder="WSH_Automated_Reports"):
+    """Capture and independently assess route, payload identity and source freshness.
+
+    Route matching and encoded expiry are necessary but insufficient for VALID.
+    Payload identity must explicitly match the requested underlying, a source
+    timestamp must be fresh, and at least two distinct snapshots must be observed.
     """
     dataset_key = f"sensibull_ws_{symbol.lower()}_{expiry}"
-    captured_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    captured_at = datetime.datetime.now(datetime.timezone.utc)
     route_ok, current_url = _wsh_contract_route_matches(driver, symbol, expiry)
-    result = {"symbol": symbol, "requested_expiry": expiry, "captured_at_utc": captured_at,
-              "page_url_at_capture": current_url, "route_identity_check": "PASS" if route_ok else "FAIL",
-              "status": "NOT_CAPTURED", "frames_seen": 0, "rows": [], "summary": {}, "reasons": []}
+    result = {
+        "symbol": symbol,
+        "requested_expiry": expiry,
+        "captured_at_utc": captured_at.isoformat(),
+        "page_url_at_capture": current_url,
+        "route_identity_check": "PASS" if route_ok else "FAIL",
+        "payload_identity_status": "NOT_CHECKED",
+        "source_freshness_status": "NOT_CHECKED",
+        "status": "NOT_CAPTURED",
+        "frames_seen": 0,
+        "matching_expiry_frames": 0,
+        "distinct_snapshot_count": 0,
+        "rows": [],
+        "summary": {},
+        "reasons": [],
+    }
     if not route_ok:
         reason = f"Current page route does not match requested contract {symbol} {expiry}: {current_url}"
         result["reasons"] = [reason]
         manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, "PUBLISHED", "FAILED", "INVALID",
             ["symbol", "expiry", "strike", "call_oi", "put_oi"], 0, [reason])
         return result
-    try:
-        logs = driver.get_log("performance")
-    except Exception as exc:
-        logs = []
-        result["reasons"].append(f"Chrome performance log unavailable: {type(exc).__name__}: {exc}")
-    parsed = []
-    for entry in logs:
-        try:
-            envelope = json.loads(entry.get("message", "{}"))
-            message = envelope.get("message", {})
-            if message.get("method") != "Network.webSocketFrameReceived":
-                continue
-            params = message.get("params", {})
-            response = params.get("response", {})
-            result["frames_seen"] += 1
-            if int(response.get("opcode", 0)) != 2:
-                continue
-            decoded = _wsh_unpack_ws_payload(response.get("payloadData", ""))
-            if decoded:
-                parsed.append(decoded)
-        except (ValueError, TypeError, KeyError):
-            continue
-    # Some browser versions deliver frames after the first log drain. Wait and drain once more.
-    deadline = time.time() + 3
-    while time.time() < deadline and not parsed:
-        time.sleep(0.5)
+
+    # Collect throughout a bounded observation window. A single frame is not
+    # treated as proof of successive updates.
+    observation_seconds = _WSH_WS_OBSERVATION_WINDOW_SECONDS
+    deadline = time.monotonic() + observation_seconds
+    snapshots = {}
+    identity_evidence = []
+    timestamp_evidence = []
+    frame_receipts = []
+
+    while time.monotonic() < deadline:
         try:
             logs = driver.get_log("performance")
-        except Exception:
+        except Exception as exc:
             logs = []
+            result["reasons"].append(
+                f"Chrome performance log unavailable: {type(exc).__name__}: {exc}"
+            )
+
         for entry in logs:
             try:
                 envelope = json.loads(entry.get("message", "{}"))
@@ -232,52 +339,175 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
                     continue
                 response = message.get("params", {}).get("response", {})
                 result["frames_seen"] += 1
-                if int(response.get("opcode", 0)) == 2:
-                    decoded = _wsh_unpack_ws_payload(response.get("payloadData", ""))
-                    if decoded:
-                        parsed.append(decoded)
+                if int(response.get("opcode", 0)) != 2:
+                    continue
+                decoded = _wsh_unpack_ws_payload(response.get("payloadData", ""))
+                if not decoded:
+                    continue
+
+                data = decoded["data"]
+                encoded_expiry_bytes = decoded["raw"][:decoded["gzip_offset"]]
+                expiry_match = re.search(rb"20\d{6}", encoded_expiry_bytes)
+                encoded_expiry = expiry_match.group(0).decode("ascii") if expiry_match else None
+                if encoded_expiry != expiry.replace("-", ""):
+                    continue
+
+                rows, issues = _wsh_ws_chain_rows(data)
+                if not rows or issues:
+                    continue
+
+                result["matching_expiry_frames"] += 1
+                decompressed_hash = hashlib.sha256(
+                    json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                ).hexdigest()
+                received_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+                frame_receipts.append(received_at)
+                frame_identity = _wsh_find_payload_identity(data)
+                frame_timestamps = _wsh_find_payload_timestamps(data)
+                snapshots.setdefault(decompressed_hash, {
+                    "data": data,
+                    "rows": rows,
+                    "encoded_expiry": encoded_expiry,
+                    "binary_message_sha256": hashlib.sha256(decoded["raw"]).hexdigest(),
+                    "decompressed_json_sha256": decompressed_hash,
+                    "received_at_utc": received_at,
+                    "identity_evidence": frame_identity,
+                    "timestamp_evidence": frame_timestamps,
+                })
+                identity_evidence.extend(frame_identity)
+                timestamp_evidence.extend(frame_timestamps)
             except (ValueError, TypeError, KeyError):
                 continue
-    matching = []
-    for item in parsed:
-        data = item["data"]
-        encoded_expiry = item["raw"][:item["gzip_offset"]]
-        expiry_match = re.search(rb"20\d{6}", encoded_expiry)
-        encoded = expiry_match.group(0).decode("ascii") if expiry_match else None
-        # Contract acceptance is strict: an absent expiry is not a match.
-        if not encoded or encoded != expiry.replace("-", ""):
-            continue
-        rows, issues = _wsh_ws_chain_rows(data)
-        if rows and not issues:
-            matching.append((item, data, rows, encoded))
-    if matching:
-        item, data, rows, encoded = max(matching, key=lambda x: len(x[2]))
-        result.update({"status": "EXPIRY_MATCHED_STRUCTURE_PASS", "rows": rows,
-                       "encoded_expiry": encoded,
-                       "identity_limitations": ["Expiry matched to the requested contract.",
-                           "Underlying identity is not independently proven by the decoded payload unless the payload itself exposes it.",
-                           "Freshness is not proven by structural validation; compare capture time and live source state."],
-                       "summary": {key: data.get(key) for key in ("atm_strike", "atm_iv", "atm_iv_change", "atm_iv_percentile", "pcr", "max_pain_strike", "atm_ivp_type", "future_price")},
-                       "binary_message_sha256": hashlib.sha256(item["raw"]).hexdigest(),
-                       "decompressed_json_sha256": hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
-                       "reasons": []})
-        os.makedirs(output_folder, exist_ok=True)
-        safe_expiry = expiry.replace("-", "")
-        outfile = os.path.join(output_folder, f"WSH_Sensibull_WS_{symbol}_{safe_expiry}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-        with open(outfile, "w", encoding="utf-8") as f:
-            json.dump(result, f, indent=2, ensure_ascii=False)
-        result["output_file"] = outfile
-        pub = "MARKET_CLOSED" if not is_market_trading_day() else "PUBLISHED"
-        val = "PARTIAL" if pub == "MARKET_CLOSED" else "PARTIAL"
-        reason = ["Payload structure and encoded expiry validated. Underlying identity is not independently proven unless exposed by the payload; market freshness must be confirmed separately."]
-        manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, pub, "SUCCESS", val,
-            ["symbol", "expiry", "strike", "call_oi", "put_oi", "call_change_oi", "put_change_oi"], len(rows), reason)
-    else:
-        reason = result["reasons"] or ["No binary WebSocket frame decoded into a matching GZIP-compressed option-chain payload. This can occur without an authenticated Sensibull session or when the market is closed."]
+
+        if time.monotonic() < deadline:
+            time.sleep(0.5)
+
+    result["distinct_snapshot_count"] = len(snapshots)
+    result["frame_receipts_utc"] = frame_receipts
+    result["payload_identity_evidence"] = identity_evidence
+    result["source_timestamp_evidence"] = timestamp_evidence
+
+    if not snapshots:
+        reason = result["reasons"] or [
+            "No binary WebSocket frame decoded into a structurally valid chain with the requested encoded expiry."
+        ]
         result["reasons"] = reason
         pub = "MARKET_CLOSED" if not is_market_trading_day() else "PUBLISHED"
         manifest_tracker.record_dataset("Sensibull-WebSocket", dataset_key, pub, "FAILED", "INVALID",
             ["symbol", "expiry", "strike", "call_oi", "put_oi"], 0, reason)
+        return result
+
+    # Select the latest distinct snapshot received in this observation window.
+    selected = max(snapshots.values(), key=lambda item: item["received_at_utc"])
+    data = selected["data"]
+    rows = selected["rows"]
+    result.update({
+        "rows": rows,
+        "encoded_expiry": selected["encoded_expiry"],
+        "summary": {
+            key: data.get(key) for key in (
+                "atm_strike", "atm_iv", "atm_iv_change", "atm_iv_percentile",
+                "pcr", "max_pain_strike", "atm_ivp_type", "future_price"
+            )
+        },
+        "binary_message_sha256": selected["binary_message_sha256"],
+        "decompressed_json_sha256": selected["decompressed_json_sha256"],
+    })
+
+    requested_identity = _wsh_normalize_identity(symbol)
+    selected_identity_evidence = selected.get("identity_evidence", [])
+    observed_identities = {
+        _wsh_normalize_identity(item["value"])
+        for item in selected_identity_evidence
+    }
+    if observed_identities:
+        if observed_identities == {requested_identity}:
+            result["payload_identity_status"] = "PASS"
+        else:
+            result["payload_identity_status"] = "MISMATCH"
+            result["reasons"].append(
+                f"Payload identity evidence does not match requested symbol {symbol}: {identity_evidence}"
+            )
+    else:
+        result["payload_identity_status"] = "UNPROVEN"
+        result["reasons"].append(
+            "Decoded payload exposes no recognized underlying identity field; route identity alone is insufficient."
+        )
+
+    now_epoch = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    selected_timestamp_evidence = selected.get("timestamp_evidence", [])
+    parsed_timestamps = [item for item in selected_timestamp_evidence if item.get("epoch") is not None]
+    if parsed_timestamps:
+        latest_source_timestamp = max(item["epoch"] for item in parsed_timestamps)
+        source_age = now_epoch - latest_source_timestamp
+        result["source_timestamp_latest_epoch"] = latest_source_timestamp
+        result["source_timestamp_age_seconds"] = round(source_age, 3)
+        if source_age < -_WSH_WS_FUTURE_CLOCK_TOLERANCE_SECONDS:
+            result["source_freshness_status"] = "FUTURE_TIMESTAMP"
+            result["reasons"].append("Source timestamp is more than five seconds in the future.")
+        elif source_age > _WSH_WS_MAX_SOURCE_AGE_SECONDS:
+            result["source_freshness_status"] = "STALE"
+            result["reasons"].append(
+                f"Latest source timestamp is {source_age:.1f}s old; configured freshness limit is {_WSH_WS_MAX_SOURCE_AGE_SECONDS}s."
+            )
+        else:
+            result["source_freshness_status"] = "FRESH"
+    else:
+        result["source_freshness_status"] = "UNPROVEN"
+        result["reasons"].append(
+            "No recognized source timestamp was exposed; receipt time cannot certify market-data freshness."
+        )
+
+    if len(snapshots) >= 2:
+        result["successive_snapshot_status"] = "MULTIPLE_DISTINCT_SNAPSHOTS"
+    else:
+        result["successive_snapshot_status"] = "SINGLE_DISTINCT_SNAPSHOT"
+        result["reasons"].append(
+            "Only one distinct decoded snapshot was observed during the 8-second window."
+        )
+
+    if result["payload_identity_status"] == "MISMATCH":
+        validation_status = "INVALID"
+    elif (
+        result["payload_identity_status"] == "PASS"
+        and result["source_freshness_status"] == "FRESH"
+        and len(snapshots) >= 2
+    ):
+        validation_status = "VALID"
+    else:
+        validation_status = "PARTIAL"
+
+    result["status"] = validation_status
+    result["observation_window_seconds"] = observation_seconds
+    result["reasons"] = list(dict.fromkeys(result["reasons"]))
+
+    os.makedirs(output_folder, exist_ok=True)
+    safe_expiry = expiry.replace("-", "")
+    outfile = os.path.join(
+        output_folder,
+        f"WSH_Sensibull_WS_{symbol}_{safe_expiry}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+    )
+    with open(outfile, "w", encoding="utf-8") as handle:
+        json.dump(result, handle, indent=2, ensure_ascii=False)
+    result["output_file"] = outfile
+
+    pub = "MARKET_CLOSED" if not is_market_trading_day() else "PUBLISHED"
+    manifest_tracker.record_dataset(
+        "Sensibull-WebSocket",
+        dataset_key,
+        pub,
+        "SUCCESS",
+        validation_status,
+        ["symbol", "expiry", "strike", "call_oi", "put_oi", "call_change_oi", "put_change_oi"],
+        len(rows),
+        result["reasons"],
+    )
+    print(
+        f"[WSH WEBSOCKET RESULT] symbol={symbol} expiry={expiry} "
+        f"validation={validation_status} payload_identity={result['payload_identity_status']} "
+        f"freshness={result['source_freshness_status']} distinct_snapshots={len(snapshots)} "
+        f"rows={len(rows)} reasons={json.dumps(result['reasons'], ensure_ascii=False)}"
+    )
     return result
 
 
