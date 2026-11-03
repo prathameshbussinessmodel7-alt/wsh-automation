@@ -1,0 +1,71 @@
+name: WSH V3 Live Browser Validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-browser-validation:
+    name: Candidate Live Chrome and Source Collection
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout R&D candidate
+        uses: actions/checkout@v4
+        with:
+          ref: wsh-collector-rnd
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Install candidate dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install beautifulsoup4 selenium requests
+
+      - name: Record environment and candidate fingerprint
+        run: |
+          google-chrome --version || chrome --version
+          chromedriver --version
+          python --version
+          sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py | tee V3_SOURCE_SHA256.txt
+
+      - name: Compile candidate
+        run: |
+          python -m py_compile wsh_cloud_automation_isolation_manifest_candidate_v3.py
+
+      - name: Execute candidate against live sources
+        run: |
+          set -o pipefail
+          timeout 15m python -u wsh_cloud_automation_isolation_manifest_candidate_v3.py 2>&1 | tee WSH_LIVE_BROWSER_EXECUTION.log
+
+      - name: Audit generated manifests
+        if: always()
+        run: |
+          python wsh_v3_live_manifest_audit.py
+
+      - name: Upload live validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WSH-V3-Live-Browser-Validation-Evidence
+          path: |
+            V3_SOURCE_SHA256.txt
+            WSH_LIVE_BROWSER_EXECUTION.log
+            WSH_LIVE_VALIDATION_SUMMARY.txt
+            WSH_Automated_Reports/**
+          if-no-files-found: warn
+          retention-days: 30
