@@ -1,4 +1,3 @@
-
 name: WSH V3 Candidate Validation
 
 on:
@@ -9,7 +8,7 @@ permissions:
 
 jobs:
   validate-v3-candidate:
-    name: Offline V3 Integration Tests
+    name: V3 Integration and Controlled Runtime Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -23,36 +22,48 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install candidate dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install beautifulsoup4 selenium requests
+
       - name: Record candidate source hash
         run: |
           sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py \
             | tee V3_SOURCE_SHA256.txt
 
-      - name: Compile candidate and tests
+      - name: Compile candidate and all tests
         run: |
           python -m py_compile \
             wsh_cloud_automation_isolation_manifest_candidate_v3.py \
-            test_wsh_candidate_v3_integration.py
+            test_wsh_candidate_v3_integration.py \
+            test_wsh_candidate_v3_runtime.py
+
+      - name: Verify dependencies
+        run: |
+          python -c "from bs4 import BeautifulSoup; print('BeautifulSoup dependency: PASS')"
+          python -c "import selenium, requests; print('Browser and HTTP dependencies: PASS')"
 
       - name: Run V3 integration tests
         run: |
           set -euo pipefail
-
-          python -m pip install --upgrade pip
-          python -m pip install beautifulsoup4 selenium requests
-
-          python -c "from bs4 import BeautifulSoup; print('BeautifulSoup dependency: PASS')"
-
           python -u test_wsh_candidate_v3_integration.py 2>&1 \
             | tee V3_INTEGRATION_TEST_RESULTS.txt
+
+      - name: Run V3 controlled runtime tests
+        run: |
+          set -euo pipefail
+          python -u test_wsh_candidate_v3_runtime.py 2>&1 \
+            | tee V3_RUNTIME_TEST_RESULTS.txt
 
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: WSH-V3-Candidate-Validation-Evidence
+          name: WSH-V3-Controlled-Runtime-Validation-Evidence
           path: |
             V3_SOURCE_SHA256.txt
             V3_INTEGRATION_TEST_RESULTS.txt
+            V3_RUNTIME_TEST_RESULTS.txt
           if-no-files-found: warn
           retention-days: 30
