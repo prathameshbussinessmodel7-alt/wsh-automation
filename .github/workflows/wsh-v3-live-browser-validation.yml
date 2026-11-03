@@ -1,3 +1,4 @@
+
 name: WSH V3 Live Browser Validation
 
 on:
@@ -43,9 +44,15 @@ jobs:
           python --version
           sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py | tee V3_SOURCE_SHA256.txt
 
-      - name: Compile candidate
+      - name: Compile candidate and audit utility
         run: |
-          python -m py_compile wsh_cloud_automation_isolation_manifest_candidate_v3.py
+          python -m py_compile \
+            wsh_cloud_automation_isolation_manifest_candidate_v3.py \
+            wsh_v3_live_manifest_audit.py
+
+      - name: Record live run start time
+        run: |
+          date -u +%s | tee WSH_LIVE_RUN_START_EPOCH.txt
 
       - name: Execute candidate against live sources
         run: |
@@ -64,6 +71,7 @@ jobs:
           name: WSH-V3-Live-Browser-Validation-Evidence
           path: |
             V3_SOURCE_SHA256.txt
+            WSH_LIVE_RUN_START_EPOCH.txt
             WSH_LIVE_BROWSER_EXECUTION.log
             WSH_LIVE_VALIDATION_SUMMARY.txt
             WSH_Automated_Reports/**
