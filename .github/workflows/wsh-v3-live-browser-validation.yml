@@ -1,4 +1,3 @@
-
 name: WSH V3 Live Browser Validation
 
 on:
@@ -56,7 +55,7 @@ jobs:
 
       - name: Execute candidate against live sources
         run: |
-          set -o pipefail
+          set -euo pipefail
           timeout 15m python -u wsh_cloud_automation_isolation_manifest_candidate_v3.py 2>&1 | tee WSH_LIVE_BROWSER_EXECUTION.log
 
       - name: Audit generated manifests
