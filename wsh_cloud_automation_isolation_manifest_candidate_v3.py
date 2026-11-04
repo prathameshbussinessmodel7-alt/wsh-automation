@@ -184,9 +184,11 @@ def _wsh_normalize_identity(value):
 
 def _wsh_find_payload_identity(data):
     """Inspect metadata outside the strike chain for explicit underlying identity."""
+    # Keys are stored in the same punctuation-free form produced below.
     identity_keys = {
-        "symbol", "underlying", "tradingsymbol", "underlying_symbol",
-        "underlying_name", "instrument_name", "exchange_symbol",
+        "symbol", "underlying", "tradingsymbol", "underlyingsymbol",
+        "underlyingname", "instrumentname", "exchangesymbol",
+        "underlyinginstrument", "underlyingtradingsymbol",
     }
     found = []
 
@@ -278,6 +280,62 @@ def _wsh_find_payload_timestamps(data):
 
     walk(data)
     return [item for item in found if item["epoch"] is not None]
+
+
+def _wsh_collect_payload_metadata_diagnostic(data, max_fields=100, max_value_chars=160):
+    """Collect bounded metadata outside the strike chain for schema discovery.
+
+    Key paths and value types are retained for scalar metadata. Values are
+    retained only for identity/time/contract-like keys, with strict length
+    limits. The option-chain subtree is deliberately excluded.
+    """
+    candidate_terms = (
+        "symbol", "underlying", "instrument", "tradingsymbol", "timestamp",
+        "time", "updated", "expiry", "contract", "asset", "exchange",
+    )
+    fields = []
+    truncated = False
+
+    def walk(obj, path=""):
+        nonlocal truncated
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if str(key).lower() == "chain":
+                    continue
+                current_path = f"{path}.{key}" if path else str(key)
+                if isinstance(value, (dict, list)):
+                    walk(value, current_path)
+                    continue
+                if len(fields) >= max_fields:
+                    truncated = True
+                    return
+                key_text = str(key)
+                candidate = any(term in re.sub(r"[^a-z0-9]", "", key_text.lower()) for term in candidate_terms)
+                item = {
+                    "path": current_path[:240],
+                    "key": key_text[:100],
+                    "value_type": type(value).__name__,
+                    "candidate_metadata": candidate,
+                }
+                if candidate and isinstance(value, (str, int, float, bool)):
+                    rendered = str(value)
+                    item["value"] = rendered[:max_value_chars]
+                    if len(rendered) > max_value_chars:
+                        item["value_truncated"] = True
+                fields.append(item)
+        elif isinstance(obj, list):
+            for index, value in enumerate(obj[:20]):
+                if isinstance(value, (dict, list)):
+                    walk(value, f"{path}[{index}]")
+
+    walk(data)
+    return {
+        "diagnostic_version": "V3.2",
+        "fields": fields,
+        "field_count": len(fields),
+        "truncated": truncated,
+        "chain_subtree_excluded": True,
+    }
 
 
 def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, output_folder="WSH_Automated_Reports"):
@@ -373,6 +431,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
                     "received_at_utc": received_at,
                     "identity_evidence": frame_identity,
                     "timestamp_evidence": frame_timestamps,
+                    "metadata_diagnostic": _wsh_collect_payload_metadata_diagnostic(data),
                 })
                 identity_evidence.extend(frame_identity)
                 timestamp_evidence.extend(frame_timestamps)
@@ -412,6 +471,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
         },
         "binary_message_sha256": selected["binary_message_sha256"],
         "decompressed_json_sha256": selected["decompressed_json_sha256"],
+        "payload_metadata_diagnostic": selected.get("metadata_diagnostic", {}),
     })
 
     requested_identity = _wsh_normalize_identity(symbol)

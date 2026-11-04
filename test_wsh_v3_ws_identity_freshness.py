@@ -138,6 +138,39 @@ class WebSocketIdentityFreshnessTests(unittest.TestCase):
         })
         self.assertEqual(found, [])
 
+    def test_underscore_identity_keys_are_normalized_and_recognized(self):
+        found = candidate._wsh_find_payload_identity({
+            "underlying_symbol": "NIFTY",
+            "instrument_name": "NIFTY 50",
+            "exchange_symbol": "NIFTY",
+            "chain": {},
+        })
+        self.assertEqual(
+            [item["path"] for item in found],
+            ["underlying_symbol", "instrument_name", "exchange_symbol"],
+        )
+
+    def test_metadata_diagnostic_excludes_chain_and_preserves_candidate_values(self):
+        diagnostic = candidate._wsh_collect_payload_metadata_diagnostic({
+            "underlying_symbol": "NIFTY",
+            "server_time": "2026-11-03T13:00:00Z",
+            "opaque_meta": {"sequence": 42},
+            "chain": {"22000": {"call": {"instrument_name": "MUST_NOT_LEAK"}}},
+        })
+        self.assertTrue(diagnostic["chain_subtree_excluded"])
+        paths = [item["path"] for item in diagnostic["fields"]]
+        self.assertIn("underlying_symbol", paths)
+        self.assertIn("opaque_meta.sequence", paths)
+        self.assertNotIn("chain.22000.call.instrument_name", paths)
+        identity = next(item for item in diagnostic["fields"] if item["key"] == "underlying_symbol")
+        self.assertEqual(identity["value"], "NIFTY")
+
+    def test_metadata_diagnostic_is_bounded(self):
+        payload = {f"meta_{i}": i for i in range(150)}
+        diagnostic = candidate._wsh_collect_payload_metadata_diagnostic(payload, max_fields=25)
+        self.assertEqual(diagnostic["field_count"], 25)
+        self.assertTrue(diagnostic["truncated"])
+
     def test_iso_timestamp_parses_as_utc_epoch(self):
         value = "2026-11-03T12:44:21+00:00"
         parsed = candidate._wsh_parse_source_timestamp(value)
