@@ -21,7 +21,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-31_ISOLATION-MANIFEST-CANDIDATE_2",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-11-04_V3_3_METADATA_DISCOVERY",
             "datasets": {}
         }
 
@@ -183,8 +183,12 @@ def _wsh_normalize_identity(value):
 
 
 def _wsh_find_payload_identity(data):
-    """Inspect metadata outside the strike chain for explicit underlying identity."""
-    # Keys are stored in the same punctuation-free form produced below.
+    """Find explicitly labelled underlying identity outside strike-chain data.
+
+    Scalar values in anonymous lists are deliberately NOT promoted to identity:
+    without a field name their meaning cannot be established safely. They are
+    exposed by the V3.3 bounded diagnostic for schema investigation.
+    """
     identity_keys = {
         "symbol", "underlying", "tradingsymbol", "underlyingsymbol",
         "underlyingname", "instrumentname", "exchangesymbol",
@@ -192,33 +196,32 @@ def _wsh_find_payload_identity(data):
     }
     found = []
 
-    def walk(obj, path=""):
+    def walk(obj, path="", depth=0):
+        if depth > 40:
+            return
         if isinstance(obj, dict):
             for key, value in obj.items():
-                normalized_key = re.sub(r"[^a-z0-9]", "", str(key).lower())
-                if key == "chain":
+                if str(key).lower() == "chain":
                     continue
+                normalized_key = re.sub(r"[^a-z0-9]", "", str(key).lower())
                 current_path = f"{path}.{key}" if path else str(key)
-                if normalized_key in identity_keys and isinstance(value, (str, int)):
+                if normalized_key in identity_keys and isinstance(value, (str, int)) and not isinstance(value, bool):
                     found.append({"path": current_path, "value": str(value)})
                 elif isinstance(value, (dict, list)):
-                    walk(value, current_path)
+                    walk(value, current_path, depth + 1)
         elif isinstance(obj, list):
-            for index, value in enumerate(obj):
+            for index, value in enumerate(obj[:200]):
                 if isinstance(value, (dict, list)):
-                    walk(value, f"{path}[{index}]")
+                    walk(value, f"{path}[{index}]", depth + 1)
 
     walk(data)
-    # Stable de-duplication without losing source paths.
-    unique = []
-    seen = set()
+    unique, seen = [], set()
     for item in found:
         marker = (item["path"], item["value"])
         if marker not in seen:
             seen.add(marker)
             unique.append(item)
     return unique
-
 
 def _wsh_parse_source_timestamp(value):
     """Parse supported source timestamps; return UTC epoch seconds or None."""
@@ -249,7 +252,7 @@ def _wsh_parse_source_timestamp(value):
 
 
 def _wsh_find_payload_timestamps(data):
-    """Find explicit source timestamp fields outside option-chain strike records."""
+    """Find explicitly labelled source timestamps outside strike-chain data."""
     timestamp_keys = {
         "timestamp", "lastupdated", "updatedat", "lastupdatetime",
         "exchangetimestamp", "datatimestamp", "markettimestamp",
@@ -257,86 +260,117 @@ def _wsh_find_payload_timestamps(data):
     }
     found = []
 
-    def walk(obj, path=""):
+    def walk(obj, path="", depth=0):
+        if depth > 40:
+            return
         if isinstance(obj, dict):
             for key, value in obj.items():
-                normalized_key = re.sub(r"[^a-z0-9]", "", str(key).lower())
-                if key == "chain":
+                if str(key).lower() == "chain":
                     continue
+                normalized_key = re.sub(r"[^a-z0-9]", "", str(key).lower())
                 current_path = f"{path}.{key}" if path else str(key)
                 if normalized_key in timestamp_keys:
                     epoch = _wsh_parse_source_timestamp(value)
-                    found.append({
-                        "path": current_path,
-                        "value": value if isinstance(value, (str, int, float)) else str(value),
-                        "epoch": epoch,
-                    })
+                    if epoch is not None:
+                        found.append({"path": current_path, "value": value if isinstance(value, (str, int, float)) else str(value), "epoch": epoch})
                 elif isinstance(value, (dict, list)):
-                    walk(value, current_path)
+                    walk(value, current_path, depth + 1)
         elif isinstance(obj, list):
-            for index, value in enumerate(obj):
+            for index, value in enumerate(obj[:200]):
                 if isinstance(value, (dict, list)):
-                    walk(value, f"{path}[{index}]")
+                    walk(value, f"{path}[{index}]", depth + 1)
 
     walk(data)
-    return [item for item in found if item["epoch"] is not None]
+    return found
 
+def _wsh_collect_payload_metadata_diagnostic(data, max_fields=160, max_value_chars=160, max_depth=40, max_list_items=100):
+    """Collect bounded metadata/schema evidence outside the strike-chain subtree.
 
-def _wsh_collect_payload_metadata_diagnostic(data, max_fields=100, max_value_chars=160):
-    """Collect bounded metadata outside the strike chain for schema discovery.
-
-    Key paths and value types are retained for scalar metadata. Values are
-    retained only for identity/time/contract-like keys, with strict length
-    limits. The option-chain subtree is deliberately excluded.
+    V3.3 inventories dictionary keys, nested/empty containers, and primitive
+    list elements. Candidate values are retained only for semantically named
+    metadata keys or plausible timestamp/ticker-like anonymous list scalars.
+    Anonymous list values are diagnostic clues only; they are never promoted
+    into identity/freshness acceptance evidence without an explicit key.
     """
     candidate_terms = (
         "symbol", "underlying", "instrument", "tradingsymbol", "timestamp",
         "time", "updated", "expiry", "contract", "asset", "exchange",
+        "identity", "token", "name", "market",
     )
-    fields = []
+    fields, containers = [], []
     truncated = False
+    visited_nodes = 0
+    max_nodes = max(500, max_fields * 20)
 
-    def walk(obj, path=""):
+    def add_field(item):
         nonlocal truncated
+        if len(fields) >= max_fields:
+            truncated = True
+            return False
+        fields.append(item)
+        return True
+
+    def walk(obj, path="", depth=0):
+        nonlocal truncated, visited_nodes
+        if depth > max_depth or visited_nodes >= max_nodes:
+            truncated = True
+            return
+        visited_nodes += 1
         if isinstance(obj, dict):
+            containers.append({"path": path or "$", "container_type": "dict", "size": len(obj)})
             for key, value in obj.items():
                 if str(key).lower() == "chain":
                     continue
                 current_path = f"{path}.{key}" if path else str(key)
                 if isinstance(value, (dict, list)):
-                    walk(value, current_path)
+                    walk(value, current_path, depth + 1)
                     continue
-                if len(fields) >= max_fields:
-                    truncated = True
-                    return
                 key_text = str(key)
-                candidate = any(term in re.sub(r"[^a-z0-9]", "", key_text.lower()) for term in candidate_terms)
-                item = {
-                    "path": current_path[:240],
-                    "key": key_text[:100],
-                    "value_type": type(value).__name__,
-                    "candidate_metadata": candidate,
-                }
+                normalized = re.sub(r"[^a-z0-9]", "", key_text.lower())
+                candidate = any(term in normalized for term in candidate_terms)
+                item = {"path": current_path[:240], "key": key_text[:100], "value_type": type(value).__name__, "candidate_metadata": candidate, "source": "keyed_scalar"}
                 if candidate and isinstance(value, (str, int, float, bool)):
                     rendered = str(value)
                     item["value"] = rendered[:max_value_chars]
                     if len(rendered) > max_value_chars:
                         item["value_truncated"] = True
-                fields.append(item)
+                if not add_field(item):
+                    return
         elif isinstance(obj, list):
-            for index, value in enumerate(obj[:20]):
+            containers.append({"path": path or "$", "container_type": "list", "size": len(obj)})
+            if len(obj) > max_list_items:
+                truncated = True
+            for index, value in enumerate(obj[:max_list_items]):
+                item_path = f"{path}[{index}]"
                 if isinstance(value, (dict, list)):
-                    walk(value, f"{path}[{index}]")
+                    walk(value, item_path, depth + 1)
+                    continue
+                value_type = type(value).__name__
+                rendered = str(value) if value is not None else ""
+                epoch = _wsh_parse_source_timestamp(value)
+                ticker_like = isinstance(value, str) and bool(re.fullmatch(r"[A-Z][A-Z0-9._ -]{1,24}", value.strip()))
+                candidate = epoch is not None or ticker_like
+                item = {"path": item_path[:240], "key": None, "value_type": value_type, "candidate_metadata": candidate, "source": "anonymous_list_scalar"}
+                if candidate:
+                    item["value"] = rendered[:max_value_chars]
+                    if epoch is not None:
+                        item["parsed_epoch"] = epoch
+                    item["candidate_reason"] = "timestamp_like_scalar" if epoch is not None else "ticker_like_scalar"
+                if not add_field(item):
+                    return
 
     walk(data)
     return {
-        "diagnostic_version": "V3.2",
+        "diagnostic_version": "V3.3",
         "fields": fields,
         "field_count": len(fields),
+        "containers": containers[:max_fields],
+        "container_count": len(containers),
         "truncated": truncated,
+        "limits": {"max_fields": max_fields, "max_value_chars": max_value_chars, "max_depth": max_depth, "max_list_items": max_list_items, "max_nodes": max_nodes},
+        "anonymous_list_values_are_diagnostic_only": True,
         "chain_subtree_excluded": True,
     }
-
 
 def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, output_folder="WSH_Automated_Reports"):
     """Capture and independently assess route, payload identity and source freshness.
@@ -472,6 +506,7 @@ def capture_sensibull_ws_option_chain(driver, symbol, expiry, manifest_tracker, 
         "binary_message_sha256": selected["binary_message_sha256"],
         "decompressed_json_sha256": selected["decompressed_json_sha256"],
         "payload_metadata_diagnostic": selected.get("metadata_diagnostic", {}),
+        "metadata_discovery_version": "V3.3",
     })
 
     requested_identity = _wsh_normalize_identity(symbol)
@@ -1472,7 +1507,7 @@ def execute_wsh_institutional_pipeline():
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         fingerprint_path = os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt")
         with open(fingerprint_path, "w", encoding="utf-8") as fp:
-            fp.write("pipeline_version=WSH_COLLECTOR_RND_2026-10-31_ISOLATION-MANIFEST-CANDIDATE_2\n")
+            fp.write("pipeline_version=WSH_COLLECTOR_RND_2026-11-04_V3_3_METADATA_DISCOVERY\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as exc:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {type(exc).__name__}: {exc}", flush=True)

@@ -1,4 +1,4 @@
-"""Focused deterministic tests for V3.1 WebSocket identity and freshness gates."""
+"""Focused deterministic tests for V3.3 WebSocket metadata discovery, identity and freshness gates."""
 import base64
 import datetime
 import gzip
@@ -237,6 +237,51 @@ class WebSocketIdentityFreshnessTests(unittest.TestCase):
         self.assertEqual(result["distinct_snapshot_count"], 1)
         self.assertEqual(result["successive_snapshot_status"], "SINGLE_DISTINCT_SNAPSHOT")
         self.assertEqual(result["status"], "PARTIAL")
+
+
+    def test_identity_and_timestamp_fields_inside_nested_list_of_dicts_are_found(self):
+        payload = {"metadata": [{"underlying_symbol": "NIFTY"}, {"exchange_timestamp": 1793709861}], "chain": {}}
+        identities = candidate._wsh_find_payload_identity(payload)
+        timestamps = candidate._wsh_find_payload_timestamps(payload)
+        self.assertEqual(identities[0]["path"], "metadata[0].underlying_symbol")
+        self.assertEqual(timestamps[0]["path"], "metadata[1].exchange_timestamp")
+
+    def test_anonymous_scalar_list_values_are_diagnostic_not_acceptance_evidence(self):
+        payload = {"metadata": ["NIFTY", "NSE", 1793709861], "chain": {}}
+        self.assertEqual(candidate._wsh_find_payload_identity(payload), [])
+        self.assertEqual(candidate._wsh_find_payload_timestamps(payload), [])
+        diagnostic = candidate._wsh_collect_payload_metadata_diagnostic(payload)
+        anonymous = [x for x in diagnostic["fields"] if x["source"] == "anonymous_list_scalar"]
+        self.assertEqual(len(anonymous), 3)
+        self.assertTrue(any(x.get("value") == "NIFTY" and x["candidate_reason"] == "ticker_like_scalar" for x in anonymous))
+        self.assertTrue(any(x.get("parsed_epoch") == 1793709861 for x in anonymous))
+        self.assertTrue(diagnostic["anonymous_list_values_are_diagnostic_only"])
+
+    def test_metadata_diagnostic_records_empty_and_nested_containers(self):
+        diagnostic = candidate._wsh_collect_payload_metadata_diagnostic({"meta": {"empty": {}, "items": []}, "chain": {"x": 1}})
+        paths = {x["path"] for x in diagnostic["containers"]}
+        self.assertIn("meta", paths)
+        self.assertIn("meta.empty", paths)
+        self.assertIn("meta.items", paths)
+        self.assertNotIn("chain", paths)
+
+    def test_metadata_diagnostic_depth_and_list_limits_are_bounded(self):
+        payload = {"meta": ["NIFTY"] * 120}
+        diagnostic = candidate._wsh_collect_payload_metadata_diagnostic(payload, max_list_items=10)
+        self.assertEqual(diagnostic["field_count"], 10)
+        self.assertTrue(diagnostic["truncated"])
+        self.assertLessEqual(len(diagnostic["fields"]), 160)
+
+    def test_anonymous_values_do_not_make_capture_valid(self):
+        payload = make_payload(marker=1)
+        payload.pop("symbol")
+        payload.pop("timestamp")
+        payload["metadata"] = ["NIFTY", datetime.datetime.now(datetime.timezone.utc).timestamp()]
+        result, manifest = self.run_capture([payload, dict(payload, pcr=1.5)])
+        self.assertEqual(result["payload_identity_status"], "UNPROVEN")
+        self.assertEqual(result["source_freshness_status"], "UNPROVEN")
+        self.assertEqual(result["status"], "PARTIAL")
+
 
 
 if __name__ == "__main__":
