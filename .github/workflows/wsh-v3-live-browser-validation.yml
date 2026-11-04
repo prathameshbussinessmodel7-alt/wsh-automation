@@ -1,3 +1,4 @@
+
 name: WSH V3 Live Browser Validation
 
 on:
@@ -10,7 +11,7 @@ jobs:
   live-browser-validation:
     name: Candidate Live Chrome and Source Collection
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       - name: Checkout R&D candidate
@@ -43,11 +44,21 @@ jobs:
           python --version
           sha256sum wsh_cloud_automation_isolation_manifest_candidate_v3.py | tee V3_SOURCE_SHA256.txt
 
-      - name: Compile candidate and audit utility
+      - name: Compile candidate, audit utility and tests
         run: |
           python -m py_compile \
             wsh_cloud_automation_isolation_manifest_candidate_v3.py \
-            wsh_v3_live_manifest_audit.py
+            wsh_v3_live_manifest_audit.py \
+            test_wsh_candidate_v3_integration.py \
+            test_wsh_candidate_v3_runtime.py \
+            test_wsh_v3_ws_identity_freshness.py
+
+      - name: Run offline regression and WebSocket gate tests
+        run: |
+          set -euo pipefail
+          python -u test_wsh_candidate_v3_integration.py 2>&1 | tee V3_INTEGRATION_TEST_RESULTS.txt
+          python -u test_wsh_candidate_v3_runtime.py 2>&1 | tee V3_RUNTIME_TEST_RESULTS.txt
+          python -u test_wsh_v3_ws_identity_freshness.py 2>&1 | tee V3_WS_IDENTITY_FRESHNESS_TEST_RESULTS.txt
 
       - name: Record live run start time
         run: |
@@ -56,7 +67,7 @@ jobs:
       - name: Execute candidate against live sources
         run: |
           set -euo pipefail
-          timeout 15m python -u wsh_cloud_automation_isolation_manifest_candidate_v3.py 2>&1 | tee WSH_LIVE_BROWSER_EXECUTION.log
+          timeout 18m python -u wsh_cloud_automation_isolation_manifest_candidate_v3.py 2>&1 | tee WSH_LIVE_BROWSER_EXECUTION.log
 
       - name: Audit generated manifests
         if: always()
@@ -67,12 +78,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: WSH-V3-Live-Browser-Validation-Evidence
+          name: WSH-V3-2-WebSocket-Metadata-Repair-Evidence
           path: |
             V3_SOURCE_SHA256.txt
+            V3_INTEGRATION_TEST_RESULTS.txt
+            V3_RUNTIME_TEST_RESULTS.txt
+            V3_WS_IDENTITY_FRESHNESS_TEST_RESULTS.txt
             WSH_LIVE_RUN_START_EPOCH.txt
             WSH_LIVE_BROWSER_EXECUTION.log
             WSH_LIVE_VALIDATION_SUMMARY.txt
             WSH_Automated_Reports/**
+            WSH_Quality_Manifest_*.json
           if-no-files-found: warn
           retention-days: 30
