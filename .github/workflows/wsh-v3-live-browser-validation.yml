@@ -78,7 +78,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: WSH-V3-2-WebSocket-Metadata-Repair-Evidence
+          name: WSH-V3-3-WebSocket-Metadata-Discovery-Evidence
           path: |
             V3_SOURCE_SHA256.txt
             V3_INTEGRATION_TEST_RESULTS.txt
