@@ -1,0 +1,366 @@
+{
+    "execution_timestamp": "2026-11-09T16:38:44.045481",
+    "pipeline_version": "WSH_COLLECTOR_RND_2026-10-21_EXPIRY-FALLBACK_1",
+    "datasets": {
+        "sensibull_ws_nifty_2026-11-09": {
+            "source": "Sensibull-WebSocket",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "PARTIAL",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 81,
+            "failure_reasons": [
+                "Payload structure and encoded expiry validated. Underlying identity is not independently proven unless exposed by the payload; market freshness must be confirmed separately."
+            ]
+        },
+        "option_chain_nifty_2026-11-09": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Only 0 structured strike rows found; at least 8 required."
+            ]
+        },
+        "sensibull_ws_banknifty_2026-11-23": {
+            "source": "Sensibull-WebSocket",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "PARTIAL",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 81,
+            "failure_reasons": [
+                "Payload structure and encoded expiry validated. Underlying identity is not independently proven unless exposed by the payload; market freshness must be confirmed separately."
+            ]
+        },
+        "option_chain_banknifty_2026-11-23": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Only 0 structured strike rows found; at least 8 required."
+            ]
+        },
+        "sensibull_ws_finnifty_2026-11-23": {
+            "source": "Sensibull-WebSocket",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "PARTIAL",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 81,
+            "failure_reasons": [
+                "Payload structure and encoded expiry validated. Underlying identity is not independently proven unless exposed by the payload; market freshness must be confirmed separately."
+            ]
+        },
+        "option_chain_finnifty_2026-11-23": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Only 0 structured strike rows found; at least 8 required."
+            ]
+        },
+        "sensibull_ws_sensex_2026-11-12": {
+            "source": "Sensibull-WebSocket",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "No binary WebSocket frame decoded into a matching GZIP-compressed option-chain payload. This can occur without an authenticated Sensibull session or when the market is closed."
+            ]
+        },
+        "option_chain_sensex_2026-11-12": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "symbol",
+                "expiry",
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Only 0 structured strike rows found; at least 8 required."
+            ]
+        },
+        "oi_vs_strike_nifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "expiry_selection",
+                "strike",
+                "call_oi",
+                "put_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Fallback/error page or symbol route mismatch: []"
+            ]
+        },
+        "oi_vs_strike_banknifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "expiry_selection",
+                "strike",
+                "call_oi",
+                "put_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Fallback/error page or symbol route mismatch: []"
+            ]
+        },
+        "oi_vs_strike_finnifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "expiry_selection",
+                "strike",
+                "call_oi",
+                "put_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Fallback/error page or symbol route mismatch: []"
+            ]
+        },
+        "oi_vs_strike_sensex": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "expiry_selection",
+                "strike",
+                "call_oi",
+                "put_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Fallback/error page or symbol route mismatch: []"
+            ]
+        },
+        "fii_dii_summary": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 7,
+            "failure_reasons": [
+                "Rows exist, but required participant, flow and date-like headers were not all detected."
+            ]
+        },
+        "fii_dii_futures_and_options": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: all rendered table content duplicates an earlier tab."
+            ]
+        },
+        "fii_dii_cash_market": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: all rendered table content duplicates an earlier tab."
+            ]
+        },
+        "fii_dii_fii_history": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: all rendered table content duplicates an earlier tab."
+            ]
+        },
+        "ccil_money_market": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "ccil_gsec": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Contamination detected: Gsec table contains Money Market instruments."
+            ]
+        },
+        "ccil_forex": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "ccil_derivatives": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \n"
+            ]
+        },
+        "gsse_sovereign_bonds": {
+            "source": "TradingEconomics",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "PARTIAL",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 83,
+            "failure_reasons": [
+                "Table rows extracted; indicator/actual/previous fields and source-specific record schema still require validation."
+            ]
+        },
+        "gsse_macro_calendar": {
+            "source": "TradingEconomics",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "PARTIAL",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 1577,
+            "failure_reasons": [
+                "Table rows extracted; indicator/actual/previous fields and source-specific record schema still require validation."
+            ]
+        }
+    }
+}

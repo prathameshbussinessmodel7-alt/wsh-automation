@@ -1,0 +1,3 @@
+pipeline_version=WSH_COLLECTOR_RND_2026-10-21_EXPIRY-FALLBACK_1
+source_file=wsh_cloud_automation.py
+sha256=2abbb95adea9907420378787c69193e7199c6430d94d65ff69f9c9aee481b559

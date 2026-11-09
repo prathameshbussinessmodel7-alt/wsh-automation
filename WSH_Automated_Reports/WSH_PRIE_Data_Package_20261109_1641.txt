@@ -1,0 +1,142 @@
+=== WSH PRIE DATA PACKAGE [Multi-Dimensional Audit] - 2026-11-09 16:38:44 ===\n
+
+==================================================
+WSH PRIE: SENSIBULL OPTION CHAIN (SEPARATE EXPIRY-SPECIFIC SOURCE)
+==================================================
+
+--- OPTION CHAIN INDEX: NIFTY ---
+[EXPIRY DISCOVERY SOURCE]: visible_page_text_fallback
+[DISCOVERED EXPIRIES]: 2026-11-09
+
+[WEBSOCKET CAPTURE]: status=EXPIRY_MATCHED_STRUCTURE_PASS frames_seen=3 rows=81 reasons=
+
+[REQUESTED CONTRACT]: NIFTY 2026-11-09
+[REQUESTED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=NIFTY&expiry=2026-11-09
+[RESOLVED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=NIFTY&expiry=2026-11-09
+[PAGE TITLE]: Live NSE Option Chain: NIFTY, BANKNIFTY, Stocks - Sensibull
+[DIAGNOSTIC]: Live NSE Option Chain: NIFTY, BANKNIFTY, Stocks - Sensibull If you're seeing this message, that means JavaScript has been disabled on your browser , please enable JS to make this app work. Option Chain Trade Analyse Watchlist New Positions Orders Login Login with your broker for real-time prices and trading. Login Team Sensibull wishes you a very Happy Diwali filled with joy and prosperity! Dismiss NIFTY 25044.65 +0.23% Info Expiry 09 Nov Synth Fut Price 24994.83 IVP -- Per Lot CALLS PUTS Gamma Vega Theta Delta PCR POP Volume OI Chg OI Chg% OI-lakh Call OI Bid Offer Int Val F Int Val S Time Va
+[STATUS: EXT=FAILED | VAL=INVALID | ROWS=0]
+[REASON]: Only 0 structured strike rows found; at least 8 required.
+
+--- OPTION CHAIN INDEX: BANKNIFTY ---
+[EXPIRY DISCOVERY SOURCE]: visible_page_text_fallback
+[DISCOVERED EXPIRIES]: 2026-11-23
+
+[WEBSOCKET CAPTURE]: status=EXPIRY_MATCHED_STRUCTURE_PASS frames_seen=3 rows=81 reasons=
+
+[REQUESTED CONTRACT]: BANKNIFTY 2026-11-23
+[REQUESTED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=BANKNIFTY&expiry=2026-11-23
+[RESOLVED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=BANKNIFTY&expiry=2026-11-23
+[PAGE TITLE]: Live NSE Option Chain: NIFTY, BANKNIFTY, Stocks - Sensibull
+[DIAGNOSTIC]: Live NSE Option Chain: NIFTY, BANKNIFTY, Stocks - Sensibull If you're seeing this message, that means JavaScript has been disabled on your browser , please enable JS to make this app work. Option Chain Trade Analyse Watchlist New Positions Orders Login Login with your broker for real-time prices and trading. Login Team Sensibull wishes you a very Happy Diwali filled with joy and prosperity! Dismiss BANKNIFTY 59741.25 +1.51% Info Expiry 23 Nov Fut Price 59659.60 IVP 69 Per Lot CALLS PUTS Gamma Vega Theta Delta PCR POP Volume OI Chg OI Chg% OI-lakh Call OI Bid Offer Int Val F Int Val S Time Valu
+[STATUS: EXT=FAILED | VAL=INVALID | ROWS=0]
+[REASON]: Only 0 structured strike rows found; at least 8 required.
+
+--- OPTION CHAIN INDEX: FINNIFTY ---
+[EXPIRY DISCOVERY SOURCE]: visible_page_text_fallback
+[DISCOVERED EXPIRIES]: 2026-11-23
+
+[WEBSOCKET CAPTURE]: status=EXPIRY_MATCHED_STRUCTURE_PASS frames_seen=3 rows=81 reasons=
+
+[REQUESTED CONTRACT]: FINNIFTY 2026-11-23
+[REQUESTED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=FINNIFTY&expiry=2026-11-23
+[RESOLVED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=FINNIFTY&expiry=2026-11-23
+[PAGE TITLE]: Live NSE FINNIFTY Option Chain - Sensibull
+[DIAGNOSTIC]: Live NSE FINNIFTY Option Chain - Sensibull If you're seeing this message, that means JavaScript has been disabled on your browser , please enable JS to make this app work. Option Chain Trade Analyse Watchlist New Positions Orders Login Login with your broker for real-time prices and trading. Login Team Sensibull wishes you a very Happy Diwali filled with joy and prosperity! Dismiss FINNIFTY 27384.90 +0.75% Info Expiry 23 Nov Fut Price 27270.00 IVP 68 Per Lot CALLS PUTS Gamma Vega Theta Delta PCR POP Volume OI Chg OI Chg% OI-lakh Call OI Bid Offer Int Val F Int Val S Time Value Breakeven(%) LTP
+[STATUS: EXT=FAILED | VAL=INVALID | ROWS=0]
+[REASON]: Only 0 structured strike rows found; at least 8 required.
+
+--- OPTION CHAIN INDEX: SENSEX ---
+[EXPIRY DISCOVERY SOURCE]: visible_page_text_fallback
+[DISCOVERED EXPIRIES]: 2026-11-12
+
+[WEBSOCKET CAPTURE]: status=NOT_CAPTURED frames_seen=3 rows=0 reasons=No binary WebSocket frame decoded into a matching GZIP-compressed option-chain payload. This can occur without an authenticated Sensibull session or when the market is closed.
+
+[REQUESTED CONTRACT]: SENSEX 2026-11-12
+[REQUESTED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=SENSEX&expiry=2026-11-12
+[RESOLVED URL]: https://web.sensibull.com/option-chain?view=all&tradingsymbol=SENSEX&expiry=2026-11-12
+[PAGE TITLE]: Live BSE SENSEX Option Chain - Sensibull
+[DIAGNOSTIC]: Live BSE SENSEX Option Chain - Sensibull If you're seeing this message, that means JavaScript has been disabled on your browser , please enable JS to make this app work. Option Chain Trade Analyse Watchlist New Positions Orders Login Login with your broker for real-time prices and trading. Login Team Sensibull wishes you a very Happy Diwali filled with joy and prosperity! Dismiss SENSEX 81106.65 +0.13% Info Expiry 12 Nov Synth Fut Price 81049.51 IVP 83 Per Lot CALLS PUTS Gamma Vega Theta Delta PCR POP Volume OI Chg OI Chg% OI-lakh Call OI Bid Offer Int Val F Int Val S Time Value Breakeven(%) L
+[STATUS: EXT=FAILED | VAL=INVALID | ROWS=0]
+[REASON]: Only 0 structured strike rows found; at least 8 required.
+
+
+==================================================
+WSH PRIE: SENSIBULL OI VS STRIKE (DYNAMIC EXPIRY SELECTION)
+==================================================
+
+
+--- OI VS STRIKE: NIFTY ---
+Requested URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=NIFTY
+Resolved URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=RELIANCE
+Page title: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull
+[STATUS: FAILED / INVALID]
+[REASON]: Fallback/error page or symbol route mismatch: []
+
+
+--- OI VS STRIKE: BANKNIFTY ---
+Requested URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=BANKNIFTY
+Resolved URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=RELIANCE
+Page title: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull
+[STATUS: FAILED / INVALID]
+[REASON]: Fallback/error page or symbol route mismatch: []
+
+
+--- OI VS STRIKE: FINNIFTY ---
+Requested URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=FINNIFTY
+Resolved URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=RELIANCE
+Page title: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull
+[STATUS: FAILED / INVALID]
+[REASON]: Fallback/error page or symbol route mismatch: []
+
+
+--- OI VS STRIKE: SENSEX ---
+Requested URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=SENSEX
+Resolved URL: https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=RELIANCE
+Page title: Open Interest Charts of NIFTY, BANKNIFTY, NSE - Sensibull
+[STATUS: FAILED / INVALID]
+[REASON]: Fallback/error page or symbol route mismatch: []
+
+
+==================================================
+WSH PRIE: FII/DII PARTICIPANT POSITIONING (TAB FINGERPRINTING)
+==================================================
+
+
+--- PRIE FII/DII TAB TARGET: Summary ---
+
+[Table #1 for Summary]
+Segment | Bearish | Bullish | Net OI | Change
+
+[Table #2 for Summary]
+Index Futures | Indecisive | -90,741 | 10,718
+Index Options | Indecisive | -5L | 71,817
+
+[Table #3 for Summary]
+Index Futures | Mild Bearish |  | -20,475 | -4,629
+Index Options | Indecisive | 1.76L | -10,432
+
+[Table #4 for Summary]
+Index Futures | Indecisive | 80,759 | -1,010
+Index Options | Indecisive | 4.14L | -64,430
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: INVALID | Rows: 7]
+[REASON]: Rows exist, but required participant, flow and date-like headers were not all detected.
+
+
+--- PRIE FII/DII TAB TARGET: Futures and Options ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED | Rows: 0]
+[REASON]: Cross-tab fingerprint match: all rendered table content duplicates an earlier tab.
+
+
+--- PRIE FII/DII TAB TARGET: Cash Market ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED | Rows: 0]
+[REASON]: Cross-tab fingerprint match: all rendered table content duplicates an earlier tab.
+
+
+--- PRIE FII/DII TAB TARGET: FII History ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED | Rows: 0]
+[REASON]: Cross-tab fingerprint match: all rendered table content duplicates an earlier tab.
