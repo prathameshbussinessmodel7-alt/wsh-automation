@@ -1,0 +1,51 @@
+name: WSH FII-DII and CCIL Isolated Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsh-fii-ccil-isolated-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fii-ccil-isolated-test:
+    if: github.ref_name == 'wsh-collector-rnd'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout R&D branch
+        uses: actions/checkout@v4
+        with:
+          ref: wsh-collector-rnd
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up Google Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Run isolated FII-DII and CCIL collector
+        run: python wsh_fii_ccil_only.py
+
+      - name: Upload isolated FII-DII and CCIL evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WSH-FII-CCIL-Isolated-${{ github.run_number }}
+          path: WSH_FII_CCIL_RND/
+          if-no-files-found: warn
+          retention-days: 14
