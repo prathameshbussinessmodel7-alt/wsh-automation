@@ -21,7 +21,7 @@ class InstitutionalQualityManifest:
     def __init__(self):
         self.manifest = {
             "execution_timestamp": datetime.datetime.now().isoformat(),
-            "pipeline_version": "WSH_COLLECTOR_RND_2026-10-21_EXPIRY-FALLBACK_1",
+            "pipeline_version": "WSH_COLLECTOR_RND_2026-11-09_FII-CCIL-REPAIR_V3",
             "datasets": {}
         }
 
@@ -628,7 +628,7 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
                     ready_state: document ? document.readyState : 'unavailable',
                     script_count: document ? document.scripts.length : -1,
                     script_sources: document ? Array.from(document.scripts).map(s => s.src || '[inline]').slice(0,20) : [],
-                    resource_scripts: (performance && performance.getEntriesByType) ? performance.getEntriesByType('resource').filter(r => /\.js([?#]|$)|javascript/i.test(r.name)).map(r => ({name:r.name,duration_ms:Math.round(r.duration),transfer_size:r.transferSize||0})).slice(-20) : [],
+                    resource_scripts: (performance && performance.getEntriesByType) ? performance.getEntriesByType('resource').filter(r => /\\.js([?#]|$)|javascript/i.test(r.name)).map(r => ({name:r.name,duration_ms:Math.round(r.duration),transfer_size:r.transferSize||0})).slice(-20) : [],
                     title: document ? document.title : '',
                     body_text: document && document.body ? (document.body.innerText || '').slice(0,900) : '',
                     url: location ? location.href : '',
@@ -729,182 +729,401 @@ def extract_sensibull_option_chains(driver, manifest_tracker):
     return payload
 
 # ==========================================================
+# WSH R&D V3: SOURCE TAB DISCOVERY, TRANSITION AND EVIDENCE
+# ==========================================================
+def _wsh_v3_norm_text(value):
+    return re.sub(r"\s+", " ", str(value or "")).strip().casefold()
+
+
+def _wsh_v3_table_snapshot(html):
+    soup = BeautifulSoup(html or "", "html.parser")
+    signatures, tables = [], []
+    for table in soup.find_all("table"):
+        rows = []
+        for tr in table.find_all("tr"):
+            cells = [re.sub(r"\s+", " ", c.get_text(" ", strip=True)).strip()
+                     for c in tr.find_all(["th", "td"])]
+            if cells:
+                rows.append(cells)
+        if rows:
+            sig = hashlib.sha256(json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
+            signatures.append(sig)
+            tables.append({"headers": rows[0], "rows": rows[1:], "row_count": max(0, len(rows)-1), "signature": sig})
+    combined = hashlib.sha256("|".join(sorted(signatures)).encode()).hexdigest() if signatures else ""
+    return {"fingerprint": combined, "table_count": len(tables), "tables": tables}
+
+
+def _wsh_v3_visible_tab_controls(driver):
+    """Return visible tab-like controls with stable diagnostics; no broad text-click fallback."""
+    found = []
+    try:
+        elements = driver.find_elements(By.CSS_SELECTOR,
+            "[role='tab'],button,a,[aria-controls],[role='button']")
+    except Exception:
+        elements = []
+    seen = set()
+    for el in elements:
+        try:
+            if not el.is_displayed():
+                continue
+            text = (el.get_attribute("aria-label") or el.get_attribute("title") or
+                    el.text or el.get_attribute("textContent") or "")
+            label = _wsh_v3_norm_text(text)
+            if not label:
+                continue
+            ident = (el.get_attribute("id") or "", el.get_attribute("aria-controls") or "", label,
+                     el.get_attribute("role") or "", el.tag_name)
+            if ident in seen:
+                continue
+            seen.add(ident)
+            found.append({"element": el, "label": label, "id": ident[0],
+                "aria_controls": ident[1], "role": ident[3], "tag": ident[4],
+                "aria_selected": el.get_attribute("aria-selected"),
+                "aria_current": el.get_attribute("aria-current"),
+                "class": el.get_attribute("class") or ""})
+        except Exception:
+            continue
+    return found
+
+
+def _wsh_v3_active_state(el):
+    try:
+        selected = (el.get_attribute("aria-selected") or "").strip().lower()
+        if selected in {"true", "false"}:
+            return selected == "true"
+        current = (el.get_attribute("aria-current") or "").strip().lower()
+        if current in {"page", "true"}:
+            return True
+        classes = set((el.get_attribute("class") or "").lower().split())
+        return bool(classes.intersection({"active", "selected", "current", "tab-active"}))
+    except Exception:
+        return None
+
+
+def _wsh_v3_panel_text(driver, aria_controls):
+    if not aria_controls:
+        return ""
+    try:
+        panel = driver.find_element(By.ID, aria_controls)
+        if panel.is_displayed():
+            return re.sub(r"\s+", " ", panel.text or panel.get_attribute("textContent") or "").strip()
+    except Exception:
+        pass
+    return ""
+
+
+def _wsh_v3_activate_tab(driver, tab_name, timeout=10):
+    before_html = driver.page_source
+    before = _wsh_v3_table_snapshot(before_html)
+    target = _wsh_v3_norm_text(tab_name)
+    controls = _wsh_v3_visible_tab_controls(driver)
+    # Match exact accessible label or exact visible text; partial matches are not clicked.
+    matches = [x for x in controls if x["label"] == target]
+    diag = {"target": tab_name, "candidate_count": len(matches), "clicked": False,
+            "verified": False, "method": "not_attempted", "before": before,
+            "controls_seen": [{k:v for k,v in x.items() if k != "element"} for x in controls]}
+    if len(matches) != 1:
+        diag["method"] = "missing_or_ambiguous_exact_accessible_control"
+        return diag
+    item = matches[0]
+    el = item["element"]
+    before_active = _wsh_v3_active_state(el)
+    before_panel = _wsh_v3_panel_text(driver, item["aria_controls"])
+    diag.update({"control": {k:v for k,v in item.items() if k != "element"},
+                 "before_active": before_active,
+                 "before_panel_sha256": hashlib.sha256(before_panel.encode()).hexdigest() if before_panel else ""})
+    try:
+        driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+        driver.execute_script("arguments[0].click();", el)
+        diag["clicked"] = True
+        def changed(_):
+            current_el = item["element"]
+            active = _wsh_v3_active_state(current_el)
+            html = driver.page_source
+            snap = _wsh_v3_table_snapshot(html)
+            panel = _wsh_v3_panel_text(driver, item["aria_controls"])
+            panel_changed = bool(panel and panel != before_panel)
+            table_changed = snap["fingerprint"] != before["fingerprint"]
+            diag.update({"after_active": active, "after": snap,
+                         "panel_changed": panel_changed, "table_set_changed": table_changed,
+                         "after_panel_sha256": hashlib.sha256(panel.encode()).hexdigest() if panel else ""})
+            # Active state alone is not enough if the control was already active and its panel did not change.
+            if active is True and (before_active is not True or table_changed or panel_changed):
+                return True
+            return table_changed or panel_changed
+        WebDriverWait(driver, timeout).until(changed)
+        diag["verified"] = True
+        diag["method"] = "active_state_plus_transition" if diag.get("after_active") is True else "content_transition"
+    except Exception as exc:
+        html = driver.page_source
+        snap = _wsh_v3_table_snapshot(html)
+        panel = _wsh_v3_panel_text(driver, item["aria_controls"])
+        active = _wsh_v3_active_state(el)
+        diag.update({"after_active": active, "after": snap,
+                     "panel_changed": bool(panel and panel != before_panel),
+                     "table_set_changed": snap["fingerprint"] != before["fingerprint"],
+                     "wait_error": f"{type(exc).__name__}: {exc}"})
+        if active is True and before_active is True and not diag["table_set_changed"] and not diag["panel_changed"]:
+            diag["verified"] = True
+            diag["method"] = "already_active_explicit_state"
+        elif diag["table_set_changed"] or diag["panel_changed"]:
+            diag["verified"] = True
+            diag["method"] = "content_transition_after_wait_exception"
+        else:
+            diag["method"] = "transition_not_verified"
+    return diag
+
+
+def _wsh_v3_save_evidence(dataset_key, html, diagnostics):
+    folder = os.path.join("WSH_Automated_Reports", "evidence")
+    os.makedirs(folder, exist_ok=True)
+    stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    safe = re.sub(r"[^a-zA-Z0-9_-]+", "_", dataset_key)
+    html_path = os.path.join(folder, f"{safe}_{stamp}.html")
+    json_path = os.path.join(folder, f"{safe}_{stamp}.json")
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(html or "")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(diagnostics, f, indent=2, ensure_ascii=False, default=str)
+    return html_path, json_path
+
+
+def _wsh_v3_header_groups(headers):
+    return {_wsh_norm_key(x) for x in headers if str(x).strip()}
+
+
+# ==========================================================
 # 2. SENSIBULL FII/DII PARTICIPANT POSITIONING ADAPTER (PRIE)
+# ==========================================================
+# ==========================================================
+# 2. SENSIBULL FII/DII PARTICIPANT POSITIONING ADAPTER (R&D V3)
 # ==========================================================
 def extract_sensibull_fii_dii_tabs(driver, manifest_tracker):
     payload = "\n\n==================================================\n"
-    payload += "WSH PRIE: FII/DII PARTICIPANT POSITIONING (TAB FINGERPRINTING)\n"
+    payload += "WSH PRIE: FII/DII PARTICIPANT POSITIONING (R&D V3 VERIFIED TAB EVIDENCE)\n"
     payload += "==================================================\n"
-
     tabs = ["Summary", "Futures and Options", "Cash Market", "FII History"]
-    seen_content_signatures = set()
-    pub_state = "PUBLISHED" if is_market_trading_day() else "MARKET_CLOSED"
-
+    seen = {}
+    pub_state = "UNKNOWN"  # Trading day is not proof that this source published fresh data.
     try:
         driver.get("https://web.sensibull.com/fii-dii-data")
-        WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        time.sleep(6)
-
+        WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        time.sleep(5)
         for tab_name in tabs:
+            key = f"fii_dii_{tab_name.lower().replace(' ', '_')}"
             payload += f"\n\n--- PRIE FII/DII TAB TARGET: {tab_name} ---\n"
-            dataset_key = f"fii_dii_{tab_name.lower().replace(' ', '_')}"
             try:
-                tab_xpath = (
-                    f"//*[self::button or self::a or self::div or self::span]"
-                    f"[normalize-space(text())='{tab_name}']"
-                )
-                tab_element = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, tab_xpath))
-                )
-                driver.execute_script("arguments[0].click();", tab_element)
-                time.sleep(4)
-
-                soup = BeautifulSoup(driver.page_source, "html.parser")
+                transition = _wsh_v3_activate_tab(driver, tab_name)
+                html = driver.page_source
+                soup = BeautifulSoup(html, "html.parser")
+                snapshot = _wsh_v3_table_snapshot(html)
                 tables = soup.find_all("table")
-                rows_captured = 0
-                data_rows = 0
-                signature_parts = []
-
-                for tbl in tables:
-                    signature_parts.append(re.sub(r"\s+", " ", tbl.get_text(" ", strip=True)).strip())
-                table_signature = "||".join(signature_parts)
-
-                if not tables or not table_signature.strip("| "):
-                    ext_state, val_state = "FAILED", "INVALID"
-                    reasons = ["No non-empty tables rendered."]
-                elif table_signature in seen_content_signatures and tab_name != "Summary":
-                    ext_state, val_state = "SUCCESS", "QUARANTINED"
-                    reasons = ["Cross-tab fingerprint match: all rendered table content duplicates an earlier tab."]
+                table_fps = [t["signature"] for t in snapshot["tables"]]
+                table_set_fp = snapshot["fingerprint"]
+                duplicate_of = seen.get(table_set_fp) if table_set_fp else None
+                captured_rows, data_rows = 0, 0
+                headers = []
+                table_payload = []
+                for idx, table in enumerate(tables):
+                    rows = table.find_all("tr")
+                    row_values = []
+                    for ri, row in enumerate(rows):
+                        cells = [c.get_text(" ", strip=True) for c in row.find_all(["th", "td"])]
+                        if not cells:
+                            continue
+                        if ri == 0:
+                            headers.extend(cells)
+                        row_values.append(cells)
+                        captured_rows += 1
+                        if ri > 0 and any(x.strip() for x in cells):
+                            data_rows += 1
+                    if row_values:
+                        table_payload.append((idx + 1, row_values))
+                normalized_headers = _wsh_v3_header_groups(headers)
+                # The captured Sensibull Summary is a segment positioning matrix, not a
+                # participant/net-flow/date table. Its observed contract is Segment/Bearish/Bullish/Net OI/Change.
+                summary_contract = {
+                    "segment": bool(normalized_headers.intersection({"segment", "marketsegment"})),
+                    "bearish": bool(normalized_headers.intersection({"bearish", "short", "shortposition"})),
+                    "bullish": bool(normalized_headers.intersection({"bullish", "long", "longposition"})),
+                    "net_oi": bool(normalized_headers.intersection({"netoi", "netopeninterest"})),
+                    "change": bool(normalized_headers.intersection({"change", "changeoi", "changeinopeninterest"})),
+                }
+                history_date_signal = bool(re.search(r"\b(20\d{2}|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b", soup.get_text(" ", strip=True), re.I))
+                evidence = {"url": getattr(driver, "current_url", ""), "tab": tab_name,
+                    "transition": transition, "table_snapshot": snapshot,
+                    "table_fingerprints": table_fps, "duplicate_of": duplicate_of,
+                    "headers": headers, "normalized_headers": sorted(normalized_headers),
+                    "summary_contract": summary_contract, "history_date_signal": history_date_signal,
+                    "captured_rows_including_headers": captured_rows, "data_rows": data_rows,
+                    "page_text_excerpt": re.sub(r"\s+", " ", soup.get_text(" ", strip=True))[:1800]}
+                raw_path, evidence_path = _wsh_v3_save_evidence(key, html, evidence)
+                payload += f"[RAW EVIDENCE]: {raw_path}\n[EVIDENCE JSON]: {evidence_path}\n"
+                payload += f"[TAB TRANSITION]: {json.dumps(transition, ensure_ascii=False, default=str)}\n"
+                payload += f"[TABLE SET]: count={snapshot['table_count']} fingerprint={table_set_fp}\n"
+                payload += f"[HEADERS]: {json.dumps(headers, ensure_ascii=False)}\n"
+                if not transition.get("verified"):
+                    ext, val = "FAILED", "INVALID"
+                    reasons = ["Target tab selection/content transition was not verified; captured page is diagnostic evidence only."]
+                elif not tables or data_rows == 0:
+                    ext, val = "FAILED", "INVALID"
+                    reasons = ["Verified tab control but no table data rows were rendered."]
+                elif duplicate_of:
+                    ext, val = "SUCCESS", "QUARANTINED"
+                    reasons = [f"Whole table-set fingerprint duplicates {duplicate_of}; duplicate gate retained."]
                 else:
-                    seen_content_signatures.add(table_signature)
-                    for idx, tbl in enumerate(tables):
-                        payload += f"\n[Table #{idx + 1} for {tab_name}]\n"
-                        for row_index, row in enumerate(tbl.find_all("tr")):
-                            cols = row.find_all(["td", "th"])
-                            r_data = [c.get_text(" ", strip=True) for c in cols]
-                            if r_data:
-                                payload += " | ".join(r_data) + "\n"
-                                rows_captured += 1
-                                if row_index > 0 and any(value.strip() for value in r_data):
-                                    data_rows += 1
-                    header_text = " ".join(
-                        _wsh_norm_key(c.get_text(" ", strip=True))
-                        for tbl in tables[:3]
-                        for row in tbl.find_all("tr")[:1]
-                        for c in row.find_all(["th", "td"])
-                    )
-                    has_participant = any(k in header_text for k in ("participant", "clienttype", "category", "participanttype"))
-                    has_flow = any(k in header_text for k in ("net", "long", "short", "buy", "sell", "oi", "openinterest", "value"))
-                    has_date = any(k in header_text for k in ("date", "day", "expiry"))
-                    if data_rows and has_participant and has_flow and has_date:
-                        ext_state, val_state, reasons = "SUCCESS", "PARTIAL", [
-                            "Recognized participant/flow/date-like headers; source-specific semantics and units still require review."
-                        ]
-                    elif data_rows:
-                        ext_state, val_state, reasons = "SUCCESS", "INVALID", [
-                            "Rows exist, but required participant, flow and date-like headers were not all detected."
-                        ]
+                    for idx, rows in table_payload:
+                        payload += f"\n[Table #{idx} for {tab_name}]\n"
+                        payload += "\n".join(" | ".join(r) for r in rows) + "\n"
+                    if tab_name == "Summary":
+                        if all(summary_contract.values()) and data_rows >= 2:
+                            ext, val = "SUCCESS", "PARTIAL"
+                            reasons = ["Observed segment positioning schema matched; units, as-of timestamp and independent source reconciliation remain outstanding."]
+                        else:
+                            ext, val = "SUCCESS", "INVALID"
+                            reasons = [f"Summary table schema mismatch: {summary_contract}; source-specific contract not satisfied."]
+                    elif tab_name == "FII History":
+                        if data_rows >= 2 and history_date_signal:
+                            ext, val = "SUCCESS", "QUARANTINED"
+                            reasons = ["Distinct dated history rows captured; date semantics, units and history schema still require confirmation."]
+                        else:
+                            ext, val = "SUCCESS", "INVALID"
+                            reasons = ["History data lacks sufficient rows or a recognizable date signal."]
                     else:
-                        ext_state, val_state, reasons = "PARTIAL", "INVALID", [
-                            "Tables rendered but no data rows were found."
-                        ]
-
-                payload += (
-                    f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | "
-                    f"VAL: {val_state} | Rows: {rows_captured}]\n"
-                )
-                if reasons:
-                    payload += "[REASON]: " + "; ".join(reasons) + "\n"
-
-                manifest_tracker.record_dataset(
-                    "Sensibull", dataset_key, pub_state, ext_state, val_state,
-                    ["participant", "net_flow", "date"], rows_captured, reasons
-                )
-            except Exception as e:
-                reasons = [f"{type(e).__name__}: {e}"]
-                payload += f"[STATUS -> PUB: {pub_state} | EXT: FAILED | VAL: INVALID | REASON: {reasons[0]}]\n"
-                manifest_tracker.record_dataset(
-                    "Sensibull", dataset_key, pub_state, "FAILED", "INVALID",
-                    ["participant", "net_flow", "date"], 0, reasons
-                )
-    except Exception as e:
-        payload += f"\n[Portal Error: {type(e).__name__}: {e}]\n"
-
+                        ext, val = "SUCCESS", "QUARANTINED"
+                        reasons = ["Distinct tab content captured; Futures/Options or Cash Market business schema and units require source-specific confirmation."]
+                    if table_set_fp:
+                        seen[table_set_fp] = tab_name
+                payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext} | VAL: {val} | TABLES: {snapshot['table_count']} | DATA_ROWS: {data_rows}]\n"
+                payload += "[REASON]: " + "; ".join(reasons) + "\n"
+                expected = (["segment", "bearish", "bullish", "net_oi", "change"] if tab_name == "Summary"
+                            else ["tab-specific fields", "source date", "units"])
+                manifest_tracker.record_dataset("Sensibull", key, pub_state, ext, val, expected, data_rows, reasons)
+            except Exception as exc:
+                reason = f"{type(exc).__name__}: {exc}"
+                payload += f"[STATUS -> PUB: {pub_state} | EXT: FAILED | VAL: INVALID | REASON: {reason}]\n"
+                manifest_tracker.record_dataset("Sensibull", key, pub_state, "FAILED", "INVALID",
+                    ["tab-specific fields"], 0, [reason])
+    except Exception as exc:
+        payload += f"\n[FII/DII PORTAL ERROR: {type(exc).__name__}: {exc}]\n"
     return payload
 
 # ==========================================================
 # 3. CCIL MULTI-MARKET CALENDAR-AWARE ADAPTER (GSSE)
 # ==========================================================
+# ==========================================================
+# 3. CCIL MULTI-MARKET ADAPTER (R&D V3 VERIFIED TAB EVIDENCE)
+# ==========================================================
 def extract_ccil_multi_tabs(driver, manifest_tracker):
-    payload = f"\n\n==================================================\n"
-    payload += f"WSH GSSE: CCIL MULTI-MARKET ISOLATION (CALENDAR-AWARE)\n"
-    payload += f"==================================================\n"
-    
+    payload = "\n\n==================================================\n"
+    payload += "WSH GSSE: CCIL MULTI-MARKET ISOLATION (R&D V3 VERIFIED TAB EVIDENCE)\n"
+    payload += "==================================================\n"
     tabs = ["Money Market", "Gsec", "Forex", "Derivatives"]
-    is_trading = is_market_trading_day()
-    pub_state = "PUBLISHED" if is_trading else "MARKET_CLOSED"
-
+    # Weekends are a configured closure rule; weekdays remain UNKNOWN until page evidence proves publication.
+    pub_state = "PUBLISHED" if is_market_trading_day() else "MARKET_CLOSED"
+    pub_reason = "Weekday source content will determine publication; calendar alone is insufficient." if pub_state == "PUBLISHED" else "Weekend closure rule."
+    contracts = {
+        "Money Market": {"instrument": {"instrument", "product", "segment", "market", "scheme", "tenor"},
+                         "rate": {"rate", "weightedaveragerate", "wavg rate", "weighted average rate", "interestrate"}},
+        "Gsec": {"security": {"security", "securityname", "isin", "scrip", "instrument", "governmentsecurity"},
+                 "maturity": {"maturity", "maturitydate", "redemptiondate"},
+                 "yield_or_price": {"yield", "ytm", "price", "cleanprice", "coupon"}},
+        "Forex": {"pair_or_instrument": {"currencypair", "pair", "currency", "instrument", "ccy"},
+                  "rate": {"rate", "exchangerate", "forwardrate", "spotrate", "buyrate", "sellrate"}},
+        "Derivatives": {"contract": {"contract", "instrument", "underlying", "product", "contractname"},
+                        "expiry_or_value_date": {"expiry", "expirydate", "valuedate", "maturity", "settlementdate"}},
+    }
+    contamination_markers = ("TREPS", "TREP", "CALL MONEY", "SPECIAL REPO", "BASKET REPO", "NOTICE MONEY", "MONEY MARKET")
     try:
         driver.get("https://www.ccilindia.com/")
-        WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        time.sleep(6)
-        
+        WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        time.sleep(5)
         for tab_name in tabs:
+            key = f"ccil_{tab_name.lower().replace(' ', '_')}"
             payload += f"\n\n--- GSSE CCIL SUB-MARKET TAB: {tab_name} ---\n"
-            
-            # If weekend, handle as expected non-publication rather than script failure
-            if not is_trading:
-                payload += f"\n[STATUS -> PUB: MARKET_CLOSED | EXT: NOT_ATTEMPTED | VAL: NOT_RUN | Note: Weekend non-publication window]\n"
-                manifest_tracker.record_dataset("CCIL", f"ccil_{tab_name.lower().replace(' ', '_')}", "MARKET_CLOSED", "NOT_ATTEMPTED", "NOT_RUN", ["instrument", "rate"], 0, ["Expected weekend non-publication"])
+            if pub_state == "MARKET_CLOSED":
+                payload += "[STATUS -> PUB: MARKET_CLOSED | EXT: NOT_ATTEMPTED | VAL: NOT_RUN]\n"
+                manifest_tracker.record_dataset("CCIL", key, "MARKET_CLOSED", "NOT_ATTEMPTED", "NOT_RUN",
+                    ["market-specific schema"], 0, [pub_reason])
                 continue
-
             try:
-                tab_xpath = f"//*[self::a or self::button or self::span][contains(normalize-space(text()), '{tab_name}')]"
-                tab_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
-                driver.execute_script("arguments[0].click();", tab_element)
-                time.sleep(4)
-                
-                soup = BeautifulSoup(driver.page_source, 'html.parser')
-                tables = soup.find_all('table')
-                
-                if tables:
-                    table_text = tables[0].get_text(strip=True)
-                    if tab_name == "Gsec" and any(k in table_text for k in ["CALL", "TREP", "SPECIAL REPO", "BASKET REPO"]):
-                        ext_state, val_state = "SUCCESS", "QUARANTINED"
-                        reasons = ["Contamination detected: Gsec table contains Money Market instruments."]
-                    elif len(table_text) < 20:
-                        ext_state, val_state = "SUCCESS", "INVALID"
-                        reasons = ["Extracted table is empty."]
-                    elif not any(_wsh_has_expected_table_schema(tbl, (("instrument", "security", "tenor", "product", "currency", "market"), ("rate", "yield", "price", "value", "amount", "quote"))) for tbl in tables):
-                        ext_state, val_state = "SUCCESS", "INVALID"
-                        reasons = ["Table content exists, but no table header matched expected instrument/market and rate/value fields; not accepted as valid CCIL data."]
-                        for idx, tbl in enumerate(tables):
-                            payload += f"\n[Diagnostic table #{idx + 1} for {tab_name}; NOT VALIDATED]\n"
-                            payload += re.sub(r"\s+", " ", tbl.get_text(" ", strip=True))[:1200] + "\n"
-                    else:
-                        ext_state, val_state, reasons = "SUCCESS", "PARTIAL", ["Header pattern matched, but source-specific CCIL market isolation and units still require verification."]
-                        for idx, tbl in enumerate(tables):
-                            payload += f"\n[Table #{idx + 1} for {tab_name}]\n"
-                            for row in tbl.find_all('tr'):
-                                cols = row.find_all(['td', 'th'])
-                                r_data = [c.get_text(strip=True) for c in cols]
-                                if r_data:
-                                    payload += " | ".join(r_data) + "\n"
-                    
-                    payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state}]\n"
+                transition = _wsh_v3_activate_tab(driver, tab_name)
+                html = driver.page_source
+                soup = BeautifulSoup(html, "html.parser")
+                snapshot = _wsh_v3_table_snapshot(html)
+                table_details, selected_rows, contract_matches = [], [], []
+                gsec_contamination = []
+                for ti, table in enumerate(soup.find_all("table")):
+                    rows = table.find_all("tr")
+                    if not rows:
+                        continue
+                    header = [c.get_text(" ", strip=True) for c in rows[0].find_all(["th", "td"])]
+                    if not header:
+                        continue
+                    normalized = {_wsh_norm_key(h) for h in header}
+                    matched = {field: sorted(normalized.intersection({_wsh_norm_key(a) for a in aliases}))
+                               for field, aliases in contracts[tab_name].items()}
+                    complete = all(bool(v) for v in matched.values())
+                    data = []
+                    for row in rows[1:]:
+                        cells = [c.get_text(" ", strip=True) for c in row.find_all(["th", "td"])]
+                        if cells and any(x.strip() for x in cells):
+                            data.append(cells)
+                    table_text = table.get_text(" ", strip=True).upper()
+                    markers = [m for m in contamination_markers if m in table_text]
+                    if tab_name == "Gsec":
+                        gsec_contamination.extend(markers)
+                    table_details.append({"table": ti+1, "headers": header, "matched_fields": matched,
+                        "contract_complete": complete, "data_rows": len(data), "contamination_markers": markers})
+                    if complete and data:
+                        contract_matches.append((ti+1, header, data, matched))
+                    elif data:
+                        # Keep raw candidate evidence visible but never treat generic rows as a market match.
+                        selected_rows.append((ti+1, header, data, False))
+                evidence = {"url": getattr(driver, "current_url", ""), "tab": tab_name,
+                    "transition": transition, "table_snapshot": snapshot, "table_details": table_details,
+                    "contract_matches": [{"table": x[0], "headers": x[1], "matched_fields": x[3], "rows": len(x[2])} for x in contract_matches],
+                    "gsec_contamination_markers": sorted(set(gsec_contamination)),
+                    "page_text_excerpt": re.sub(r"\s+", " ", soup.get_text(" ", strip=True))[:1800]}
+                raw_path, evidence_path = _wsh_v3_save_evidence(key, html, evidence)
+                payload += f"[RAW EVIDENCE]: {raw_path}\n[EVIDENCE JSON]: {evidence_path}\n"
+                payload += "[TAB TRANSITION]: " + json.dumps(transition, ensure_ascii=False, default=str) + "\n"
+                payload += "[TABLE CONTRACT DIAGNOSTICS]: " + json.dumps(table_details, ensure_ascii=False) + "\n"
+                total_data_rows = sum(len(x[2]) for x in contract_matches)
+                if not transition.get("verified"):
+                    ext, val = "FAILED", "INVALID"
+                    reasons = ["Target CCIL tab transition was not verified; page captured as diagnostic evidence only."]
+                elif not snapshot["table_count"]:
+                    ext, val = "FAILED", "INVALID"
+                    reasons = ["No HTML tables were rendered after the tab selection attempt."]
+                elif tab_name == "Gsec" and gsec_contamination:
+                    ext, val = "SUCCESS", "QUARANTINED"
+                    reasons = [f"GSEC content contains money-market contamination markers: {sorted(set(gsec_contamination))}."]
+                elif not contract_matches:
+                    ext, val = "SUCCESS", "QUARANTINED"
+                    reasons = ["Tables rendered but no complete positive market-specific header contract matched; raw evidence retained."]
                 else:
-                    ext_state, val_state = "FAILED", "INVALID"
-                    reasons = ["No table elements found."]
-                    payload += f"\n[STATUS -> PUB: {pub_state} | EXT: {ext_state} | VAL: {val_state}]\n"
-                
-                manifest_tracker.record_dataset("CCIL", f"ccil_{tab_name.lower().replace(' ', '_')}", pub_state, ext_state, val_state, ["instrument", "rate"], 1 if val_state=="VALID" else 0, reasons)
-
-            except Exception as e:
-                manifest_tracker.record_dataset("CCIL", f"ccil_{tab_name.lower().replace(' ', '_')}", pub_state, "FAILED", "INVALID", ["instrument", "rate"], 0, [str(e)])
-                
-    except Exception as e:
-        payload += f"\n[CCIL Portal General Error: {str(e)}]\n"
-        
+                    ext, val = "SUCCESS", "QUARANTINED"
+                    reasons = ["Market-specific header contract matched; units, observation date, instrument identity, source semantics and independent reconciliation remain pending."]
+                for ti, header, rows, matched in contract_matches:
+                    payload += f"\n[CONTRACT-MATCHED TABLE #{ti} | {tab_name}]\n"
+                    payload += " | ".join(header) + "\n"
+                    for row in rows:
+                        payload += " | ".join(row) + "\n"
+                if selected_rows:
+                    payload += f"[NON-MATCHING TABLES RETAINED IN RAW EVIDENCE]: {len(selected_rows)}\n"
+                payload += f"\n[STATUS -> PUB: {pub_state if snapshot['table_count'] else 'UNKNOWN'} | EXT: {ext} | VAL: {val} | TABLES: {snapshot['table_count']} | CONTRACT_ROWS: {total_data_rows}]\n"
+                payload += "[PUBLICATION NOTE]: " + pub_reason + "\n[REASON]: " + "; ".join(reasons) + "\n"
+                manifest_pub = ("PUBLISHED" if snapshot["table_count"] and transition.get("verified") else "UNKNOWN")
+                expected = sorted({a for group in contracts[tab_name].values() for a in group})
+                manifest_tracker.record_dataset("CCIL", key, manifest_pub, ext, val, expected, total_data_rows, reasons)
+            except Exception as exc:
+                reason = f"{type(exc).__name__}: {exc}"
+                payload += f"[STATUS -> PUB: UNKNOWN | EXT: FAILED | VAL: INVALID | REASON: {reason}]\n"
+                manifest_tracker.record_dataset("CCIL", key, "UNKNOWN", "FAILED", "INVALID",
+                    ["market-specific schema"], 0, [reason])
+    except Exception as exc:
+        payload += f"\n[CCIL PORTAL ERROR: {type(exc).__name__}: {exc}]\n"
     return payload
 
 # ==========================================================
@@ -1016,7 +1235,7 @@ def execute_wsh_institutional_pipeline():
         with open(__file__, "rb") as source_file:
             source_hash = hashlib.sha256(source_file.read()).hexdigest()
         with open(os.path.join(folder_path, f"WSH_Source_Fingerprint_{run_date_str}.txt"), "w", encoding="utf-8") as fp:
-            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-10-21_EXPIRY-FALLBACK_1\n")
+            fp.write(f"pipeline_version=WSH_COLLECTOR_RND_2026-11-09_FII-CCIL-REPAIR_V3\n")
             fp.write(f"source_file={os.path.basename(__file__)}\nsha256={source_hash}\n")
     except Exception as e:
         print(f"[PROVENANCE WARNING] Could not write source fingerprint: {e}")
