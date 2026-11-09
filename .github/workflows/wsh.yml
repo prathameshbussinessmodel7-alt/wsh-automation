@@ -1,3 +1,4 @@
+
 name: WSH Cloud Institutional Pipeline
 
 on:
@@ -9,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: wsh-cloud-pipeline-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   run-cloud-pipeline:
     runs-on: ubuntu-latest
@@ -16,6 +21,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -37,11 +44,32 @@ jobs:
 
     - name: Commit and Push Cloud Reports
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TARGET_BRANCH: ${{ github.ref_name }}
       run: |
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        git config --global user.name "WSH-Cloud-Bot"
-        git config --global user.email "bot@whitesaltholdings.local"
+        set -e
+
+        echo "Current execution branch: $TARGET_BRANCH"
+
+        git remote set-url origin \
+          "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+        git config user.name "WSH-Cloud-Bot"
+        git config user.email "bot@whitesaltholdings.local"
+
         git add WSH_Automated_Reports/
-        git commit -m "Auto-harvested cloud report [skip ci]" || echo "No changes to commit"
-        git push origin HEAD:main
+
+        if git diff --cached --quiet; then
+          echo "No new cloud reports to commit."
+          exit 0
+        fi
+
+        git commit -m "Auto-harvested cloud report [skip ci]"
+
+        git fetch origin "$TARGET_BRANCH"
+
+        git rebase "origin/$TARGET_BRANCH"
+
+        git push origin "HEAD:$TARGET_BRANCH"
+
+        echo "Reports successfully pushed to $TARGET_BRANCH"
