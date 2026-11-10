@@ -1,6 +1,5 @@
-
 """
-WSH R7.4 — Integrated Evidence Acceptance Gate.
+WSH R7.4 â€” Integrated Evidence Acceptance Gate.
 
 Purpose:
 Evaluate acquisition, provenance, semantic and cross-layer
@@ -416,26 +415,7 @@ def _validate_cross_layer(
             "One or more layers are unavailable for cross-layer validation.",
         )
 
-    acquisition_count = acquisition.get("records_count")
-    semantic_count = semantic.get("records_checked")
-
-    if (
-        isinstance(acquisition_count, bool)
-        or not isinstance(acquisition_count, int)
-        or isinstance(semantic_count, bool)
-        or not isinstance(semantic_count, int)
-    ):
-        return _result(
-            "UNKNOWN",
-            "Record counts cannot be compared.",
-        )
-
-    if acquisition_count != semantic_count:
-        return _result(
-            "FAIL",
-            "Acquired record count and semantically checked record count differ.",
-        )
-
+    # Identity contradictions remain FAIL, even when no records were acquired.
     identities = [
         acquisition.get("dataset"),
         provenance.get("dataset"),
@@ -457,6 +437,40 @@ def _validate_cross_layer(
         return _result(
             "FAIL",
             "Dataset identities conflict across evidence layers.",
+        )
+
+    acquisition_count = acquisition.get("records_count")
+    semantic_count = semantic.get("records_checked")
+
+    if (
+        isinstance(acquisition_count, bool)
+        or not isinstance(acquisition_count, int)
+        or isinstance(semantic_count, bool)
+        or not isinstance(semantic_count, int)
+    ):
+        return _result(
+            "UNKNOWN",
+            "Record counts cannot be compared.",
+        )
+
+    if acquisition_count < 0 or semantic_count < 0:
+        return _result(
+            "FAIL",
+            "Record counts cannot be negative.",
+        )
+
+    # Zero acquired records provide no basis for count reconciliation.
+    # This is UNKNOWN, not FAIL; absence alone is not a contradiction.
+    if acquisition_count == 0:
+        return _result(
+            "UNKNOWN",
+            "No acquired records are available; cross-layer consistency cannot be established.",
+        )
+
+    if acquisition_count != semantic_count:
+        return _result(
+            "FAIL",
+            "Acquired record count and semantically checked record count differ.",
         )
 
     return _result(
