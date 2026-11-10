@@ -1,4 +1,4 @@
-"""WSH isolated NSE FII/DII + CCIL collector — R7.5.1.
+"""WSH isolated NSE FII/DII + CCIL collector — R7.5.2.
 
 R6 repairs CCIL table attribution: each market is identified by its own exact
 header contract, not by page-wide fingerprints or unrelated page text. The
@@ -32,13 +32,13 @@ except ImportError:  # Allows offline parser/regression tests without Selenium i
         CSS_SELECTOR = "css selector"
         TAG_NAME = "tag name"
 
-PIPELINE_VERSION = "WSH_FII_CCIL_ISOLATED_R7.5.1_2026-11-11"
+PIPELINE_VERSION = "WSH_FII_CCIL_ISOLATED_R7.5.2_2026-11-11"
 REPORT_DIR = "WSH_FII_CCIL_RND"
 EVIDENCE_DIR = os.path.join(REPORT_DIR, "evidence")
 CCIL_URL = "https://www.ccilindia.com/"
 NSE_PAGE = "https://www.nseindia.com/reports/fii-dii"
 NSE_ENDPOINT = "https://www.nseindia.com/api/fiidiiTradeReact"
-CCIL_WAIT_SECONDS = 18
+CCIL_WAIT_SECONDS = 30
 
 # Exact normalized header sequences observed in the supplied Run #1 evidence.
 # These contracts deliberately preserve CCIL's native field names and units.
@@ -227,27 +227,73 @@ def select_ccil_market(driver, market):
     return diag
 
 
-def wait_for_market_table(driver, market, timeout=CCIL_WAIT_SECONDS):
-    """Wait for this market's own exact-header table and non-empty rows.
+def ccil_page_diagnostics(driver, market):
+    """Capture observable page state without inferring publication or market status."""
+    diagnostics = {"target_market": market, "current_url": getattr(driver, "current_url", None)}
+    try:
+        diagnostics["ready_state"] = driver.execute_script("return document.readyState")
+    except Exception as exc:
+        diagnostics["ready_state_error"] = type(exc).__name__
+    try:
+        diagnostics["active_controls"] = [
+            {"label": label, "active": active_state(element),
+             "aria_selected": element.get_attribute("aria-selected"),
+             "aria_controls": element.get_attribute("aria-controls"),
+             "role": element.get_attribute("role")}
+            for label, element in visible_controls(driver)
+        ]
+    except Exception as exc:
+        diagnostics["active_controls_error"] = type(exc).__name__
+    try:
+        diagnostics["loading_indicators"] = driver.execute_script("""
+          const selectors=['[aria-busy=true]','.loading','.loader','.spinner',
+                           '[class*=loading i]','[class*=spinner i]'];
+          return selectors.flatMap(s=>Array.from(document.querySelectorAll(s)))
+            .filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0})
+            .slice(0,30).map(e=>({selector:e.tagName.toLowerCase(),className:String(e.className||''),
+              text:(e.innerText||e.getAttribute('aria-label')||'').trim().slice(0,160)}));
+        """)
+    except Exception as exc:
+        diagnostics["loading_indicators_error"] = type(exc).__name__
+    try:
+        diagnostics["performance_resources"] = driver.execute_script("""
+          return performance.getEntriesByType('resource').map(x=>x.name)
+            .filter(x=>/ccil|market|gsec|forex|deriv|money|api/i.test(x))
+            .slice(-80);
+        """)
+    except Exception as exc:
+        diagnostics["performance_resources_error"] = type(exc).__name__
+    try:
+        diagnostics["iframe_count"] = len(driver.find_elements(By.TAG_NAME, 'iframe'))
+    except Exception:
+        diagnostics["iframe_count"] = None
+    return diagnostics
 
-    Page-wide fingerprints and other market tables are deliberately ignored.
-    The last observed target table is returned even when it remains empty.
-    """
+
+def wait_for_market_table(driver, market, timeout=CCIL_WAIT_SECONDS):
+    """Poll the exact target table and retain state transitions for diagnosis."""
     end = time.monotonic() + timeout
     last_html = driver.page_source
     last_table, last_reason = find_contract_table(last_html, market)
     observations = []
+    previous_signature = None
     while time.monotonic() < end:
         last_html = driver.page_source
         last_table, last_reason = find_contract_table(last_html, market)
-        observations.append({"at": datetime.datetime.now().astimezone().isoformat(),
-                             "contract_status": last_reason,
-                             "rows": last_table["row_count"] if last_table else 0,
-                             "table_fingerprint": last_table["fingerprint"] if last_table else None})
+        signature = (last_table["row_count"], last_table["fingerprint"]) if last_table else (0, None)
+        observations.append({
+            "captured_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "contract_status": last_reason,
+            "rows": last_table["row_count"] if last_table else 0,
+            "table_fingerprint": last_table["fingerprint"] if last_table else None,
+            "table_state_changed": signature != previous_signature,
+        })
+        previous_signature = signature
         if last_table and last_table["row_count"] > 0:
             return last_html, last_table, observations, "TARGET_TABLE_POPULATED"
         time.sleep(0.75)
-    return last_html, last_table, observations, "TARGET_TABLE_EMPTY_AFTER_WAIT" if last_table else last_reason
+    status = "TARGET_TABLE_EMPTY_AFTER_WAIT" if last_table else last_reason
+    return last_html, last_table, observations, status
 
 
 def decimal_reconciliation(records):
@@ -400,8 +446,8 @@ def extract_nse_fii_dii(driver, manifest, output):
 
     # These remain explicitly unimplemented rather than being inferred from the cash API.
     for dataset, reason in [
-        ("fii_dii_derivatives_participant", "Participant-wise derivatives source mapping is not implemented in R6; no data fabricated."),
-        ("fii_dii_history", "Historical archive source mapping is not implemented in R6; no data fabricated."),
+        ("fii_dii_derivatives_participant", "Participant-wise derivatives source mapping is not implemented in R7.5.2; no data fabricated."),
+        ("fii_dii_history", "Historical archive source mapping is not implemented in R7.5.2; no data fabricated."),
     ]:
         manifest.record(dataset, "NSE", "UNKNOWN", "NOT_ATTEMPTED", "NOT_RUN",
                         ["source-specific fields", "report date", "units"], 0, [reason])
@@ -410,7 +456,7 @@ def extract_nse_fii_dii(driver, manifest, output):
 
 
 def extract_ccil(driver, manifest):
-    lines = ["WSH CCIL FOUR-MARKET TABLE EXTRACTION — R6", f"Source: {CCIL_URL}",
+    lines = ["WSH CCIL FOUR-MARKET TABLE EXTRACTION — R7.5.2", f"Source: {CCIL_URL}",
              "Identity rule: exact market-specific header contract; page-wide fingerprints are diagnostic only."]
     driver.get(CCIL_URL)
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
@@ -425,6 +471,7 @@ def extract_ccil(driver, manifest):
             if market != "Money Market":
                 transition = select_ccil_market(driver, market)
             html, table, observations, wait_status = wait_for_market_table(driver, market)
+            page_state_diagnostics = ccil_page_diagnostics(driver, market)
             all_tables = parse_html_tables(html)
             page_table_count = len(all_tables)
             page_fingerprint = sha_bytes("|".join(sorted(t["fingerprint"] for t in all_tables)))
@@ -444,6 +491,8 @@ def extract_ccil(driver, manifest):
                 "page_fingerprint_diagnostic_only": page_fingerprint,
                 "wait_status": wait_status,
                 "poll_observations": observations,
+                "poll_duration_seconds": round((len(observations) - 1) * 0.75, 2),
+                "page_state_diagnostics": page_state_diagnostics,
                 "unit_notes": contract["unit_notes"],
                 "row_policy": "rows with blank first-column key excluded as footer/summary rows",
             }
@@ -477,11 +526,14 @@ def extract_ccil(driver, manifest):
                     lines.append(" | ".join(row))
             elif table and row_count == 0:
                 reasons = ["Target-specific table and header contract were found, but no data rows appeared within the wait window.",
-                           "This is an EMPTY capture, not evidence that the market was closed or unpublished."]
+                           "This is an EMPTY capture, not evidence that the market was closed or unpublished.",
+                           "Page readiness, active controls, loading indicators, iframe count and matching resource URLs were captured for diagnosis."]
                 manifest.record(key, "CCIL", "UNKNOWN", "EMPTY", "INVALID", contract["fields"], 0,
                                 reasons, evidence,
                                 {"target_table_fingerprint": target_fp, "target_table_index": table["index"],
-                                 "navigation_transition": transition, "table_identity_method": "EXACT_NORMALIZED_HEADER_SEQUENCE"})
+                                 "navigation_transition": transition, "table_identity_method": "EXACT_NORMALIZED_HEADER_SEQUENCE",
+                                 "empty_capture_diagnostics": page_state_diagnostics,
+                                 "poll_observation_count": len(observations)})
                 lines += ["STATUS: UNKNOWN / EMPTY / INVALID", "REASONS: " + "; ".join(reasons),
                           f"Evidence: {json.dumps(evidence)}"]
             else:
@@ -526,7 +578,7 @@ def main():
     with open(os.path.join(REPORT_DIR, f"WSH_Source_Fingerprint_{stamp}.txt"), "w", encoding="utf-8") as f:
         f.write(f"pipeline_version={PIPELINE_VERSION}\nsource_file={os.path.basename(__file__)}\nsha256={sha_bytes(open(source_path, 'rb').read())}\n")
     counts = Counter(item["validation_status"] for item in manifest.data["datasets"].values())
-    print(f"[FII-CCIL R6 COMPLETE] datasets={len(manifest.data['datasets'])} validation={dict(counts)} manifest={manifest_path}")
+    print(f"[FII-CCIL R7.5.2 COMPLETE] datasets={len(manifest.data['datasets'])} validation={dict(counts)} manifest={manifest_path}")
 
 
 if __name__ == "__main__":
