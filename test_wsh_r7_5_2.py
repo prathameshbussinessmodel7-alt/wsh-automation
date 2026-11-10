@@ -49,7 +49,7 @@ class CollectorSourceTests(unittest.TestCase):
         self.assertNotIn("not implemented in R6", source)
     def test_r752_version_fingerprint(self):
         source=(ROOT/"wsh_fii_ccil_only.py").read_text(encoding="utf-8")
-        self.assertIn("WSH_FII_CCIL_ISOLATED_R7.5.2", source)
+        self.assertIn("WSH_FII_CCIL_ISOLATED_R7.5.3", source)
     def test_empty_capture_diagnostics_added(self):
         source=(ROOT/"wsh_fii_ccil_only.py").read_text(encoding="utf-8")
         self.assertIn("page_state_diagnostics", source)

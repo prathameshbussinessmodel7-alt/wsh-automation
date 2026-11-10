@@ -1,4 +1,4 @@
-"""WSH isolated NSE FII/DII + CCIL collector — R7.5.2.
+"""WSH isolated NSE FII/DII + CCIL collector — R7.5.3.
 
 R6 repairs CCIL table attribution: each market is identified by its own exact
 header contract, not by page-wide fingerprints or unrelated page text. The
@@ -32,13 +32,14 @@ except ImportError:  # Allows offline parser/regression tests without Selenium i
         CSS_SELECTOR = "css selector"
         TAG_NAME = "tag name"
 
-PIPELINE_VERSION = "WSH_FII_CCIL_ISOLATED_R7.5.2_2026-11-11"
+PIPELINE_VERSION = "WSH_FII_CCIL_ISOLATED_R7.5.3_2026-11-11"
 REPORT_DIR = "WSH_FII_CCIL_RND"
 EVIDENCE_DIR = os.path.join(REPORT_DIR, "evidence")
 CCIL_URL = "https://www.ccilindia.com/"
 NSE_PAGE = "https://www.nseindia.com/reports/fii-dii"
 NSE_ENDPOINT = "https://www.nseindia.com/api/fiidiiTradeReact"
 CCIL_WAIT_SECONDS = 30
+CCIL_NETWORK_EVENT_BUFFER = []
 
 # Exact normalized header sequences observed in the supplied Run #1 evidence.
 # These contracts deliberately preserve CCIL's native field names and units.
@@ -225,6 +226,130 @@ def select_ccil_market(driver, market):
     except Exception as exc:
         diag["click_error"] = f"{type(exc).__name__}: {exc}"
     return diag
+
+
+CCIL_TABLE_RESOURCE_IDS = {
+    "Money Market": "moneyMarketTable",
+    "Gsec": "gsecTable",
+    "Forex": "forexTable",
+    "Derivatives": "derivativeTable",
+}
+
+
+def parse_chrome_network_events(entries, market):
+    """Reduce Chrome performance-log entries to target CCIL table request evidence."""
+    from urllib.parse import urlparse, parse_qs
+    target = CCIL_TABLE_RESOURCE_IDS[market]
+    requests, responses, finished, failures = {}, {}, set(), {}
+    for entry in entries or []:
+        try:
+            envelope = json.loads(entry["message"] if isinstance(entry, dict) else entry)
+            message = envelope.get("message", envelope)
+            method, params = message.get("method"), message.get("params", {})
+            if method == "Network.requestWillBeSent":
+                req = params.get("request", {})
+                url = req.get("url", "")
+                rid = params.get("requestId")
+                resource_id = parse_qs(urlparse(url).query).get("p_p_resource_id", [None])[0]
+                if rid and resource_id == target:
+                    requests[rid] = {"request_id": rid, "url": url,
+                                     "method": req.get("method"),
+                                     "request_timestamp": params.get("timestamp"),
+                                     "initiator_type": params.get("initiator", {}).get("type")}
+            elif method == "Network.responseReceived":
+                rid = params.get("requestId")
+                if rid in requests:
+                    response = params.get("response", {})
+                    responses[rid] = {
+                        "http_status": response.get("status"),
+                        "status_text": response.get("statusText"),
+                        "mime_type": response.get("mimeType"),
+                        "protocol": response.get("protocol"),
+                        "remote_ip_address": response.get("remoteIPAddress"),
+                        "from_disk_cache": response.get("fromDiskCache", False),
+                        "from_service_worker": response.get("fromServiceWorker", False),
+                        "encoded_data_length": response.get("encodedDataLength"),
+                        "response_headers": {k: v for k, v in (response.get("headers") or {}).items()
+                                              if k.lower() in {"content-type", "content-length", "cache-control", "date", "server"}},
+                    }
+            elif method == "Network.loadingFinished" and params.get("requestId") in requests:
+                finished.add(params["requestId"])
+            elif method == "Network.loadingFailed" and params.get("requestId") in requests:
+                failures[params["requestId"]] = {
+                    "error_text": params.get("errorText"),
+                    "canceled": params.get("canceled", False),
+                    "blocked_reason": params.get("blockedReason"),
+                }
+        except Exception:
+            continue
+
+    results = []
+    for rid, req in requests.items():
+        response = responses.get(rid, {})
+        failure = failures.get(rid)
+        status = response.get("http_status")
+        if failure:
+            verdict = "REQUEST_FAILED"
+        elif status is None:
+            verdict = "RESPONSE_NOT_OBSERVED"
+        elif not (200 <= int(status) < 300):
+            verdict = "HTTP_ERROR"
+        elif rid in finished:
+            verdict = "HTTP_SUCCESS_BODY_PENDING"
+        else:
+            verdict = "RESPONSE_RECEIVED_NOT_FINISHED"
+        results.append({**req, **response, "loading_finished": rid in finished,
+                        "loading_failure": failure, "network_verdict": verdict})
+    return {"target_resource_id": target, "request_count": len(results),
+            "requests": results,
+            "capture_note": "Only matching CCIL table-resource requests are included; absence is not proof that the source has no data."}
+
+
+def capture_ccil_network_evidence(driver, market):
+    """Drain Chrome network events and preserve matching response metadata/body when available."""
+    try:
+        entries = driver.get_log("performance")
+        CCIL_NETWORK_EVENT_BUFFER.extend(entries)
+    except Exception as exc:
+        return {"target_resource_id": CCIL_TABLE_RESOURCE_IDS[market], "request_count": 0,
+                "requests": [], "log_capture_error": f"{type(exc).__name__}: {exc}"}
+    # Keep a page-session buffer: CCIL may request all four table endpoints during initial load.
+    # Do not discard GSEC/Forex/Derivatives events merely because Money Market is audited first.
+    result = parse_chrome_network_events(CCIL_NETWORK_EVENT_BUFFER, market)
+    body_files = []
+    for item in result["requests"]:
+        if not item.get("loading_finished") or item.get("loading_failure"):
+            item["body_capture_status"] = "NOT_AVAILABLE_REQUEST_NOT_FINISHED"
+            continue
+        try:
+            body_result = driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": item["request_id"]})
+            body = body_result.get("body", "")
+            if body_result.get("base64Encoded"):
+                import base64
+                raw = base64.b64decode(body)
+            else:
+                raw = body.encode("utf-8", "replace")
+            digest = hashlib.sha256(raw).hexdigest()
+            stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+            filename = f"ccil_network_{market.lower().replace(' ', '_')}_{stamp}.response.raw"
+            os.makedirs(EVIDENCE_DIR, exist_ok=True)
+            path = os.path.join(EVIDENCE_DIR, filename)
+            # Preserve full response up to 5 MiB; larger payloads are explicitly truncated.
+            limit = 5 * 1024 * 1024
+            stored = raw[:limit]
+            with open(path, "wb") as handle:
+                handle.write(stored)
+            item.update({"body_capture_status": "CAPTURED" if len(raw) <= limit else "TRUNCATED_5_MIB",
+                         "body_length_bytes": len(raw), "body_sha256": digest,
+                         "body_saved_path": path, "body_saved_length_bytes": len(stored),
+                         "body_base64_encoded_by_browser": bool(body_result.get("base64Encoded"))})
+            body_files.append(path)
+        except Exception as exc:
+            item["body_capture_status"] = "CAPTURE_FAILED"
+            item["body_capture_error"] = f"{type(exc).__name__}: {exc}"
+    result["response_body_files"] = body_files
+    result["captured_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    return result
 
 
 def ccil_page_diagnostics(driver, market):
@@ -472,6 +597,7 @@ def extract_ccil(driver, manifest):
                 transition = select_ccil_market(driver, market)
             html, table, observations, wait_status = wait_for_market_table(driver, market)
             page_state_diagnostics = ccil_page_diagnostics(driver, market)
+            network_response_diagnostics = capture_ccil_network_evidence(driver, market)
             all_tables = parse_html_tables(html)
             page_table_count = len(all_tables)
             page_fingerprint = sha_bytes("|".join(sorted(t["fingerprint"] for t in all_tables)))
@@ -493,6 +619,7 @@ def extract_ccil(driver, manifest):
                 "poll_observations": observations,
                 "poll_duration_seconds": round((len(observations) - 1) * 0.75, 2),
                 "page_state_diagnostics": page_state_diagnostics,
+                "network_response_diagnostics": network_response_diagnostics,
                 "unit_notes": contract["unit_notes"],
                 "row_policy": "rows with blank first-column key excluded as footer/summary rows",
             }
@@ -527,7 +654,7 @@ def extract_ccil(driver, manifest):
             elif table and row_count == 0:
                 reasons = ["Target-specific table and header contract were found, but no data rows appeared within the wait window.",
                            "This is an EMPTY capture, not evidence that the market was closed or unpublished.",
-                           "Page readiness, active controls, loading indicators, iframe count and matching resource URLs were captured for diagnosis."]
+                           "Page readiness, active controls, loading indicators, iframe count, resource URLs and matching HTTP response/body evidence were captured where available."]
                 manifest.record(key, "CCIL", "UNKNOWN", "EMPTY", "INVALID", contract["fields"], 0,
                                 reasons, evidence,
                                 {"target_table_fingerprint": target_fp, "target_table_index": table["index"],
@@ -556,6 +683,8 @@ def main():
     manifest = QualityManifest()
     options = Options()
     options.add_argument("--headless=new")
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL", "browser": "ALL"})
+    options.add_experimental_option("perfLoggingPrefs", {"enableNetwork": True, "enablePage": True})
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
@@ -563,6 +692,8 @@ def main():
     options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36")
     driver = webdriver.Chrome(options=options)
     try:
+        driver.execute_cdp_cmd("Network.enable", {})
+        CCIL_NETWORK_EVENT_BUFFER.clear()
         fii_report = extract_nse_fii_dii(driver, manifest, None)
         ccil_report = extract_ccil(driver, manifest)
     finally:
@@ -578,7 +709,7 @@ def main():
     with open(os.path.join(REPORT_DIR, f"WSH_Source_Fingerprint_{stamp}.txt"), "w", encoding="utf-8") as f:
         f.write(f"pipeline_version={PIPELINE_VERSION}\nsource_file={os.path.basename(__file__)}\nsha256={sha_bytes(open(source_path, 'rb').read())}\n")
     counts = Counter(item["validation_status"] for item in manifest.data["datasets"].values())
-    print(f"[FII-CCIL R7.5.2 COMPLETE] datasets={len(manifest.data['datasets'])} validation={dict(counts)} manifest={manifest_path}")
+    print(f"[FII-CCIL R7.5.3 COMPLETE] datasets={len(manifest.data['datasets'])} validation={dict(counts)} manifest={manifest_path}")
 
 
 if __name__ == "__main__":
