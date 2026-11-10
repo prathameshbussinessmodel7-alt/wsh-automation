@@ -1,4 +1,4 @@
-"""WSH isolated NSE FII/DII + CCIL collector — R6.
+"""WSH isolated NSE FII/DII + CCIL collector — R7.5.1.
 
 R6 repairs CCIL table attribution: each market is identified by its own exact
 header contract, not by page-wide fingerprints or unrelated page text. The
@@ -13,6 +13,8 @@ import hashlib
 import datetime
 from decimal import Decimal, InvalidOperation
 from collections import Counter
+
+from wsh_r7_5_1 import attach_capture_timestamp, extract_explicit_ccil_date
 
 from bs4 import BeautifulSoup
 try:
@@ -30,7 +32,7 @@ except ImportError:  # Allows offline parser/regression tests without Selenium i
         CSS_SELECTOR = "css selector"
         TAG_NAME = "tag name"
 
-PIPELINE_VERSION = "WSH_FII_CCIL_ISOLATED_R6_2026-11-10"
+PIPELINE_VERSION = "WSH_FII_CCIL_ISOLATED_R7.5.1_2026-11-11"
 REPORT_DIR = "WSH_FII_CCIL_RND"
 EVIDENCE_DIR = os.path.join(REPORT_DIR, "evidence")
 CCIL_URL = "https://www.ccilindia.com/"
@@ -356,7 +358,7 @@ def extract_nse_fii_dii(driver, manifest, output):
         observed_dates = sorted({parse_nse_date(r.get("date")) for r in records if parse_nse_date(r.get("date"))})
         date_parse_complete = bool(records) and all(parse_nse_date(r.get("date")) for r in records)
         date_consistent = len(observed_dates) == 1
-        evidence = save_evidence(key, raw, {
+        nse_metadata = attach_capture_timestamp({
             "page_url": driver.current_url, "endpoint": NSE_ENDPOINT,
             "http_status": result.get("http_status"), "content_type": result.get("content_type"),
             "fetch_error": result.get("error"), "raw_length": len(raw),
@@ -366,7 +368,8 @@ def extract_nse_fii_dii(driver, manifest, output):
             "date_parse_complete": date_parse_complete,
             "date_consistent": date_consistent,
             "units": "UNVERIFIED — source response does not state unit in the captured record schema",
-        }, "json")
+        })
+        evidence = save_evidence(key, raw, nse_metadata, "json")
         lines += [f"HTTP status: {result.get('http_status')}", f"Records: {len(records)}",
                   f"Arithmetic reconciliation: {json.dumps(reconciliation, ensure_ascii=False)}",
                   "Units: UNVERIFIED", f"Evidence: {json.dumps(evidence)}"]
@@ -445,10 +448,13 @@ def extract_ccil(driver, manifest):
                 "row_policy": "rows with blank first-column key excluded as footer/summary rows",
             }
             numeric_checks = ccil_numeric_checks(market, rows) if table else {"rows_checked": 0, "checks_total": 0, "checks_passed": 0, "all_checks_pass": False, "row_results": []}
-            evidence = save_evidence(key, html, {"url": driver.current_url, "captured_at": datetime.datetime.now().astimezone().isoformat(),
-                                                  "source_as_of_date": "UNKNOWN_NOT_EXPLICIT_IN_CAPTURE",
+            ccil_date = extract_explicit_ccil_date({}, html)
+            ccil_metadata = attach_capture_timestamp({"url": driver.current_url,
+                                                  "source_as_of_date": ccil_date.get("normalized_date") if ccil_date.get("status") == "PASS" else "UNKNOWN_NOT_EXPLICIT_IN_CAPTURE",
+                                                  "source_date_evidence": ccil_date,
                                                   "transition_diagnostic_only": transition, "table_diagnostic": table_diag,
-                                                  "numeric_checks": numeric_checks, "rows": rows}, "html")
+                                                  "numeric_checks": numeric_checks, "rows": rows})
+            evidence = save_evidence(key, html, ccil_metadata, "html")
             if table and row_count > 0:
                 extraction = "SUCCESS"
                 validation = "PARTIAL"
