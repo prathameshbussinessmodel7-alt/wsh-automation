@@ -1,0 +1,2596 @@
+=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - 2026-11-10 09:50:22 ===
+
+
+==================================================
+WSH GSSE: CCIL MULTI-MARKET ISOLATION (CALENDAR-AWARE)
+==================================================
+
+
+--- GSSE CCIL SUB-MARKET TAB: Money Market ---
+
+
+--- GSSE CCIL SUB-MARKET TAB: Gsec ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED]
+
+
+--- GSSE CCIL SUB-MARKET TAB: Forex ---
+
+
+--- GSSE CCIL SUB-MARKET TAB: Derivatives ---
+
+
+==================================================
+WSH GSSE: TRADINGECONOMICS EXTRACTION: https://tradingeconomics.com/bonds
+==================================================
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: VALID | Tables: 6]
+
+[Table #1]
+ | Major10Y | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | United States | 4.8870 | 0.0080 | -0.09% | -0.35% | 0.72% | 0.76% | Nov/10
+ | United Kingdom | 5.1048 | 0.0348 | -0.14% | -0.33% | 0.63% | 0.71% | Nov/10
+ | Japan | 2.6950 | 0.0179 | -0.08% | -0.32% | 0.62% | 1.00% | Nov/10
+ | Australia | 4.9760 | 0.0290 | -0.12% | -0.35% | 0.22% | 0.58% | Nov/10
+ | Germany | 3.2424 | 0.0230 | -0.07% | -0.23% | 0.38% | 0.59% | Nov/10
+ | Brazil | 15.1640 | 0.0260 | -0.58% | 2.39% | 1.31% | 1.46% | Nov/09
+ | Russia | 16.6400 | 0.1100 | 0.10% | 0.00% | 2.20% | 2.12% | Nov/09
+ | India | 7.1740 | 0.0060 | -0.16% | -0.22% | 0.60% | 0.68% | Nov/09
+ | Canada | 3.6580 | 0.0010 | -0.10% | -0.21% | 0.22% | 0.48% | Nov/09
+ | Italy | 4.2610 | 0.0464 | -0.20% | -0.33% | 0.75% | 0.86% | Nov/10
+ | France | 4.6840 | 0.0610 | -0.25% | -0.22% | 1.12% | 1.26% | Nov/10
+ | South Africa | 8.3950 | 0.0150 | -0.21% | -0.57% | 0.19% | -0.42% | Nov/10
+ | China | 1.5983 | 0.0037 | -0.03% | -0.08% | -0.26% | -0.23% | Nov/10
+ | Switzerland | 0.4660 | 0.0090 | -0.02% | -0.08% | 0.18% | 0.31% | Nov/10
+ | Mexico | 9.0850 | 0.0360 | -0.19% | -0.21% | 0.14% | 0.33% | Nov/09
+ | Netherlands | 3.3250 | 0.0290 | -0.09% | -0.26% | 0.36% | 0.52% | Nov/10
+ | New Zealand | 4.6300 | 0.0484 | -0.18% | -0.40% | 0.22% | 0.50% | Nov/10
+ | Portugal | 3.6570 | 0.0368 | -0.10% | -0.32% | 0.50% | 0.64% | Nov/10
+ | South Korea | 3.8600 | 0.0130 | -0.14% | -0.46% | 0.47% | 0.64% | Nov/10
+ | Spain | 3.7860 | 0.0350 | -0.14% | -0.31% | 0.49% | 0.62% | Nov/10
+ | Greece | 4.0570 | 0.0330 | -0.18% | -0.35% | 0.58% | 0.76% | Nov/10
+ | Turkey | 35.9150 | 2.8450 | 2.90% | 3.17% | 8.76% | 5.77% | Nov/09
+
+[Table #2]
+ | Europe | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | United Kingdom | 5.1048 | 0.0348 | -0.14% | -0.33% | 0.63% | 0.71% | Nov/10
+ | Germany | 3.2434 | 0.0220 | -0.07% | -0.23% | 0.38% | 0.59% | Nov/10
+ | Russia | 16.6400 | 0.1100 | 0.10% | 0.00% | 2.20% | 2.12% | Nov/09
+ | Italy | 4.2610 | 0.0464 | -0.20% | -0.33% | 0.75% | 0.86% | Nov/10
+ | France | 4.6840 | 0.0610 | -0.25% | -0.22% | 1.12% | 1.26% | Nov/10
+ | Switzerland | 0.4590 | 0.0020 | -0.03% | -0.09% | 0.18% | 0.30% | Nov/10
+ | Turkey | 35.9150 | 2.8450 | 2.90% | 3.17% | 8.76% | 5.77% | Nov/09
+ | Finland | 3.6120 | 0.0390 | -0.12% | -0.26% | 0.44% | 0.60% | Nov/10
+ | Lithuania | 4.2170 | 0.0180 | -0.18% | -0.29% | 0.53% | 0.70% | Nov/10
+ | Netherlands | 3.3260 | 0.0280 | -0.09% | -0.26% | 0.36% | 0.52% | Nov/10
+ | Norway | 4.2750 | 0.0421 | -0.13% | -0.35% | 0.09% | 0.15% | Nov/10
+ | Poland | 6.1120 | 0.0560 | -0.19% | -0.27% | 0.96% | 0.76% | Nov/10
+ | Portugal | 3.6570 | 0.0368 | -0.10% | -0.32% | 0.50% | 0.64% | Nov/10
+ | Romania | 7.0800 | 0.0100 | -0.07% | -0.14% | 0.27% | 0.13% | Nov/10
+ | Slovakia | 4.1600 | 0.0200 | -0.11% | -0.24% | 0.63% | 0.77% | Nov/10
+ | Slovenia | 3.7530 | 0.0250 | -0.16% | -0.28% | 0.61% | 0.77% | Nov/10
+ | Spain | 3.7860 | 0.0350 | -0.14% | -0.31% | 0.49% | 0.62% | Nov/10
+ | Sweden | 2.9530 | 0.0080 | -0.15% | -0.24% | 0.20% | 0.32% | Nov/10
+ | Greece | 4.0580 | 0.0320 | -0.18% | -0.35% | 0.58% | 0.76% | Nov/10
+ | Hungary | 5.2940 | 0.0510 | -0.24% | -0.34% | -1.58% | -1.68% | Nov/10
+ | Iceland | 6.8410 | 0.0500 | -0.09% | -0.18% | 0.37% | 0.36% | Nov/09
+ | Ireland | 3.3890 | 0.0230 | -0.09% | -0.23% | 0.36% | 0.50% | Nov/10
+ | Austria | 3.4680 | 0.0405 | -0.12% | -0.28% | 0.36% | 0.52% | Nov/10
+ | Belgium | 4.1660 | 0.0527 | -0.24% | -0.17% | 0.82% | 0.97% | Nov/10
+ | Croatia | 3.8470 | 0.0003 | -0.30% | -0.29% | 0.58% | 0.79% | Nov/06
+ | Czech Republic | 5.0920 | 0.0130 | -0.20% | -0.24% | 0.59% | 0.57% | Nov/10
+ | Denmark | 3.0540 | 0.0200 | -0.06% | -0.22% | 0.30% | 0.54% | Nov/10
+ | Euro area | 3.84 | 0.00 | -0.14% | -0.26% | 0.59% | 0.70% | Nov/06
+
+[Table #3]
+ | America | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | United States | 4.8870 | 0.0080 | -0.09% | -0.35% | 0.72% | 0.76% | Nov/10
+ | Brazil | 15.1640 | 0.0260 | -0.58% | 2.39% | 1.31% | 1.46% | Nov/09
+ | Canada | 3.6580 | 0.0010 | -0.10% | -0.21% | 0.22% | 0.48% | Nov/09
+ | Mexico | 9.0850 | 0.0360 | -0.19% | -0.21% | 0.14% | 0.33% | Nov/09
+ | Peru | 6.2214 | 0.0478 | -0.08% | 0.07% | 0.68% | 0.48% | Nov/09
+ | Chile | 5.9300 | 0.0200 | -0.07% | -0.16% | 0.52% | 0.42% | Nov/09
+ | Colombia | 12.7910 | 0.0110 | -0.23% | -0.10% | 0.14% | 1.08% | Nov/09
+
+[Table #4]
+ | Asia | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | Japan | 2.6950 | 0.0179 | -0.08% | -0.32% | 0.62% | 1.00% | Nov/10
+ | India | 7.1740 | 0.0060 | -0.16% | -0.22% | 0.60% | 0.68% | Nov/09
+ | China | 1.5983 | 0.0037 | -0.03% | -0.08% | -0.26% | -0.23% | Nov/10
+ | Singapore | 2.1290 | 0.0379 | -0.09% | -0.31% | -0.09% | 0.18% | Nov/10
+ | South Korea | 3.8600 | 0.0130 | -0.14% | -0.46% | 0.47% | 0.64% | Nov/10
+ | Taiwan | 1.9000 | 0.0100 | -0.08% | -0.15% | 0.50% | 0.61% | Nov/10
+ | Thailand | 1.9100 | 0.0730 | -0.16% | -0.41% | 0.25% | 0.19% | Nov/10
+ | Vietnam | 4.5741 | 0.0021 | -0.01% | 0.01% | 0.39% | 0.60% | Nov/10
+ | Hong Kong | 3.6740 | 0.0030 | -0.14% | -0.44% | 0.58% | 0.70% | Nov/10
+ | Indonesia | 7.5500 | 0.1430 | -0.16% | 0.35% | 1.43% | 1.39% | Nov/10
+ | Israel | 4.0870 | 0.0450 | -0.08% | -0.13% | 0.17% | 0.14% | Nov/10
+ | Malaysia | 3.8390 | 0.0122 | -0.04% | -0.11% | 0.34% | 0.33% | Nov/10
+ | Pakistan | 12.6810 | 0.0010 | -0.14% | -0.14% | 1.28% | 0.73% | Nov/09
+ | Philippines | 8.0020 | 0.0040 | -0.15% | 0.09% | 1.97% | 2.16% | Nov/10
+
+[Table #5]
+ | Oceania | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | Australia | 4.9760 | 0.0290 | -0.12% | -0.35% | 0.22% | 0.58% | Nov/10
+ | New Zealand | 4.6300 | 0.0484 | -0.18% | -0.40% | 0.22% | 0.50% | Nov/10
+
+[Table #6]
+ | Africa | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | South Africa | 8.3950 | 0.0150 | -0.21% | -0.57% | 0.19% | -0.42% | Nov/10
+ | Zambia | 14.7500 | 0.0000 | 0.00% | -0.02% | -3.10% | -3.47% | Nov/09
+ | Kenya | 12.4760 | 0.0000 | -0.03% | -0.09% | -0.14% | -0.63% | Nov/10
+ | Nigeria | 16.8460 | 0.0020 | -0.06% | 0.42% | 0.04% | 1.26% | Nov/06
+
+
+==================================================
+WSH GSSE: TRADINGECONOMICS EXTRACTION: https://tradingeconomics.com/calendar
+==================================================
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: VALID | Tables: 490]
+
+[Table #1]
+RecentRecentTodayTomorrowThis WeekNext WeekThis MonthNext MonthYesterdayPrevious WeekPrevious MonthCustomImpactCountriesCategoryAll EventsInterest RatePrices & InflationLabour MarketGDP GrowthForeign TradeGovernmentBusiness ConfidenceConsumer SentimentHousing MarketBond AuctionsEnergyHolidaysEarningsUTC -12UTC -11UTC -10UTC -9UTC -8UTC -7UTC -6UTC -5UTC -4UTC -3UTC -2UTC -1UTCUTC +1UTC +2UTC +3UTC +3:30UTC +4UTC +4:30UTC +5UTC +5:30UTC +5:45UTC +6UTC +7UTC +8UTC +9UTC +9:30UTC +10UTC +10:30UTC +11UTC +12UTC +13UTC +14 | Download
+
+[Table #2]
+Tuesday November 10 2026 | Actual | Previous | Consensus | Forecast |  | 
+Tuesday November 10 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:01 AM | GB |  | GB | BRC Retail Sales Monitor YoYOCT | 1.1% | 1% | 1.2% | 1.2% |  |  | 
+ | GB
+12:30 AM | AU |  | AU | NAB Business ConfidenceOCT | -15 | -14® |  | -14 |  |  | 
+ | AU
+02:30 AM | CN |  | CN | Balance of TradeOCT | $105.28B | $133.53B | $125.8B | $135.0B |  |  | 
+ | CN
+02:30 AM | CN |  | CN | Exports YoYOCT | 35.2% | 36.3% | 33.5% |  |  |  | 
+ | CN
+02:30 AM | CN |  | CN | Imports YoYOCT | 41.6% | 31% | 32% |  |  |  | 
+ | CN
+02:30 AM | CN |  | CN | Balance of Trade YuanOCT | CNY712.78B | CNY905.97B | CNY859B | CNY915.0B |  |  | 
+ | CN
+03:00 AM | ID |  | ID | Retail Sales YoYSEP | 0.6% | 1.3% |  | -4% |  |  | 
+ | ID
+03:35 AM | JP |  | JP | 30-Year JGB Auction | 3.847% | 4.109% |  |  |  |  | 
+ | JP
+05:00 AM | JP |  | JP | Eco Watchers Survey CurrentOCT | 46.1 | 47.0 | 46.8 | 47.2 |  |  | 
+ | JP
+05:00 AM | JP |  | JP | Eco Watchers Survey OutlookOCT | 46.5 | 47.4 |  | 47.8 |  |  | 
+ | JP
+06:00 AM | SA |  | SA | Industrial Production YoYSEP | -10.9% | -23.0%® |  | -14.0% |  |  | 
+ | SA
+06:30 AM | FR |  | FR | Unemployment RateQ3 | 8.2% | 8.3% | 8.4% | 8.30% |  |  | 
+ | FR
+07:00 AM | TR |  | TR | Industrial Production YoYSEP | 2.6% | -1.7%® |  | -0.3% |  |  | 
+ | TR
+07:00 AM | TR |  | TR | Industrial Production MoMSEP | 2.1% | -0.9%® |  | 0.6% |  |  | 
+ | TR
+09:00 AM | ZA |  | ZA | Unemployment RateQ3 | 33.7% | 33.6% |  | 32.5% |  |  | 
+ | ZA
+09:00 AM | ZA |  | ZA | Unemployed PersonsQ3 | 8.578M | 8.481M |  | 8.1M |  |  | 
+ | ZA
+09:00 AM | US |  | US | Fed Waller Speech |  |  |  |  |  |  | 
+ | US
+09:30 AM | ZA |  | ZA | 2033 Bond Auction | 8.066% | 8.350% |  |  |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | 2039 Bond Auction | 8.612% | 8.911% |  |  |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | 2042 Bond Auction | 8.793% | 9.066% |  |  |  |  | 
+ | ZA
+09:40 AM | ES |  | ES | 3-Month Letras Auction | 2.652% | 2.635% |  |  |  |  | 
+ | ES
+09:40 AM | ES |  | ES | 9-Month Letras Auction | 2.936% | 2.960% |  |  |  |  | 
+ | ES
+10:00 AM | GB |  | GB | Treasury Gilt 2056 Auction |  | 5.82% |  |  |  |  | 
+ | GB
+11:00 AM | BR |  | BR | BCB Copom Meeting Minutes |  |  |  |  |  |  | 
+ | BR
+11:00 AM | ZA |  | ZA | Manufacturing Production MoMSEP |  | -3.1% |  | -0.7% |  |  | 
+ | ZA
+11:00 AM | ZA |  | ZA | Manufacturing Production YoYSEP |  | -4.3% | -2% | -1.4% |  |  | 
+ | ZA
+11:00 AM | US |  | US | NFIB Business Optimism IndexOCT |  | 97.9 | 97.7 | 97.6 |  |  | 
+ | US
+12:30 PM | GB |  | GB | BoE Lombardelli Speech |  |  |  |  |  |  | 
+ | GB
+01:15 PM | US |  | US | ADP Employment Change Weekly |  | 16.75K |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Core Inflation Rate MoMOCT |  | 0.3% | 0.2% | 0.2% |  |  | 
+ | US
+01:30 PM | US |  | US | Inflation Rate MoMOCT |  | 0.6% | 0.3% | 0.2% |  |  | 
+ | US
+01:30 PM | US |  | US | CPIOCT |  | 336.94 | 337.02 | 337 |  |  | 
+ | US
+01:30 PM | US |  | US | CPI s.aOCT |  | 336.30 |  | 337 |  |  | 
+ | US
+01:30 PM | US |  | US | Real Earnings MoM |  | -0.5% |  |  |  |  | 
+ | US
+01:55 PM | US |  | US | Redbook YoYNOV/07 |  | 10.4% | 9.3% |  |  |  | 
+ | US
+02:00 PM | BR |  | BR | Car Production MoMOCT |  | -1.1% |  | 1.8% |  |  | 
+ | BR
+02:00 PM | BR |  | BR | New Car Registrations MoMOCT |  | 2.3% |  | -0.8% |  |  | 
+ | BR
+02:00 PM | EA |  | EA | ECB Cipollone Speech |  |  |  |  |  |  | 
+ | EA
+02:35 PM | US |  | US | Fed Logan Speech |  |  |  |  |  |  | 
+ | US
+04:00 PM | US |  | US | Total Household DebtQ3 |  | $18.8T |  |  |  |  | 
+ | US
+04:00 PM | US |  | US | WASDE Report |  |  |  |  |  |  | 
+ | US
+04:45 PM | EA |  | EA | ECB Lane Speech |  |  |  |  |  |  | 
+ | EA
+05:00 PM | US |  | US | EIA Short-Term Energy Outlook |  |  |  |  |  |  | 
+ | US
+06:00 PM | US |  | US | 10-Year Note Auction |  | 5.300% |  |  |  |  | 
+ | US
+06:30 PM | CA |  | CA | BoC Summary of Deliberations |  |  |  |  |  |  | 
+ | CA
+06:30 PM | CA |  | CA | BoC Survey of Consumer Expectations |  |  |  |  |  |  | 
+ | CA
+06:30 PM | GB |  | GB | BoE Pill Speech |  |  |  |  |  |  | 
+ | GB
+06:30 PM | US |  | US | Fed Bowman Speech |  |  |  |  |  |  | 
+ | US
+06:30 PM | US |  | US | Fed Schmid Speech |  |  |  |  |  |  | 
+ | US
+09:30 PM | US |  | US | API Crude Oil Stock ChangeNOV/06 |  | -5.267M |  |  |  |  | 
+ | US
+11:00 PM | JP |  | JP | Reuters Tankan IndexNOV |  | 22 |  | 23 |  |  | 
+ | JP
+11:00 PM | KR |  | KR | Unemployment RateOCT |  | 2.6% |  | 2.8% |  |  | 
+ | KR
+11:30 PM | US |  | US | Fed Bowman Speech |  |  |  |  |  |  | 
+ | US
+ | EU |  | EU | ECOFIN Meeting |  |  |  |  |  |  | 
+ | EU
+ | ES |  | ES | Consumer ConfidenceSEP |  | 84.1 |  | 83.4 |  |  | 
+ | ES
+ | US |  | US | Core Inflation Rate YoYOCT |  | 2.6% | 2.8% | 2.7% |  |  | 
+ | US
+ | US |  | US | Inflation Rate YoYOCT |  | 3.7% | 3.9% | 3.8% |  |  | 
+ | US
+Wednesday November 11 2026 | Actual | Previous | Consensus | Forecast |  | 
+Wednesday November 11 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:30 AM | AU |  | AU | Home Loans QoQQ3 |  | -1.9% |  | -6.0% |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Investment Lending for HomesQ3 |  | -10.2% |  | -14.0% |  |  | 
+ | AU
+03:35 AM | JP |  | JP | BoJ JGB Purchase |  |  |  |  |  |  | 
+ | JP
+05:00 AM | SG |  | SG | MAS 12-Week Bill Auction |  | 1.84% |  |  |  |  | 
+ | SG
+05:00 AM | SG |  | SG | MAS 36-Week Bill Auction |  | 1.87% |  |  |  |  | 
+ | SG
+05:00 AM | SG |  | SG | MAS 4-Week Bill Auction |  | 1.69% |  |  |  |  | 
+ | SG
+06:00 AM | JP |  | JP | Machine Tool Orders YoYOCT |  | 60.4% |  | 54.5% |  |  | 
+ | JP
+07:00 AM | DE |  | DE | Harmonised Inflation Rate MoM FinalOCT |  | 0.6% | -0.1% | -0.1% |  |  | 
+ | DE
+07:00 AM | DE |  | DE | Harmonised Inflation Rate YoY FinalOCT |  | 3.3% | 2.8% | 2.8% |  |  | 
+ | DE
+07:00 AM | DE |  | DE | Inflation Rate MoM FinalOCT |  | 0.6% | -0.2% | -0.2% |  |  | 
+ | DE
+07:00 AM | DE |  | DE | Inflation Rate YoY FinalOCT |  | 3.3% | 2.8% | 2.8% |  |  | 
+ | DE
+07:00 AM | TR |  | TR | Retail Sales MoMSEP |  | 1.4% |  | 1% |  |  | 
+ | TR
+07:00 AM | TR |  | TR | Retail Sales YoYSEP |  | 10.1% |  | 8.9% |  |  | 
+ | TR
+07:50 AM | EA |  | EA | ECB Cipollone Speech |  |  |  |  |  |  | 
+ | EA
+09:00 AM | IT |  | IT | Industrial Production MoMSEP |  | -1.3% | 0.7% | -0.2% |  |  | 
+ | IT
+09:00 AM | IT |  | IT | Industrial Production YoYSEP |  | 0% |  | 0.9% |  |  | 
+ | IT
+09:45 AM | EA |  | EA | ECB President Lagarde Speech |  |  |  |  |  |  | 
+ | EA
+10:10 AM | IT |  | IT | 12-Month BOT Auction |  | 3.175% |  |  |  |  | 
+ | IT
+10:30 AM | DE |  | DE | 20-Year Bund Auction |  | 3.80% |  |  |  |  | 
+ | DE
+10:30 AM | DE |  | DE | 30-Year Bund Auction |  | 3.67% |  |  |  |  | 
+ | DE
+12:00 PM | BR |  | BR | Services Output MoMSEP |  | -0.1% |  |  |  |  | 
+ | BR
+12:00 PM | BR |  | BR | Services Output YoYSEP |  | 0.6% |  |  |  |  | 
+ | BR
+12:00 PM | MX |  | MX | Industrial Production MoMSEP |  | 0.69% |  | 0.5% |  |  | 
+ | MX
+12:00 PM | MX |  | MX | Industrial Production YoYSEP |  | 3.5% | 3.5% | 3.6% |  |  | 
+ | MX
+12:00 PM | US |  | US | MBA 30-Year Mortgage RateNOV/06 |  | 7.3% |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Mortgage ApplicationsNOV/06 |  | -1.2% |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Mortgage Market IndexNOV/06 |  | 192.6 |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Mortgage Refinance IndexNOV/06 |  | 517.5 |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Purchase IndexNOV/06 |  | 131.4 |  |  |  |  | 
+ | US
+01:00 PM | RU |  | RU | Balance of TradeSEP |  | $11.74B |  | $ 12.4B |  |  | 
+ | RU
+11:30 PM | AU |  | AU | RBA Baker Speech |  |  |  |  |  |  | 
+ | AU
+11:50 PM | JP |  | JP | Foreign Bond InvestmentNOV/07 |  | ¥1312B |  |  |  |  | 
+ | JP
+11:50 PM | JP |  | JP | PPI MoMOCT |  | -0.3% | 0.3% | 0.4% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | PPI YoYOCT |  | 6.8% | 6.5% | 6.7% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | Stock Investment by ForeignersNOV/07 |  | ¥1129.3B |  |  |  |  | 
+ | JP
+ | CN |  | CN | Vehicle Sales YoYOCT |  | -8.4% |  | -6.7% |  |  | 
+ | CN
+ | OP |  | OP | OPEC Monthly Report |  |  |  |  |  |  | 
+ | OP
+Thursday November 12 2026 | Actual | Previous | Consensus | Forecast |  | 
+Thursday November 12 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:00 AM | AU |  | AU | Consumer Inflation ExpectationsNOV |  | 5.3% |  | 5.4% |  |  | 
+ | AU
+12:01 AM | GB |  | GB | RICS House Price BalanceOCT |  | -32% | -32% | -34.0% |  |  | 
+ | GB
+01:30 AM | JP |  | JP | BOJ Asada Speech |  |  |  |  |  |  | 
+ | JP
+03:35 AM | JP |  | JP | 5-Year JGB Auction |  | 2.379% |  |  |  |  | 
+ | JP
+07:00 AM | GB |  | GB | GDP Growth Rate QoQ PrelQ3 |  | 0.5% | 0.7% | 0.6% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | GDP Growth Rate YoY PrelQ3 |  | 1.4% | 1.9% | 1.8% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | GDP MoMSEP |  | 0.1% | 0% | 0.0% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Business Investment QoQ PrelQ3 |  | 1.8% | -0.2% | -0.3% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | GDP 3-Month AvgSEP |  | 0.7% | 0.7% | 0.6% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Goods Trade BalanceSEP |  | £-18.01B | £-19.2B | £-18.7B |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Goods Trade Balance Non-EUSEP |  | £-5.29B |  | £-5.7B |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Industrial Production MoMSEP |  | 0.8% | -0.4% | -0.2% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Manufacturing Production MoMSEP |  | 1.2% | -0.5% | -0.3% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Balance of TradeSEP |  | £-0.920B |  | £ -1.6B |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Business Investment YoY PrelQ3 |  | 5.2% |  | 4.4% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Construction Orders YoYQ3 |  | -18.1% |  | -20.0% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Construction Output MoMSEP |  | -0.2% | -0.1% | 0.0% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Construction Output YoYSEP |  | -1.8% | -2.1% | -2.4% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | GDP YoYSEP |  | 2.1% | 1.9% | 1.9% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Industrial Production YoYSEP |  | 1.6% | 3% | 3.2% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Manufacturing Production YoYSEP |  | 3% | 3.8% | 4.0% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Services Output MoMSEP |  | 0.9% | 0.9% | 0.1% |  |  | 
+ | GB
+07:30 AM | TR |  | TR | Inflation Report |  |  |  |  |  |  | 
+ | TR
+09:00 AM | EA |  | EA | ECB Economic Bulletin |  |  |  |  |  |  | 
+ | EA
+09:30 AM | ZA |  | ZA | Gold Production YoYSEP |  | -5.7% |  | -3.0% |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | Mining Production MoMSEP |  | -5.4% |  | -1.7% |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | Mining Production YoYSEP |  | -12.7% |  | 1.3% |  |  | 
+ | ZA
+10:00 AM | GB |  | GB | Treasury Gilt 2033 Auction |  | 4.761% |  |  |  |  | 
+ | GB
+10:10 AM | IT |  | IT | 20-Year BTP Green Auction |  |  |  |  |  |  | 
+ | IT
+10:10 AM | IT |  | IT | 3-Year BTP Auction |  | 3.69% |  |  |  |  | 
+ | IT
+10:10 AM | IT |  | IT | 7-Year BTP Auction |  | 3.90% |  |  |  |  | 
+ | IT
+10:30 AM | IN |  | IN | Inflation Rate YoYOCT |  | 5.54% | 5.93% | 6.2% |  |  | 
+ | IN
+10:30 AM | IN |  | IN | Inflation Rate MoMOCT |  | 0.69% |  | 0.4% |  |  | 
+ | IN
+11:30 AM | TR |  | TR | Foreign Exchange ReservesNOV/06 |  | $56.090B |  |  |  |  | 
+ | TR
+12:00 PM | BR |  | BR | Inflation Rate MoMOCT |  | 0.82% | 0.26% | 0.4% |  |  | 
+ | BR
+12:00 PM | BR |  | BR | Inflation Rate YoYOCT |  | 4.58% | 4.74% | 4.7% |  |  | 
+ | BR
+12:00 PM | GB |  | GB | NIESR Monthly GDP TrackerOCT |  | 0.7% |  | 0.5% |  |  | 
+ | GB
+01:30 PM | CA |  | CA | Building Permits MoMSEP |  | 8.8% | -3.9% | 1.0% |  |  | 
+ | CA
+01:30 PM | DE |  | DE | Current AccountSEP |  | €10.3B |  | €15.5B |  |  | 
+ | DE
+01:30 PM | US |  | US | Initial Jobless ClaimsNOV/07 |  | 189K | 195K | 191.0K |  |  | 
+ | US
+01:30 PM | US |  | US | Continuing Jobless ClaimsOCT/31 |  | 1718K | 1720K | 1722.0K |  |  | 
+ | US
+01:30 PM | US |  | US | Jobless Claims 4-week AverageNOV/07 |  | 194.75K |  | 192.5K |  |  | 
+ | US
+02:00 PM | US |  | US | Fed Hammack Speech |  |  |  |  |  |  | 
+ | US
+03:00 PM | US |  | US | Existing Home SalesOCT |  | 3.99M | 3.98M | 4.0M |  |  | 
+ | US
+03:00 PM | US |  | US | Existing Home Sales MoMOCT |  | 1.5% |  | 0.3% |  |  | 
+ | US
+03:00 PM | US |  | US | Fed Barr Speech |  |  |  |  |  |  | 
+ | US
+03:30 PM | EA |  | EA | ECB Vujčić Speech |  |  |  |  |  |  | 
+ | EA
+04:30 PM | US |  | US | Fed Goolsbee Speech |  |  |  |  |  |  | 
+ | US
+04:30 PM | US |  | US | 17-Week Bill Auction |  | 4.090% |  |  |  |  | 
+ | US
+04:30 PM | US |  | US | 4-Week Bill Auction |  | 3.890% |  |  |  |  | 
+ | US
+04:30 PM | US |  | US | 8-Week Bill Auction |  | 3.975% |  |  |  |  | 
+ | US
+05:00 PM | CA |  | CA | 2-Year Bond Auction |  | 3.310% |  |  |  |  | 
+ | CA
+05:00 PM | US |  | US | EIA Crude Oil Stocks ChangeNOV/06 |  | -0.865M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Gasoline Stocks ChangeNOV/06 |  | -0.222M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | 15-Year Mortgage RateNOV/12 |  | 6.57% |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | 30-Year Mortgage RateNOV/12 |  | 7.18% |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Crude Oil Imports ChangeNOV/06 |  | 1.179M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Cushing Crude Oil Stocks ChangeNOV/06 |  | 0.28M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Distillate Fuel Production ChangeNOV/06 |  | -0.007M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Distillate Stocks ChangeNOV/06 |  | -3.565M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Gasoline Production ChangeNOV/06 |  | 0.463M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Heating Oil Stocks ChangeNOV/06 |  | -0.203M |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | EIA Refinery Crude Runs ChangeNOV/06 |  | 0.199M |  |  |  |  | 
+ | US
+06:00 PM | US |  | US | 30-Year Bond Auction |  | 5.618% |  |  |  |  | 
+ | US
+06:10 PM | US |  | US | Fed Daly Speech |  |  |  |  |  |  | 
+ | US
+07:00 PM | AR |  | AR | Inflation Rate MoMOCT |  | 1.9% | 1.8% | 2.2% |  |  | 
+ | AR
+07:00 PM | AR |  | AR | Inflation Rate YoYOCT |  | 33.4% | 32.7% | 33.2% |  |  | 
+ | AR
+07:00 PM | US |  | US | Monthly Budget StatementOCT |  | $-27B |  | $-298.0B |  |  | 
+ | US
+07:30 PM | EA |  | EA | ECB President Lagarde Speech |  |  |  |  |  |  | 
+ | EA
+09:00 PM | KR |  | KR | Export Prices YoYOCT |  | 40.9% |  | 37.0% |  |  | 
+ | KR
+09:00 PM | KR |  | KR | Import Prices YoYOCT |  | 17.6% |  | 19.0% |  |  | 
+ | KR
+09:30 PM | US |  | US | Fed Balance SheetNOV/11 |  |  |  |  |  |  | 
+ | US
+09:30 PM | US |  | US | Reserve Balances with Fed BanksNOV/11 |  | $2.963T |  |  |  |  | 
+ | US
+11:30 PM | US |  | US | Fed Williams Speech |  |  |  |  |  |  | 
+ | US
+ | AR |  | AR | Leading Indicator MoMOCT |  | -0.25% |  | -0.2% |  |  | 
+ | AR
+Friday November 13 2026 | Actual | Previous | Consensus | Forecast |  | 
+Friday November 13 2026 | Actual | Previous | Consensus | Forecast |  | 
+02:30 AM | KR |  | KR | 50-Year KTB Auction |  | 4.195% |  |  |  |  | 
+ | KR
+03:00 AM | KR |  | KR | Money Supply M3SEP |  | KRW6368.6B |  |  |  |  | 
+ | KR
+03:35 AM | JP |  | JP | 3-Month Bill Auction |  | 1.2410% |  |  |  |  | 
+ | JP
+06:50 AM | EA |  | EA | ECB Elderson Speech |  |  |  |  |  |  | 
+ | EA
+07:00 AM | DE |  | DE | Wholesale Prices MoMOCT |  | 1.9% | 0.4% | 0.7% |  |  | 
+ | DE
+07:00 AM | DE |  | DE | Wholesale Prices YoYOCT |  | 8.7% |  | 9.1% |  |  | 
+ | DE
+07:00 AM | TR |  | TR | Current AccountSEP |  | $4.053B |  | $1.30B |  |  | 
+ | TR
+07:00 AM | TR |  | TR | End Year CPI ForecastNOV |  | 29.63% |  | 29.65% |  |  | 
+ | TR
+07:10 AM | EA |  | EA | ECB Schnabel Speech |  |  |  |  |  |  | 
+ | EA
+07:45 AM | FR |  | FR | Harmonised Inflation Rate MoM FinalOCT |  | -0.3% | 0.4% | 0.4% |  |  | 
+ | FR
+07:45 AM | FR |  | FR | Harmonised Inflation Rate YoY FinalOCT |  | 3.4% | 3.8% | 3.8% |  |  | 
+ | FR
+07:45 AM | FR |  | FR | Inflation Rate MoM FinalOCT |  | -0.3% | 0.4% | 0.4% |  |  | 
+ | FR
+07:45 AM | FR |  | FR | Inflation Rate YoY FinalOCT |  | 3.1% | 3.4% | 3.4% |  |  | 
+ | FR
+08:00 AM | ES |  | ES | Core Inflation Rate YoY FinalOCT |  | 3.1% | 3.1% | 3.1% |  |  | 
+ | ES
+08:00 AM | ES |  | ES | Harmonised Inflation Rate MoM FinalOCT |  | 0.6% | 0.5% | 0.5% |  |  | 
+ | ES
+08:00 AM | ES |  | ES | Harmonised Inflation Rate YoY FinalOCT |  | 5% | 4.9% | 4.9% |  |  | 
+ | ES
+08:00 AM | ES |  | ES | Inflation Rate MoM FinalOCT |  | 0.3% | 0.6% | 0.6% |  |  | 
+ | ES
+08:00 AM | ES |  | ES | Inflation Rate YoY FinalOCT |  | 4.9% | 4.9% | 4.9% |  |  | 
+ | ES
+09:00 AM | CN |  | CN | Current Account PrelQ3 |  | $193.7B |  | $200.5B |  |  | 
+ | CN
+09:00 AM | FR |  | FR | IEA Oil Market Report |  |  |  |  |  |  | 
+ | FR
+09:00 AM | IT |  | IT | Balance of TradeSEP |  | €1.773B | €1.85B | €2.1B |  |  | 
+ | IT
+10:00 AM | EA |  | EA | Balance of TradeSEP |  | €-16.1B | €-4.5B | €11.5B |  |  | 
+ | EA
+10:00 AM | EA |  | EA | Employment Change QoQ PrelQ3 |  | 0.1% | 0.2% | 0% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | Employment Change YoY PrelQ3 |  | 0.5% |  | 0.3% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | GDP Growth Rate QoQ 2nd EstQ3 |  | 0.6% | 0.4% | 0.4% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | GDP Growth Rate YoY 2nd EstQ3 |  | 1.2% | 1.3% | 1.3% |  |  | 
+ | EA
+11:30 AM | IN |  | IN | Bank Loan Growth YoYOCT/30 |  | 18.2% |  |  |  |  | 
+ | IN
+11:30 AM | IN |  | IN | Deposit Growth YoYOCT/30 |  | 16.7% |  |  |  |  | 
+ | IN
+11:30 AM | IN |  | IN | Foreign Exchange ReservesNOV/06 |  | $717.06B |  |  |  |  | 
+ | IN
+12:00 PM | BR |  | BR | Retail Sales MoMSEP |  | 0.1% | -0.2% | -0.3% |  |  | 
+ | BR
+12:00 PM | BR |  | BR | Retail Sales YoYSEP |  | 0.4% | 1% | 1.1% |  |  | 
+ | BR
+01:30 PM | CA |  | CA | Capacity UtilizationSEP |  | 81.9% |  | 82% |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Manufacturing Sales MoM FinalSEP |  | 1.5% | 0.1% | 0.1% |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Wholesale Sales MoM FinalSEP |  | -1.6% | 0.5% | 0.5% |  |  | 
+ | CA
+01:30 PM | US |  | US | PPI MoMOCT |  | 1.3% | 0.4% | 0.3% |  |  | 
+ | US
+01:30 PM | US |  | US | Core PPI MoMOCT |  | 0.7% | 0.3% | 0.3% |  |  | 
+ | US
+01:30 PM | US |  | US | Core PPI YoYOCT |  | 5% | 5% | 4.9% |  |  | 
+ | US
+01:30 PM | US |  | US | PPIOCT |  | 159.78 |  | 160 |  |  | 
+ | US
+01:30 PM | US |  | US | PPI Ex Food, Energy and Trade MoMOCT |  | 0.5% |  | 0.3% |  |  | 
+ | US
+01:30 PM | US |  | US | PPI Ex Food, Energy and Trade YoYOCT |  | 5% |  | 5.0% |  |  | 
+ | US
+01:30 PM | US |  | US | PPI YoYOCT |  | 6.3% | 6.6% | 6.5% |  |  | 
+ | US
+02:00 PM | BR |  | BR | Business ConfidenceNOV |  | 46.2 |  | 46.5 |  |  | 
+ | BR
+03:30 PM | US |  | US | EIA Natural Gas Stocks ChangeNOV/06 |  | 77Bcf |  |  |  |  | 
+ | US
+03:50 PM | US |  | US | Fed Bowman Speech |  |  |  |  |  |  | 
+ | US
+04:00 PM | RU |  | RU | GDP Growth Rate YoY PrelQ3 |  | 1.3% |  | 1.0% |  |  | 
+ | RU
+04:00 PM | RU |  | RU | Inflation Rate MoMOCT |  | 0.3% | 1.2% | 0.8% |  |  | 
+ | RU
+04:00 PM | RU |  | RU | Inflation Rate YoYOCT |  | 6.3% | 7.1% | 7.0% |  |  | 
+ | RU
+05:00 PM | US |  | US | Fed Daly Speech |  |  |  |  |  |  | 
+ | US
+06:00 PM | US |  | US | Baker Hughes Oil Rig CountNOV/13 |  | 463 |  |  |  |  | 
+ | US
+06:00 PM | US |  | US | Baker Hughes Total Rigs CountNOV/13 |  | 604 |  |  |  |  | 
+ | US
+ | EU |  | EU | EU Leaders Summit |  |  |  |  |  |  | 
+ | EU
+ | CN |  | CN | New Yuan LoansOCT |  | CNY1080B | CNY20B | CNY95.0B |  |  | 
+ | CN
+ | CN |  | CN | M2 Money Supply YoYOCT |  | 7.2% | 7.2% | 7.1% |  |  | 
+ | CN
+ | CN |  | CN | Outstanding Loan Growth YoYOCT |  | 4.8% | 4.8% | 4.7% |  |  | 
+ | CN
+ | CN |  | CN | Total Social FinancingOCT |  | CNY3550B | CNY1420B | CNY910.0B |  |  | 
+ | CN
+Saturday November 14 2026 | Actual | Previous | Consensus | Forecast |  | 
+Saturday November 14 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:00 AM | US |  | US | Fed Jefferson Speech |  |  |  |  |  |  | 
+ | US
+Sunday November 15 2026 | Actual | Previous | Consensus | Forecast |  | 
+Sunday November 15 2026 | Actual | Previous | Consensus | Forecast |  | 
+06:00 AM | SA |  | SA | Inflation Rate MoMOCT |  | 0.0% |  | 0.3% |  |  | 
+ | SA
+06:00 AM | SA |  | SA | Inflation Rate YoYOCT |  | 1.9% |  | 1.9% |  |  | 
+ | SA
+06:00 AM | SA |  | SA | Wholesale Prices YoYOCT |  | 4.2% |  | 3.3% |  |  | 
+ | SA
+11:50 PM | JP |  | JP | GDP Growth Rate QoQ PrelQ3 |  | 0.4% | 0.1% | 0.1% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | GDP Growth Annualized PrelQ3 |  | 1.4% | 0.3% | 0.2% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | GDP Capital Expenditure QoQ PrelQ3 |  | -0.9% | 1.5% | -1.0% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | GDP External Demand QoQ PrelQ3 |  | 0.5% | -0.4% | 0.3% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | GDP Price Index YoY PrelQ3 |  | 2.6% |  | 2.1% |  |  | 
+ | JP
+11:50 PM | JP |  | JP | GDP Private Consumption QoQ PrelQ3 |  | 0.0% | -0.2% | -0.2% |  |  | 
+ | JP
+Monday November 16 2026 | Actual | Previous | Consensus | Forecast |  | 
+Monday November 16 2026 | Actual | Previous | Consensus | Forecast |  | 
+01:30 AM | CN |  | CN | House Price Index YoYOCT |  | -2.8% |  |  |  |  | 
+ | CN
+02:00 AM | CN |  | CN | Industrial Production YoYOCT |  | 5.5% |  |  |  |  | 
+ | CN
+02:00 AM | CN |  | CN | Retail Sales YoYOCT |  | 1.1% |  |  |  |  | 
+ | CN
+02:00 AM | CN |  | CN | Fixed Asset Investment (YTD) YoYOCT |  | -7.2% |  |  |  |  | 
+ | CN
+02:00 AM | CN |  | CN | Unemployment RateOCT |  | 5.2% |  |  |  |  | 
+ | CN
+02:30 AM | KR |  | KR | 10-Year KTB Auction |  | 4.155% |  |  |  |  | 
+ | KR
+03:35 AM | JP |  | JP | 10-Year Index-Linked JGB Auction |  | 0.860% |  |  |  |  | 
+ | JP
+04:30 AM | JP |  | JP | Capacity Utilization MoMSEP |  | -4.2% |  |  |  |  | 
+ | JP
+04:30 AM | JP |  | JP | Industrial Production MoM FinalSEP |  | -2.4% | 2.2% | 2.2% |  |  | 
+ | JP
+04:30 AM | JP |  | JP | Industrial Production YoY FinalSEP |  | 2.7% |  | 1.9% |  |  | 
+ | JP
+06:30 AM | IN |  | IN | WPI Food Index YoYOCT |  | 8.66% |  | 8.5% |  |  | 
+ | IN
+06:30 AM | IN |  | IN | WPI Fuel YoYOCT |  | 25.85% |  | 27.5% |  |  | 
+ | IN
+06:30 AM | IN |  | IN | WPI Inflation YoYOCT |  | 11.39% | 12.1% | 13.0% |  |  | 
+ | IN
+06:30 AM | IN |  | IN | WPI Manufacturing YoYOCT |  | 9.76% |  | 10.0% |  |  | 
+ | IN
+08:00 AM | TR |  | TR | Budget BalanceOCT |  | TRY-532.2B |  |  |  |  | 
+ | TR
+09:30 AM | ZA |  | ZA | 182-Day T-Bill Auction |  | 7.63% |  |  |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | 273-Day T-Bill Auction |  | 7.80% |  |  |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | 364-Day T-Bill Auction |  | 7.92% |  |  |  |  | 
+ | ZA
+09:30 AM | ZA |  | ZA | 91-Day T-Bill Auction |  | 7.28% |  |  |  |  | 
+ | ZA
+10:00 AM | EA |  | EA | Industrial Production MoMSEP |  | -0.5% |  | -0.4% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | Industrial Production YoYSEP |  | -1.1% |  | -0.6% |  |  | 
+ | EA
+10:30 AM | DE |  | DE | 12-Month Bubill Auction |  | 2.949% |  |  |  |  | 
+ | DE
+10:30 AM | IN |  | IN | Unemployment RateOCT |  | 5% |  | 5.1% |  |  | 
+ | IN
+11:00 AM | BR |  | BR | IGP-10 Inflation MoMNOV |  | 1.76% |  |  |  |  | 
+ | BR
+11:30 AM | BR |  | BR | BCB Focus Market Readout |  |  |  |  |  |  | 
+ | BR
+12:00 PM | BR |  | BR | IBC-BR Economic ActivitySEP |  | 0.3% |  | -0.1% |  |  | 
+ | BR
+01:00 PM | RU |  | RU | Current AccountQ3 |  | $21.4B |  | $22.0B |  |  | 
+ | RU
+01:30 PM | CA |  | CA | Inflation Rate YoYOCT |  | 3.1% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Core Inflation Rate YoYOCT |  | 2.2% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Inflation Rate MoMOCT |  | 0.1% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Core Inflation Rate MoMOCT |  | 0% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | CPI Common YoYOCT |  | 2.4% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | CPI Median YoYOCT |  | 1.9% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | CPI Trimmed-Mean YoYOCT |  | 1.8% |  |  |  |  | 
+ | CA
+01:30 PM | US |  | US | NY Empire State Manufacturing IndexNOV |  | 25.50 |  |  |  |  | 
+ | US
+02:00 PM | FR |  | FR | 12-Month BTF Auction |  |  |  |  |  |  | 
+ | FR
+02:00 PM | FR |  | FR | 3-Month BTF Auction |  |  |  |  |  |  | 
+ | FR
+02:00 PM | FR |  | FR | 6-Month BTF Auction |  | 2.994% |  |  |  |  | 
+ | FR
+04:30 PM | US |  | US | 3-Month Bill Auction |  |  |  |  |  |  | 
+ | US
+04:30 PM | US |  | US | 6-Month Bill Auction |  |  |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | NOPA Crush Report |  |  |  |  |  |  | 
+ | US
+ | IN |  | IN | Passenger Vehicles Sales YoYOCT |  | 23.3% |  |  |  |  | 
+ | IN
+ | TR |  | TR | Auto Production YoYOCT |  | 5.1% |  | 4.0% |  |  | 
+ | TR
+ | TR |  | TR | Auto Sales YoYOCT |  | -24.3% |  | -25.0% |  |  | 
+ | TR
+ | CN |  | CN | FDI (YTD) YoYOCT |  | -4.3% |  |  |  |  | 
+ | CN
+ | IN |  | IN | Balance of TradeOCT |  | $-30.21B | $-32B | $-29.0B |  |  | 
+ | IN
+ | IN |  | IN | ExportsOCT |  | $44.4B |  |  |  |  | 
+ | IN
+ | IN |  | IN | ImportsOCT |  | $74.61B |  |  |  |  | 
+ | IN
+ | DE |  | DE | 6-Month Bubill Auction |  | 2.717% |  |  |  |  | 
+ | DE
+Tuesday November 17 2026 | Actual | Previous | Consensus | Forecast |  | 
+Tuesday November 17 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:30 AM | AU |  | AU | RBA Meeting Minutes |  |  |  |  |  |  | 
+ | AU
+12:30 AM | SG |  | SG | Balance of TradeOCT |  | $9.038B |  | $7.9B |  |  | 
+ | SG
+12:30 AM | SG |  | SG | Non-Oil Exports MoMOCT |  | 25.5% |  |  |  |  | 
+ | SG
+12:30 AM | SG |  | SG | Non-Oil Exports YoYOCT |  | 68.4% |  |  |  |  | 
+ | SG
+04:30 AM | JP |  | JP | Tertiary Industry Index MoMSEP |  | -0.1% |  |  |  |  | 
+ | JP
+05:00 AM | SG |  | SG | MAS 12-Week Bill Auction |  |  |  |  |  |  | 
+ | SG
+05:00 AM | SG |  | SG | MAS 4-Week Bill Auction |  |  |  |  |  |  | 
+ | SG
+07:00 AM | GB |  | GB | Unemployment RateSEP |  | 4.7% |  | 4.9% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Average Earnings incl. Bonus (3Mo/Yr)SEP |  | 3.7% |  | 3.7% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Employment ChangeSEP |  | 102K |  | 25.0K |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Average Earnings excl. Bonus (3Mo/Yr)SEP |  | 3.7% |  | 2.9% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Claimant Count ChangeOCT |  | 30.3K |  | 20.0K |  |  | 
+ | GB
+07:00 AM | GB |  | GB | HMRC Payrolls ChangeOCT |  | 13K |  | 15.0K |  |  | 
+ | GB
+09:00 AM | IT |  | IT | Harmonised Inflation Rate MoM FinalOCT |  | 2.1% | 1.2% | 1.2% |  |  | 
+ | IT
+09:00 AM | IT |  | IT | Harmonised Inflation Rate YoY FinalOCT |  | 4.2% | 5.6% | 5.6% |  |  | 
+ | IT
+09:00 AM | IT |  | IT | Inflation Rate MoM FinalOCT |  | 0.7% | 0.9% | 0.9% |  |  | 
+ | IT
+09:00 AM | IT |  | IT | Inflation Rate YoY FinalOCT |  | 4.2% | 5.4% | 5.4% |  |  | 
+ | IT
+09:00 AM | ES |  | ES | Balance of TradeSEP |  | €-5.98B |  | € -4.5B |  |  | 
+ | ES
+09:30 AM | ZA |  | ZA | Weekly Bond Auction |  |  |  |  |  |  | 
+ | ZA
+09:30 AM | GB |  | GB | Labour Productivity QoQQ3 |  | -0.8% |  | 0.3% |  |  | 
+ | GB
+10:00 AM | EA |  | EA | ZEW Economic Sentiment IndexNOV |  | 18.5 |  | 14 |  |  | 
+ | EA
+10:00 AM | DE |  | DE | ZEW Economic Sentiment IndexNOV |  | 28.1 |  | 15.9 |  |  | 
+ | DE
+10:00 AM | DE |  | DE | ZEW Current ConditionsNOV |  | -35.9 |  | -36 |  |  | 
+ | DE
+10:00 AM | GB |  | GB | Treasury Gilt 2041 Auction |  |  |  |  |  |  | 
+ | GB
+10:30 AM | DE |  | DE | 2-Year Schatz Auction |  | 3.08% |  |  |  |  | 
+ | DE
+01:15 PM | CA |  | CA | Housing StartsOCT |  | 250K |  |  |  |  | 
+ | CA
+01:15 PM | US |  | US | ADP Employment Change Weekly |  |  |  |  |  |  | 
+ | US
+01:30 PM | CA |  | CA | Foreign Securities PurchasesSEP |  | C$-17.31B |  | C$ 27.9B |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Foreign Securities Purchases by CanadiansSEP |  | C$23.9B |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | New Motor Vehicle SalesSEP |  | 174.6K |  | 169.0K |  |  | 
+ | CA
+01:30 PM | US |  | US | Retail Sales MoMOCT |  | 0.8% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Export Prices MoMOCT |  | 2.2% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Import Prices MoMOCT |  | 1.1% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Retail Sales Control Group MoMOCT |  | 0.1% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Retail Sales Ex Autos MoMOCT |  | 0.9% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Export Prices YoYOCT |  | 11.6% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Import Prices YoYOCT |  | 8.1% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | NY Fed Services Activity IndexNOV |  | -20.7 |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Retail Sales Ex Gas/Autos MoMOCT |  | 0.2% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Retail Sales YoYOCT |  | 6.3% |  |  |  |  | 
+ | US
+01:55 PM | US |  | US | Redbook YoYNOV/14 |  |  |  |  |  |  | 
+ | US
+02:15 PM | US |  | US | Industrial Production MoMOCT |  | 0.7% |  |  |  |  | 
+ | US
+02:15 PM | US |  | US | Capacity UtilizationOCT |  | 76.9% |  |  |  |  | 
+ | US
+02:15 PM | US |  | US | Industrial Production YoYOCT |  | 2.2% |  |  |  |  | 
+ | US
+02:15 PM | US |  | US | Manufacturing Production MoMOCT |  | 0.3% |  |  |  |  | 
+ | US
+02:15 PM | US |  | US | Manufacturing Production YoYOCT |  | 1.1% |  |  |  |  | 
+ | US
+03:00 PM | US |  | US | Business Inventories MoMSEP |  | 0.4% |  | 0.2% |  |  | 
+ | US
+03:00 PM | US |  | US | NAHB Housing Market IndexNOV |  | 29 |  |  |  |  | 
+ | US
+03:00 PM | US |  | US | Retail Inventories Ex Autos MoMSEP |  | 0.1% | 0.4% | 0.4% |  |  | 
+ | US
+04:30 PM | US |  | US | 6-Week Bill Auction |  |  |  |  |  |  | 
+ | US
+09:30 PM | US |  | US | API Crude Oil Stock ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+11:50 PM | JP |  | JP | Balance of TradeOCT |  | ¥-536.6B |  |  |  |  | 
+ | JP
+11:50 PM | JP |  | JP | Exports YoYOCT |  | 16.7% |  |  |  |  | 
+ | JP
+11:50 PM | JP |  | JP | Imports YoYOCT |  | 18.9% |  |  |  |  | 
+ | JP
+ | US |  | US | Atlanta Fed GDPNowQ4 |  |  |  |  |  |  | 
+ | US
+Wednesday November 18 2026 | Actual | Previous | Consensus | Forecast |  | 
+Wednesday November 18 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:00 AM | AU |  | AU | Westpac Leading Index MoMOCT |  | -0.1% |  | -0.2% |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Wage Price Index QoQQ3 |  | 0.8% |  | 1.0% |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Wage Price Index YoYQ3 |  | 3.2% |  | 3.4% |  |  | 
+ | AU
+03:35 AM | JP |  | JP | 20-Year JGB Auction |  | 3.723% |  |  |  |  | 
+ | JP
+03:35 AM | JP |  | JP | 52-Week Bill Auction |  | 1.6229% |  |  |  |  | 
+ | JP
+07:00 AM | GB |  | GB | Inflation Rate YoYOCT |  | 3.5% |  | 3.5% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Core Inflation Rate YoYOCT |  | 2.8% |  | 2.9% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Inflation Rate MoMOCT |  | 0.4% |  | 0.4% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Core Inflation Rate MoMOCT |  | 0.2% |  | 0.3% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | PPI Core Output MoMOCT |  | 0.2% |  | 0.2% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | PPI Core Output YoYOCT |  | 2.9% |  | 2.9% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | PPI Input MoMOCT |  | 1.5% |  | 0.2% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | PPI Input YoYOCT |  | 8.3% |  | 8.5% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | PPI Output MoMOCT |  | 0.8% |  | 0.5% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | PPI Output YoYOCT |  | 4.6% |  | 4.8% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Retail Price Index MoMOCT |  | 0.1% |  | 0.4% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Retail Price Index YoYOCT |  | 3.9% |  | 4.0% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Services Inflation YoYOCT |  | 3.7% |  | 3.9% |  |  | 
+ | GB
+07:30 AM | ID |  | ID | Interest Rate Decision |  | 5.75% |  | 6% |  |  | 
+ | ID
+07:30 AM | ID |  | ID | Deposit Facility RateNOV |  | 5% |  | 5% |  |  | 
+ | ID
+07:30 AM | ID |  | ID | Lending Facility RateNOV |  | 6.5% |  | 6.75% |  |  | 
+ | ID
+07:30 AM | ID |  | ID | Loan Growth YoYOCT |  | 13.26% |  |  |  |  | 
+ | ID
+08:00 AM | EA |  | EA | ECB Non-Monetary Policy Meeting |  |  |  |  |  |  | 
+ | EA
+08:00 AM | ZA |  | ZA | Inflation Rate MoMOCT |  | 0.4% |  | 0.6% |  |  | 
+ | ZA
+08:00 AM | ZA |  | ZA | Inflation Rate YoYOCT |  | 4.5% |  | 4.8% |  |  | 
+ | ZA
+08:00 AM | ZA |  | ZA | Core Inflation Rate MoMOCT |  | 0.2% |  |  |  |  | 
+ | ZA
+08:00 AM | ZA |  | ZA | Core Inflation Rate YoYOCT |  | 4% |  |  |  |  | 
+ | ZA
+10:00 AM | EA |  | EA | Core Inflation Rate YoY FinalOCT |  | 2.5% | 2.5% | 2.5% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | CPI FinalOCT |  | 104.31 |  | 104.77 |  |  | 
+ | EA
+10:00 AM | EA |  | EA | Inflation Rate MoM FinalOCT |  | 0.6% | 0.4% | 0.4% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | Inflation Rate YoY FinalOCT |  | 3.8% | 4% | 4.0% |  |  | 
+ | EA
+10:30 AM | DE |  | DE | 7-Year Bund Auction |  | 3.36% |  |  |  |  | 
+ | DE
+11:00 AM | ZA |  | ZA | Retail Sales MoMSEP |  | -0.3% |  | 0.6% |  |  | 
+ | ZA
+11:00 AM | ZA |  | ZA | Retail Sales YoYSEP |  | 3.3% |  | 2.3% |  |  | 
+ | ZA
+11:10 AM | EU |  | EU | 12-Month Bill Auction |  | 3.162% |  |  |  |  | 
+ | EU
+11:10 AM | EU |  | EU | 3-Month Bill Auction |  | 2.711% |  |  |  |  | 
+ | EU
+11:10 AM | EU |  | EU | 6-Month Bill Auction |  | 2.922% |  |  |  |  | 
+ | EU
+11:30 AM | IN |  | IN | M3 Money Supply YoYOCT/31 |  | 16% |  |  |  |  | 
+ | IN
+12:00 PM | US |  | US | MBA 30-Year Mortgage RateNOV/13 |  |  |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Mortgage ApplicationsNOV/13 |  |  |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Mortgage Market IndexNOV/13 |  |  |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Mortgage Refinance IndexNOV/13 |  |  |  |  |  |  | 
+ | US
+12:00 PM | US |  | US | MBA Purchase IndexNOV/13 |  |  |  |  |  |  | 
+ | US
+01:30 PM | CA |  | CA | New Housing Price Index MoMOCT |  | -0.2% |  |  |  |  | 
+ | CA
+01:30 PM | US |  | US | Building Permits PrelOCT |  | 1.398M |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Housing StartsOCT |  | 1.221M |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Building Permits MoM PrelOCT |  | -0.4% |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Housing Starts MoMOCT |  | -5.2% |  |  |  |  | 
+ | US
+03:00 PM | US |  | US | Pending Home Sales MoMOCT |  | -7.3% |  |  |  |  | 
+ | US
+03:00 PM | US |  | US | Pending Home Sales YoYOCT |  | -11.3% |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Crude Oil Stocks ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Gasoline Stocks ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Crude Oil Imports ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Cushing Crude Oil Stocks ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Distillate Fuel Production ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Distillate Stocks ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Gasoline Production ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Heating Oil Stocks ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Refinery Crude Runs ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+04:00 PM | RU |  | RU | PPI MoMOCT |  | 2.5% |  | 1.0% |  |  | 
+ | RU
+04:00 PM | RU |  | RU | PPI YoYOCT |  | 8.6% |  | 8.7% |  |  | 
+ | RU
+04:30 PM | US |  | US | 17-Week Bill Auction |  |  |  |  |  |  | 
+ | US
+06:00 PM | US |  | US | 20-Year Bond Auction |  |  |  |  |  |  | 
+ | US
+07:00 PM | US |  | US | FOMC Minutes |  |  |  |  |  |  | 
+ | US
+09:00 PM | US |  | US | Net Long-term TIC FlowsSEP |  | $279.2B |  |  |  |  | 
+ | US
+09:00 PM | US |  | US | Foreign Bond InvestmentSEP |  | $108.9B |  |  |  |  | 
+ | US
+09:00 PM | US |  | US | Overall Net Capital FlowsSEP |  | $199.8B |  |  |  |  | 
+ | US
+11:50 PM | JP |  | JP | Machinery Orders MoMSEP |  | 5.2% |  |  |  |  | 
+ | JP
+11:50 PM | JP |  | JP | Machinery Orders YoYSEP |  | 18.6% |  |  |  |  | 
+ | JP
+11:50 PM | JP |  | JP | Foreign Bond InvestmentNOV/14 |  |  |  |  |  |  | 
+ | JP
+11:50 PM | JP |  | JP | Stock Investment by ForeignersNOV/14 |  |  |  |  |  |  | 
+ | JP
+ | US |  | US | Atlanta Fed GDPNowQ4 |  |  |  |  |  |  | 
+ | US
+Thursday November 19 2026 | Actual | Previous | Consensus | Forecast |  | 
+Thursday November 19 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:30 AM | AU |  | AU | Employment ChangeOCT |  | -39.3K |  | 34.0K |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Full Time Employment ChgOCT |  | 34.4K |  |  |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Unemployment RateOCT |  | 4.7% |  | 4.7% |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Part Time Employment ChgOCT |  | -73.7K |  |  |  |  | 
+ | AU
+12:30 AM | AU |  | AU | Participation RateOCT |  | 66.8% |  | 66.8% |  |  | 
+ | AU
+03:35 AM | JP |  | JP | BoJ JGB Purchase |  |  |  |  |  |  | 
+ | JP
+05:00 AM | SG |  | SG | 6-Month T-Bill Auction |  |  |  |  |  |  | 
+ | SG
+09:00 AM | EA |  | EA | Current AccountSEP |  | €7.7B |  | €27.0B |  |  | 
+ | EA
+09:00 AM | EA |  | EA | Current Account s.aSEP |  | €8.71B |  | €29.5B |  |  | 
+ | EA
+09:00 AM | IT |  | IT | Current AccountSEP |  | €2766M |  | €2150.0M |  |  | 
+ | IT
+09:40 AM | ES |  | ES | Bonos y Obligaciones Auction |  |  |  |  |  |  | 
+ | ES
+10:00 AM | EA |  | EA | Construction Output YoYSEP |  | 1.4% |  | -2% |  |  | 
+ | EA
+10:00 AM | EA |  | EA | Labour Cost Index YoY FlashQ3 |  | 3.1% |  | 3.0% |  |  | 
+ | EA
+10:00 AM | FR |  | FR | OAT Auction |  |  |  |  |  |  | 
+ | FR
+10:00 AM | GB |  | GB | Conventional Gilt Tender |  |  |  |  |  |  | 
+ | GB
+11:00 AM | FR |  | FR | OAT€i Auction |  |  |  |  |  |  | 
+ | FR
+11:00 AM | FR |  | FR | OATi Auction |  |  |  |  |  |  | 
+ | FR
+11:30 AM | TR |  | TR | Foreign Exchange ReservesNOV/13 |  |  |  |  |  |  | 
+ | TR
+12:30 PM | ZA |  | ZA | Building Permits YoYSEP |  | -4.3% |  | 1.5% |  |  | 
+ | ZA
+01:00 PM | ZA |  | ZA | Interest Rate Decision |  | 7.25% |  | 7.5% |  |  | 
+ | ZA
+01:00 PM | ZA |  | ZA | Prime Overdraft Rate |  | 10.75% |  |  |  |  | 
+ | ZA
+01:30 PM | CA |  | CA | PPI MoMOCT |  | 2% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | PPI YoYOCT |  | 14.5% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Raw Materials Prices MoMOCT |  | 4.8% |  |  |  |  | 
+ | CA
+01:30 PM | CA |  | CA | Raw Materials Prices YoYOCT |  | 27% |  |  |  |  | 
+ | CA
+01:30 PM | US |  | US | Initial Jobless ClaimsNOV/14 |  |  |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Philadelphia Fed Manufacturing IndexNOV |  | 20.9 |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Continuing Jobless ClaimsNOV/07 |  |  |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Jobless Claims 4-week AverageNOV/14 |  |  |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Philly Fed Business ConditionsNOV |  | 33.0 |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Philly Fed CAPEX IndexNOV |  | 34.90 |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Philly Fed EmploymentNOV |  | 9.1 |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Philly Fed New OrdersNOV |  | 4.3 |  |  |  |  | 
+ | US
+01:30 PM | US |  | US | Philly Fed Prices PaidNOV |  | 43.20 |  |  |  |  | 
+ | US
+01:50 PM | US |  | US | Fed Hammack Speech |  |  |  |  |  |  | 
+ | US
+01:50 PM | US |  | US | Fed Hammack Speech |  |  |  |  |  |  | 
+ | US
+03:00 PM | AR |  | AR | Consumer ConfidenceNOV |  | 42 |  |  |  |  | 
+ | AR
+03:00 PM | MX |  | MX | Monetary Policy Meeting Minutes |  |  |  |  |  |  | 
+ | MX
+03:00 PM | US |  | US | CB Leading Index MoMOCT |  | 0% |  |  |  |  | 
+ | US
+03:30 PM | US |  | US | EIA Natural Gas Stocks ChangeNOV/13 |  |  |  |  |  |  | 
+ | US
+04:00 PM | US |  | US | Kansas Fed Composite IndexNOV |  | 11 |  |  |  |  | 
+ | US
+04:00 PM | US |  | US | Kansas Fed Manufacturing IndexNOV |  | 16 |  |  |  |  | 
+ | US
+04:30 PM | US |  | US | 4-Week Bill Auction |  |  |  |  |  |  | 
+ | US
+04:30 PM | US |  | US | 8-Week Bill Auction |  |  |  |  |  |  | 
+ | US
+05:00 PM | CA |  | CA | 5-Year Bond Auction |  | 3.460% |  |  |  |  | 
+ | CA
+05:00 PM | US |  | US | 15-Year Mortgage RateNOV/19 |  |  |  |  |  |  | 
+ | US
+05:00 PM | US |  | US | 30-Year Mortgage RateNOV/19 |  |  |  |  |  |  | 
+ | US
+06:00 PM | US |  | US | 10-Year TIPS Auction |  |  |  |  |  |  | 
+ | US
+07:00 PM | AR |  | AR | Balance of TradeOCT |  | $2976M |  |  |  |  | 
+ | AR
+09:00 PM | KR |  | KR | PPI MoMOCT |  | 0.2% |  |  |  |  | 
+ | KR
+09:00 PM | KR |  | KR | PPI YoYOCT |  | 7.7% |  |  |  |  | 
+ | KR
+09:30 PM | US |  | US | Fed Balance SheetNOV/18 |  |  |  |  |  |  | 
+ | US
+09:30 PM | US |  | US | Reserve Balances with Fed BanksNOV/18 |  |  |  |  |  |  | 
+ | US
+11:30 PM | JP |  | JP | Inflation Rate YoYOCT |  | 2.1% |  |  |  |  | 
+ | JP
+11:30 PM | JP |  | JP | Core Inflation Rate YoYOCT |  | 2.1% |  | 2.1% |  |  | 
+ | JP
+11:30 PM | JP |  | JP | Inflation Rate Ex-Food and Energy YoYOCT |  | 2.4% |  |  |  |  | 
+ | JP
+11:30 PM | JP |  | JP | Inflation Rate MoMOCT |  | 0.0% |  |  |  |  | 
+ | JP
+ | AU |  | AU | RBA Payments System Board Meeting |  |  |  |  |  |  | 
+ | AU
+ | ES |  | ES | Consumer ConfidenceOCT |  |  |  |  |  |  | 
+ | ES
+ | BR |  | BR | BCB National Monetary Council Meeting |  |  |  |  |  |  | 
+ | BR
+Friday November 20 2026 | Actual | Previous | Consensus | Forecast |  | 
+Friday November 20 2026 | Actual | Previous | Consensus | Forecast |  | 
+12:01 AM | GB |  | GB | GfK Consumer ConfidenceNOV |  | -24 |  | -23 |  |  | 
+ | GB
+01:15 AM | CN |  | CN | Loan Prime Rate 1Y |  | 3.0% |  |  |  |  | 
+ | CN
+01:15 AM | CN |  | CN | Loan Prime Rate 5YNOV |  | 3.5% |  |  |  |  | 
+ | CN
+03:00 AM | ID |  | ID | Current AccountQ3 |  | $-12.5B |  | $ -3.3B |  |  | 
+ | ID
+03:35 AM | JP |  | JP | 3-Month Bill Auction |  |  |  |  |  |  | 
+ | JP
+07:00 AM | DE |  | DE | PPI YoYOCT |  | 6.7% |  | 7.1% |  |  | 
+ | DE
+07:00 AM | DE |  | DE | PPI MoMOCT |  | 1.9% |  | 0.5% |  |  | 
+ | DE
+07:00 AM | TR |  | TR | Business ConfidenceNOV |  | 99.8 |  | 100 |  |  | 
+ | TR
+07:00 AM | TR |  | TR | Consumer ConfidenceNOV |  | 84.8 |  | 85 |  |  | 
+ | TR
+07:00 AM | TR |  | TR | Capacity UtilizationNOV |  | 74.5% |  | 74.6% |  |  | 
+ | TR
+07:00 AM | GB |  | GB | Retail Sales MoMOCT |  | -0.4% |  | 0.1% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Retail Sales YoYOCT |  | 0.8% |  | 0.9% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Public Sector Net Borrowing Ex BanksOCT |  | £-24.5B |  | £-22.0B |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Retail Sales ex Fuel MoMOCT |  | -0.7% |  | 0.1% |  |  | 
+ | GB
+07:00 AM | GB |  | GB | Retail Sales ex Fuel YoYOCT |  | 0.8% |  | 0.9% |  |  | 
+ | GB
+07:45 AM | FR |  | FR | Business ConfidenceNOV |  | 105 |  | 102 |  |  | 
+ | FR
+07:45 AM | FR |  | FR | Business Climate IndicatorNOV |  | 98 |  | 96 |  |  | 
+ | FR
+09:00 AM | IT |  | IT | Construction Output YoYSEP |  | -2.2% |  | -3% |  |  | 
+ | IT
+
+[Table #3]
+ | GB
+
+[Table #4]
+ | AU
+
+[Table #5]
+ | CN
+
+[Table #6]
+ | CN
+
+[Table #7]
+ | CN
+
+[Table #8]
+ | CN
+
+[Table #9]
+ | ID
+
+[Table #10]
+ | JP
+
+[Table #11]
+ | JP
+
+[Table #12]
+ | JP
+
+[Table #13]
+ | SA
+
+[Table #14]
+ | FR
+
+[Table #15]
+ | TR
+
+[Table #16]
+ | TR
+
+[Table #17]
+ | ZA
+
+[Table #18]
+ | ZA
+
+[Table #19]
+ | US
+
+[Table #20]
+ | ZA
+
+[Table #21]
+ | ZA
+
+[Table #22]
+ | ZA
+
+[Table #23]
+ | ES
+
+[Table #24]
+ | ES
+
+[Table #25]
+ | GB
+
+[Table #26]
+ | BR
+
+[Table #27]
+ | ZA
+
+[Table #28]
+ | ZA
+
+[Table #29]
+ | US
+
+[Table #30]
+ | GB
+
+[Table #31]
+ | US
+
+[Table #32]
+ | US
+
+[Table #33]
+ | US
+
+[Table #34]
+ | US
+
+[Table #35]
+ | US
+
+[Table #36]
+ | US
+
+[Table #37]
+ | US
+
+[Table #38]
+ | BR
+
+[Table #39]
+ | BR
+
+[Table #40]
+ | EA
+
+[Table #41]
+ | US
+
+[Table #42]
+ | US
+
+[Table #43]
+ | US
+
+[Table #44]
+ | EA
+
+[Table #45]
+ | US
+
+[Table #46]
+ | US
+
+[Table #47]
+ | CA
+
+[Table #48]
+ | CA
+
+[Table #49]
+ | GB
+
+[Table #50]
+ | US
+
+[Table #51]
+ | US
+
+[Table #52]
+ | US
+
+[Table #53]
+ | JP
+
+[Table #54]
+ | KR
+
+[Table #55]
+ | US
+
+[Table #56]
+ | EU
+
+[Table #57]
+ | ES
+
+[Table #58]
+ | US
+
+[Table #59]
+ | US
+
+[Table #60]
+ | AU
+
+[Table #61]
+ | AU
+
+[Table #62]
+ | JP
+
+[Table #63]
+ | SG
+
+[Table #64]
+ | SG
+
+[Table #65]
+ | SG
+
+[Table #66]
+ | JP
+
+[Table #67]
+ | DE
+
+[Table #68]
+ | DE
+
+[Table #69]
+ | DE
+
+[Table #70]
+ | DE
+
+[Table #71]
+ | TR
+
+[Table #72]
+ | TR
+
+[Table #73]
+ | EA
+
+[Table #74]
+ | IT
+
+[Table #75]
+ | IT
+
+[Table #76]
+ | EA
+
+[Table #77]
+ | IT
+
+[Table #78]
+ | DE
+
+[Table #79]
+ | DE
+
+[Table #80]
+ | BR
+
+[Table #81]
+ | BR
+
+[Table #82]
+ | MX
+
+[Table #83]
+ | MX
+
+[Table #84]
+ | US
+
+[Table #85]
+ | US
+
+[Table #86]
+ | US
+
+[Table #87]
+ | US
+
+[Table #88]
+ | US
+
+[Table #89]
+ | RU
+
+[Table #90]
+ | AU
+
+[Table #91]
+ | JP
+
+[Table #92]
+ | JP
+
+[Table #93]
+ | JP
+
+[Table #94]
+ | JP
+
+[Table #95]
+ | CN
+
+[Table #96]
+ | OP
+
+[Table #97]
+ | AU
+
+[Table #98]
+ | GB
+
+[Table #99]
+ | JP
+
+[Table #100]
+ | JP
+
+[Table #101]
+ | GB
+
+[Table #102]
+ | GB
+
+[Table #103]
+ | GB
+
+[Table #104]
+ | GB
+
+[Table #105]
+ | GB
+
+[Table #106]
+ | GB
+
+[Table #107]
+ | GB
+
+[Table #108]
+ | GB
+
+[Table #109]
+ | GB
+
+[Table #110]
+ | GB
+
+[Table #111]
+ | GB
+
+[Table #112]
+ | GB
+
+[Table #113]
+ | GB
+
+[Table #114]
+ | GB
+
+[Table #115]
+ | GB
+
+[Table #116]
+ | GB
+
+[Table #117]
+ | GB
+
+[Table #118]
+ | GB
+
+[Table #119]
+ | TR
+
+[Table #120]
+ | EA
+
+[Table #121]
+ | ZA
+
+[Table #122]
+ | ZA
+
+[Table #123]
+ | ZA
+
+[Table #124]
+ | GB
+
+[Table #125]
+ | IT
+
+[Table #126]
+ | IT
+
+[Table #127]
+ | IT
+
+[Table #128]
+ | IN
+
+[Table #129]
+ | IN
+
+[Table #130]
+ | TR
+
+[Table #131]
+ | BR
+
+[Table #132]
+ | BR
+
+[Table #133]
+ | GB
+
+[Table #134]
+ | CA
+
+[Table #135]
+ | DE
+
+[Table #136]
+ | US
+
+[Table #137]
+ | US
+
+[Table #138]
+ | US
+
+[Table #139]
+ | US
+
+[Table #140]
+ | US
+
+[Table #141]
+ | US
+
+[Table #142]
+ | US
+
+[Table #143]
+ | EA
+
+[Table #144]
+ | US
+
+[Table #145]
+ | US
+
+[Table #146]
+ | US
+
+[Table #147]
+ | US
+
+[Table #148]
+ | CA
+
+[Table #149]
+ | US
+
+[Table #150]
+ | US
+
+[Table #151]
+ | US
+
+[Table #152]
+ | US
+
+[Table #153]
+ | US
+
+[Table #154]
+ | US
+
+[Table #155]
+ | US
+
+[Table #156]
+ | US
+
+[Table #157]
+ | US
+
+[Table #158]
+ | US
+
+[Table #159]
+ | US
+
+[Table #160]
+ | US
+
+[Table #161]
+ | US
+
+[Table #162]
+ | AR
+
+[Table #163]
+ | AR
+
+[Table #164]
+ | US
+
+[Table #165]
+ | EA
+
+[Table #166]
+ | KR
+
+[Table #167]
+ | KR
+
+[Table #168]
+ | US
+
+[Table #169]
+ | US
+
+[Table #170]
+ | US
+
+[Table #171]
+ | AR
+
+[Table #172]
+ | KR
+
+[Table #173]
+ | KR
+
+[Table #174]
+ | JP
+
+[Table #175]
+ | EA
+
+[Table #176]
+ | DE
+
+[Table #177]
+ | DE
+
+[Table #178]
+ | TR
+
+[Table #179]
+ | TR
+
+[Table #180]
+ | EA
+
+[Table #181]
+ | FR
+
+[Table #182]
+ | FR
+
+[Table #183]
+ | FR
+
+[Table #184]
+ | FR
+
+[Table #185]
+ | ES
+
+[Table #186]
+ | ES
+
+[Table #187]
+ | ES
+
+[Table #188]
+ | ES
+
+[Table #189]
+ | ES
+
+[Table #190]
+ | CN
+
+[Table #191]
+ | FR
+
+[Table #192]
+ | IT
+
+[Table #193]
+ | EA
+
+[Table #194]
+ | EA
+
+[Table #195]
+ | EA
+
+[Table #196]
+ | EA
+
+[Table #197]
+ | EA
+
+[Table #198]
+ | IN
+
+[Table #199]
+ | IN
+
+[Table #200]
+ | IN
+
+[Table #201]
+ | BR
+
+[Table #202]
+ | BR
+
+[Table #203]
+ | CA
+
+[Table #204]
+ | CA
+
+[Table #205]
+ | CA
+
+[Table #206]
+ | US
+
+[Table #207]
+ | US
+
+[Table #208]
+ | US
+
+[Table #209]
+ | US
+
+[Table #210]
+ | US
+
+[Table #211]
+ | US
+
+[Table #212]
+ | US
+
+[Table #213]
+ | BR
+
+[Table #214]
+ | US
+
+[Table #215]
+ | US
+
+[Table #216]
+ | RU
+
+[Table #217]
+ | RU
+
+[Table #218]
+ | RU
+
+[Table #219]
+ | US
+
+[Table #220]
+ | US
+
+[Table #221]
+ | US
+
+[Table #222]
+ | EU
+
+[Table #223]
+ | CN
+
+[Table #224]
+ | CN
+
+[Table #225]
+ | CN
+
+[Table #226]
+ | CN
+
+[Table #227]
+ | US
+
+[Table #228]
+ | SA
+
+[Table #229]
+ | SA
+
+[Table #230]
+ | SA
+
+[Table #231]
+ | JP
+
+[Table #232]
+ | JP
+
+[Table #233]
+ | JP
+
+[Table #234]
+ | JP
+
+[Table #235]
+ | JP
+
+[Table #236]
+ | JP
+
+[Table #237]
+ | CN
+
+[Table #238]
+ | CN
+
+[Table #239]
+ | CN
+
+[Table #240]
+ | CN
+
+[Table #241]
+ | CN
+
+[Table #242]
+ | KR
+
+[Table #243]
+ | JP
+
+[Table #244]
+ | JP
+
+[Table #245]
+ | JP
+
+[Table #246]
+ | JP
+
+[Table #247]
+ | IN
+
+[Table #248]
+ | IN
+
+[Table #249]
+ | IN
+
+[Table #250]
+ | IN
+
+[Table #251]
+ | TR
+
+[Table #252]
+ | ZA
+
+[Table #253]
+ | ZA
+
+[Table #254]
+ | ZA
+
+[Table #255]
+ | ZA
+
+[Table #256]
+ | EA
+
+[Table #257]
+ | EA
+
+[Table #258]
+ | DE
+
+[Table #259]
+ | IN
+
+[Table #260]
+ | BR
+
+[Table #261]
+ | BR
+
+[Table #262]
+ | BR
+
+[Table #263]
+ | RU
+
+[Table #264]
+ | CA
+
+[Table #265]
+ | CA
+
+[Table #266]
+ | CA
+
+[Table #267]
+ | CA
+
+[Table #268]
+ | CA
+
+[Table #269]
+ | CA
+
+[Table #270]
+ | CA
+
+[Table #271]
+ | US
+
+[Table #272]
+ | FR
+
+[Table #273]
+ | FR
+
+[Table #274]
+ | FR
+
+[Table #275]
+ | US
+
+[Table #276]
+ | US
+
+[Table #277]
+ | US
+
+[Table #278]
+ | IN
+
+[Table #279]
+ | TR
+
+[Table #280]
+ | TR
+
+[Table #281]
+ | CN
+
+[Table #282]
+ | IN
+
+[Table #283]
+ | IN
+
+[Table #284]
+ | IN
+
+[Table #285]
+ | DE
+
+[Table #286]
+ | AU
+
+[Table #287]
+ | SG
+
+[Table #288]
+ | SG
+
+[Table #289]
+ | SG
+
+[Table #290]
+ | JP
+
+[Table #291]
+ | SG
+
+[Table #292]
+ | SG
+
+[Table #293]
+ | GB
+
+[Table #294]
+ | GB
+
+[Table #295]
+ | GB
+
+[Table #296]
+ | GB
+
+[Table #297]
+ | GB
+
+[Table #298]
+ | GB
+
+[Table #299]
+ | IT
+
+[Table #300]
+ | IT
+
+[Table #301]
+ | IT
+
+[Table #302]
+ | IT
+
+[Table #303]
+ | ES
+
+[Table #304]
+ | ZA
+
+[Table #305]
+ | GB
+
+[Table #306]
+ | EA
+
+[Table #307]
+ | DE
+
+[Table #308]
+ | DE
+
+[Table #309]
+ | GB
+
+[Table #310]
+ | DE
+
+[Table #311]
+ | CA
+
+[Table #312]
+ | US
+
+[Table #313]
+ | CA
+
+[Table #314]
+ | CA
+
+[Table #315]
+ | CA
+
+[Table #316]
+ | US
+
+[Table #317]
+ | US
+
+[Table #318]
+ | US
+
+[Table #319]
+ | US
+
+[Table #320]
+ | US
+
+[Table #321]
+ | US
+
+[Table #322]
+ | US
+
+[Table #323]
+ | US
+
+[Table #324]
+ | US
+
+[Table #325]
+ | US
+
+[Table #326]
+ | US
+
+[Table #327]
+ | US
+
+[Table #328]
+ | US
+
+[Table #329]
+ | US
+
+[Table #330]
+ | US
+
+[Table #331]
+ | US
+
+[Table #332]
+ | US
+
+[Table #333]
+ | US
+
+[Table #334]
+ | US
+
+[Table #335]
+ | US
+
+[Table #336]
+ | US
+
+[Table #337]
+ | JP
+
+[Table #338]
+ | JP
+
+[Table #339]
+ | JP
+
+[Table #340]
+ | US
+
+[Table #341]
+ | AU
+
+[Table #342]
+ | AU
+
+[Table #343]
+ | AU
+
+[Table #344]
+ | JP
+
+[Table #345]
+ | JP
+
+[Table #346]
+ | GB
+
+[Table #347]
+ | GB
+
+[Table #348]
+ | GB
+
+[Table #349]
+ | GB
+
+[Table #350]
+ | GB
+
+[Table #351]
+ | GB
+
+[Table #352]
+ | GB
+
+[Table #353]
+ | GB
+
+[Table #354]
+ | GB
+
+[Table #355]
+ | GB
+
+[Table #356]
+ | GB
+
+[Table #357]
+ | GB
+
+[Table #358]
+ | GB
+
+[Table #359]
+ | ID
+
+[Table #360]
+ | ID
+
+[Table #361]
+ | ID
+
+[Table #362]
+ | ID
+
+[Table #363]
+ | EA
+
+[Table #364]
+ | ZA
+
+[Table #365]
+ | ZA
+
+[Table #366]
+ | ZA
+
+[Table #367]
+ | ZA
+
+[Table #368]
+ | EA
+
+[Table #369]
+ | EA
+
+[Table #370]
+ | EA
+
+[Table #371]
+ | EA
+
+[Table #372]
+ | DE
+
+[Table #373]
+ | ZA
+
+[Table #374]
+ | ZA
+
+[Table #375]
+ | EU
+
+[Table #376]
+ | EU
+
+[Table #377]
+ | EU
+
+[Table #378]
+ | IN
+
+[Table #379]
+ | US
+
+[Table #380]
+ | US
+
+[Table #381]
+ | US
+
+[Table #382]
+ | US
+
+[Table #383]
+ | US
+
+[Table #384]
+ | CA
+
+[Table #385]
+ | US
+
+[Table #386]
+ | US
+
+[Table #387]
+ | US
+
+[Table #388]
+ | US
+
+[Table #389]
+ | US
+
+[Table #390]
+ | US
+
+[Table #391]
+ | US
+
+[Table #392]
+ | US
+
+[Table #393]
+ | US
+
+[Table #394]
+ | US
+
+[Table #395]
+ | US
+
+[Table #396]
+ | US
+
+[Table #397]
+ | US
+
+[Table #398]
+ | US
+
+[Table #399]
+ | US
+
+[Table #400]
+ | RU
+
+[Table #401]
+ | RU
+
+[Table #402]
+ | US
+
+[Table #403]
+ | US
+
+[Table #404]
+ | US
+
+[Table #405]
+ | US
+
+[Table #406]
+ | US
+
+[Table #407]
+ | US
+
+[Table #408]
+ | JP
+
+[Table #409]
+ | JP
+
+[Table #410]
+ | JP
+
+[Table #411]
+ | JP
+
+[Table #412]
+ | US
+
+[Table #413]
+ | AU
+
+[Table #414]
+ | AU
+
+[Table #415]
+ | AU
+
+[Table #416]
+ | AU
+
+[Table #417]
+ | AU
+
+[Table #418]
+ | JP
+
+[Table #419]
+ | SG
+
+[Table #420]
+ | EA
+
+[Table #421]
+ | EA
+
+[Table #422]
+ | IT
+
+[Table #423]
+ | ES
+
+[Table #424]
+ | EA
+
+[Table #425]
+ | EA
+
+[Table #426]
+ | FR
+
+[Table #427]
+ | GB
+
+[Table #428]
+ | FR
+
+[Table #429]
+ | FR
+
+[Table #430]
+ | TR
+
+[Table #431]
+ | ZA
+
+[Table #432]
+ | ZA
+
+[Table #433]
+ | ZA
+
+[Table #434]
+ | CA
+
+[Table #435]
+ | CA
+
+[Table #436]
+ | CA
+
+[Table #437]
+ | CA
+
+[Table #438]
+ | US
+
+[Table #439]
+ | US
+
+[Table #440]
+ | US
+
+[Table #441]
+ | US
+
+[Table #442]
+ | US
+
+[Table #443]
+ | US
+
+[Table #444]
+ | US
+
+[Table #445]
+ | US
+
+[Table #446]
+ | US
+
+[Table #447]
+ | US
+
+[Table #448]
+ | US
+
+[Table #449]
+ | AR
+
+[Table #450]
+ | MX
+
+[Table #451]
+ | US
+
+[Table #452]
+ | US
+
+[Table #453]
+ | US
+
+[Table #454]
+ | US
+
+[Table #455]
+ | US
+
+[Table #456]
+ | US
+
+[Table #457]
+ | CA
+
+[Table #458]
+ | US
+
+[Table #459]
+ | US
+
+[Table #460]
+ | US
+
+[Table #461]
+ | AR
+
+[Table #462]
+ | KR
+
+[Table #463]
+ | KR
+
+[Table #464]
+ | US
+
+[Table #465]
+ | US
+
+[Table #466]
+ | JP
+
+[Table #467]
+ | JP
+
+[Table #468]
+ | JP
+
+[Table #469]
+ | JP
+
+[Table #470]
+ | AU
+
+[Table #471]
+ | ES
+
+[Table #472]
+ | BR
+
+[Table #473]
+ | GB
+
+[Table #474]
+ | CN
+
+[Table #475]
+ | CN
+
+[Table #476]
+ | ID
+
+[Table #477]
+ | JP
+
+[Table #478]
+ | DE
+
+[Table #479]
+ | DE
+
+[Table #480]
+ | TR
+
+[Table #481]
+ | TR
+
+[Table #482]
+ | TR
+
+[Table #483]
+ | GB
+
+[Table #484]
+ | GB
+
+[Table #485]
+ | GB
+
+[Table #486]
+ | GB
+
+[Table #487]
+ | GB
+
+[Table #488]
+ | FR
+
+[Table #489]
+ | FR
+
+[Table #490]
+ | IT
