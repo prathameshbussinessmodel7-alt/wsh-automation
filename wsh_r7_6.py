@@ -19,6 +19,7 @@ import re
 import shutil
 import sqlite3
 from datetime import datetime, timezone
+from contextlib import closing
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -176,8 +177,12 @@ def atomic_copy_immutable(source: Path, destination: Path, expected_hash: str) -
 
 def initialise_database(db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(db_path) as connection:
+    connection = sqlite3.connect(db_path)
+    try:
         connection.executescript(SCHEMA)
+        connection.commit()
+    finally:
+        connection.close()
 
 def ingest_directory(input_dir: str | Path, archive_dir: str | Path) -> dict:
     root = Path(input_dir).resolve()
@@ -196,7 +201,8 @@ def ingest_directory(input_dir: str | Path, archive_dir: str | Path) -> dict:
         manifest = json.loads(manifest_bytes)
         run_id = f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}_{manifest_hash[:12]}"
         ingested_at = datetime.now(timezone.utc).isoformat()
-        with sqlite3.connect(db_path) as connection:
+        connection = sqlite3.connect(db_path)
+        try:
             connection.execute("PRAGMA foreign_keys=ON")
             existing = connection.execute(
                 "SELECT run_id FROM runs WHERE manifest_sha256=?", (manifest_hash,)
@@ -280,6 +286,8 @@ def ingest_directory(input_dir: str | Path, archive_dir: str | Path) -> dict:
                 )
                 observation_count += 1
             connection.commit()
+        finally:
+            connection.close()
         results.append({"manifest": manifest_path.name, "status": "INGESTED",
                         "run_id": run_id, "observations": observation_count})
     return {"archive_version": VERSION, "database": str(db_path),
@@ -290,7 +298,8 @@ def audit_archive(archive_dir: str | Path) -> dict:
     db_path = archive / "wsh_history.sqlite3"
     if not db_path.is_file():
         raise FileNotFoundError(db_path)
-    with sqlite3.connect(db_path) as connection:
+    connection = sqlite3.connect(db_path)
+    try:
         connection.row_factory = sqlite3.Row
         runs = connection.execute("SELECT COUNT(*) AS n FROM runs").fetchone()["n"]
         rows = connection.execute(
@@ -302,6 +311,8 @@ def audit_archive(archive_dir: str | Path) -> dict:
         integrity = connection.execute(
             "SELECT COUNT(*) AS n FROM dataset_observations WHERE raw_payload_status='FAIL'"
         ).fetchone()["n"]
+    finally:
+        connection.close()
     return {"archive_version": VERSION, "run_count": runs,
             "dataset_history": [dict(row) for row in rows],
             "raw_integrity_failures": integrity,
