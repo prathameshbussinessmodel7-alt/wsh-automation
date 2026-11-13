@@ -1,0 +1,132 @@
+=== WSH GSSE DATA PACKAGE [Calendar-Aware Governance] - 2026-11-13 08:14:49 ===
+
+
+==================================================
+WSH GSSE: CCIL MULTI-MARKET ISOLATION (CALENDAR-AWARE)
+==================================================
+
+
+--- GSSE CCIL SUB-MARKET TAB: Money Market ---
+
+
+--- GSSE CCIL SUB-MARKET TAB: Gsec ---
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: QUARANTINED]
+
+
+--- GSSE CCIL SUB-MARKET TAB: Forex ---
+
+
+--- GSSE CCIL SUB-MARKET TAB: Derivatives ---
+
+
+==================================================
+WSH GSSE: TRADINGECONOMICS EXTRACTION: https://tradingeconomics.com/bonds
+==================================================
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: VALID | Tables: 6]
+
+[Table #1]
+ | Major10Y | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | United States | 5.1300 | 0.0040 | 0.26% | -0.06% | 0.96% | 0.98% | Nov/13
+ | United Kingdom | 5.3281 | 0.0196 | 0.17% | -0.07% | 0.85% | 0.75% | Nov/13
+ | Japan | 2.8710 | 0.0783 | 0.23% | -0.13% | 0.80% | 1.17% | Nov/13
+ | Australia | 5.1270 | 0.0220 | 0.12% | -0.19% | 0.37% | 0.69% | Nov/13
+ | Germany | 3.3670 | 0.0414 | 0.11% | -0.10% | 0.50% | 0.65% | Nov/13
+ | Brazil | 15.4400 | 0.2600 | 0.22% | 2.67% | 1.58% | 1.77% | Nov/12
+ | Russia | 16.7300 | 0.0700 | 0.18% | 0.16% | 2.29% | 2.38% | Nov/12
+ | India | 7.3200 | 0.0720 | 0.20% | -0.03% | 0.75% | 0.81% | Nov/13
+ | Canada | 3.8100 | 0.0930 | 0.14% | -0.06% | 0.38% | 0.62% | Nov/12
+ | Italy | 4.4300 | 0.0415 | 0.09% | -0.13% | 0.92% | 0.96% | Nov/13
+ | France | 4.8820 | 0.0460 | 0.11% | 0.00% | 1.32% | 1.43% | Nov/13
+ | South Africa | 8.7350 | 0.0950 | 0.30% | -0.18% | 0.53% | 0.08% | Nov/13
+ | China | 1.6110 | 0.0032 | 0.02% | -0.05% | -0.25% | -0.22% | Nov/13
+ | Switzerland | 0.5670 | 0.0140 | 0.12% | 0.01% | 0.29% | 0.40% | Nov/13
+ | Mexico | 9.2780 | 0.0720 | 0.17% | 0.03% | 0.33% | 0.53% | Nov/12
+ | Netherlands | 3.4620 | 0.0364 | 0.11% | -0.10% | 0.50% | 0.59% | Nov/13
+ | New Zealand | 4.7460 | 0.0866 | 0.06% | -0.26% | 0.34% | 0.57% | Nov/13
+ | Portugal | 3.8120 | 0.0387 | 0.11% | -0.14% | 0.65% | 0.75% | Nov/13
+ | South Korea | 4.0040 | 0.0550 | 0.15% | -0.24% | 0.62% | 0.69% | Nov/13
+ | Spain | 3.9420 | 0.0375 | 0.10% | -0.14% | 0.65% | 0.72% | Nov/13
+ | Greece | 4.2540 | 0.0800 | 0.13% | -0.14% | 0.78% | 0.89% | Nov/13
+ | Turkey | 33.3600 | 0.0000 | 0.34% | 0.56% | 6.20% | 2.85% | Nov/12
+
+[Table #2]
+ | Europe | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | United Kingdom | 5.3281 | 0.0196 | 0.17% | -0.07% | 0.85% | 0.75% | Nov/13
+ | Germany | 3.3670 | 0.0414 | 0.11% | -0.10% | 0.50% | 0.65% | Nov/13
+ | Russia | 16.7300 | 0.0700 | 0.18% | 0.16% | 2.29% | 2.38% | Nov/12
+ | Italy | 4.4300 | 0.0415 | 0.09% | -0.13% | 0.92% | 0.96% | Nov/13
+ | France | 4.8820 | 0.0460 | 0.11% | 0.00% | 1.32% | 1.43% | Nov/13
+ | Switzerland | 0.5670 | 0.0140 | 0.12% | 0.01% | 0.29% | 0.40% | Nov/13
+ | Turkey | 33.3600 | 0.0000 | 0.34% | 0.56% | 6.20% | 2.85% | Nov/12
+ | Finland | 3.7490 | 0.0345 | 0.11% | -0.11% | 0.58% | 0.69% | Nov/13
+ | Lithuania | 4.2700 | 0.0050 | 0.00% | -0.21% | 0.58% | 0.77% | Nov/12
+ | Netherlands | 3.4620 | 0.0364 | 0.11% | -0.10% | 0.50% | 0.59% | Nov/13
+ | Norway | 4.3470 | 0.0200 | 0.03% | -0.27% | 0.16% | 0.22% | Nov/13
+ | Poland | 6.3390 | 0.0710 | 0.16% | -0.05% | 1.19% | 1.02% | Nov/13
+ | Portugal | 3.8120 | 0.0387 | 0.11% | -0.14% | 0.65% | 0.75% | Nov/13
+ | Romania | 7.1200 | 0.0400 | 0.01% | -0.14% | 0.31% | 0.19% | Nov/13
+ | Slovakia | 4.2500 | 0.0040 | 0.04% | -0.12% | 0.72% | 0.88% | Nov/12
+ | Slovenia | 3.9050 | 0.0770 | 0.10% | -0.10% | 0.76% | 0.91% | Nov/13
+ | Spain | 3.9420 | 0.0375 | 0.10% | -0.14% | 0.65% | 0.72% | Nov/13
+ | Sweden | 3.0880 | 0.0250 | 0.12% | -0.12% | 0.34% | 0.38% | Nov/13
+ | Greece | 4.2540 | 0.0800 | 0.13% | -0.14% | 0.78% | 0.89% | Nov/13
+ | Hungary | 5.4890 | 0.0428 | 0.03% | -0.08% | -1.38% | -1.57% | Nov/12
+ | Iceland | 6.7640 | 0.0060 | -0.08% | -0.26% | 0.29% | 0.23% | Nov/12
+ | Ireland | 3.5200 | 0.0306 | 0.11% | -0.08% | 0.49% | 0.57% | Nov/13
+ | Austria | 3.6010 | 0.0303 | 0.10% | -0.12% | 0.49% | 0.60% | Nov/13
+ | Belgium | 4.3250 | 0.0339 | 0.09% | 0.00% | 0.98% | 1.08% | Nov/13
+ | Croatia | 3.8670 | 0.0005 | 0.00% | -0.27% | 0.60% | 0.81% | Nov/12
+ | Czech Republic | 5.2140 | 0.0430 | 0.09% | -0.12% | 0.71% | 0.64% | Nov/13
+ | Denmark | 3.1630 | 0.0420 | 0.11% | -0.11% | 0.41% | 0.59% | Nov/13
+ | Euro area | 3.87 | 0.01 | -0.01% | -0.17% | 0.62% | 0.79% | Nov/11
+
+[Table #3]
+ | America | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | United States | 5.1300 | 0.0040 | 0.26% | -0.06% | 0.96% | 0.98% | Nov/13
+ | Brazil | 15.4400 | 0.2600 | 0.22% | 2.67% | 1.58% | 1.77% | Nov/12
+ | Canada | 3.8100 | 0.0930 | 0.14% | -0.06% | 0.38% | 0.62% | Nov/12
+ | Mexico | 9.2780 | 0.0720 | 0.17% | 0.03% | 0.33% | 0.53% | Nov/12
+ | Peru | 6.2600 | 0.1210 | 0.00% | 0.10% | 0.72% | 0.51% | Nov/12
+ | Chile | 5.9600 | 0.0150 | 0.01% | -0.13% | 0.55% | 0.49% | Nov/12
+ | Colombia | 12.7110 | 0.0590 | -0.12% | -0.25% | 0.06% | 0.66% | Nov/12
+
+[Table #4]
+ | Asia | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | Japan | 2.8710 | 0.0783 | 0.23% | -0.13% | 0.80% | 1.17% | Nov/13
+ | India | 7.3200 | 0.0720 | 0.20% | -0.03% | 0.75% | 0.81% | Nov/13
+ | China | 1.6110 | 0.0032 | 0.02% | -0.05% | -0.25% | -0.22% | Nov/13
+ | Singapore | 2.3300 | 0.0802 | 0.24% | -0.06% | 0.11% | 0.39% | Nov/13
+ | South Korea | 4.0040 | 0.0550 | 0.15% | -0.24% | 0.62% | 0.69% | Nov/13
+ | Taiwan | 1.8600 | 0.0000 | -0.06% | -0.18% | 0.46% | 0.54% | Nov/13
+ | Thailand | 1.9780 | 0.0000 | -0.01% | -0.33% | 0.31% | 0.23% | Nov/13
+ | Vietnam | 4.5726 | 0.0003 | -0.01% | -0.01% | 0.39% | 0.57% | Nov/13
+ | Hong Kong | 3.9500 | 0.1251 | 0.29% | -0.16% | 0.85% | 0.98% | Nov/13
+ | Indonesia | 7.6300 | 0.0790 | -0.11% | 0.46% | 1.51% | 1.52% | Nov/12
+ | Israel | 4.1470 | 0.0360 | -0.01% | -0.02% | 0.23% | 0.28% | Nov/13
+ | Malaysia | 3.8620 | 0.0068 | 0.01% | 0.02% | 0.37% | 0.41% | Nov/13
+ | Pakistan | 12.4080 | 0.0020 | -0.24% | -0.42% | 1.00% | 0.45% | Nov/12
+ | Philippines | 7.7700 | 0.0020 | -0.30% | -0.17% | 1.74% | 1.97% | Nov/13
+
+[Table #5]
+ | Oceania | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | Australia | 5.1280 | 0.0230 | 0.13% | -0.19% | 0.37% | 0.69% | Nov/13
+ | New Zealand | 4.7460 | 0.0866 | 0.06% | -0.26% | 0.34% | 0.57% | Nov/13
+
+[Table #6]
+ | Africa | Yield | Chg | Weekly | Monthly | YTD | YoY | Date
+ | South Africa | 8.7350 | 0.0950 | 0.30% | -0.18% | 0.53% | 0.08% | Nov/13
+ | Zambia | 14.7500 | 0.0000 | 0.00% | -0.02% | -3.10% | -3.46% | Nov/12
+ | Kenya | 12.5000 | 0.0240 | 0.00% | -0.09% | -0.14% | -0.63% | Nov/12
+ | Nigeria | 16.5960 | 0.2480 | -0.25% | 0.17% | -0.22% | 1.01% | Nov/11
+
+
+==================================================
+WSH GSSE: TRADINGECONOMICS EXTRACTION: https://tradingeconomics.com/calendar
+==================================================
+
+[STATUS -> PUB: PUBLISHED | EXT: SUCCESS | VAL: VALID | Tables: 1]
+
+[Table #1]
+RecentRecentTodayTomorrowThis WeekNext WeekThis MonthNext MonthYesterdayPrevious WeekPrevious MonthCustomImpactCountriesCategoryAll EventsInterest RatePrices & InflationLabour MarketGDP GrowthForeign TradeGovernmentBusiness ConfidenceConsumer SentimentHousing MarketBond AuctionsEnergyHolidaysEarningsUTC -12UTC -11UTC -10UTC -9UTC -8UTC -7UTC -6UTC -5UTC -4UTC -3UTC -2UTC -1UTCUTC +1UTC +2UTC +3UTC +3:30UTC +4UTC +4:30UTC +5UTC +5:30UTC +5:45UTC +6UTC +7UTC +8UTC +9UTC +9:30UTC +10UTC +10:30UTC +11UTC +12UTC +13UTC +14 | Download
