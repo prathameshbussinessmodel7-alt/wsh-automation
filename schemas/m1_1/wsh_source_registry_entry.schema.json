@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WSH Source Registry Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source_id",
+    "dataset_key",
+    "dataset_segments",
+    "status"
+  ],
+  "properties": {
+    "source_id": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+    },
+    "dataset_key": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+    },
+    "dataset_segments": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "url": {
+      "anyOf": [
+        {
+          "$ref": "wsh_common_definitions.schema.json#/$defs/url"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "frequency": {
+      "type": "string"
+    },
+    "integration_note": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "evidence_archive": {
+      "type": "string"
+    },
+    "evidence_date": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/isoDate"
+    },
+    "evidence_files_present": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "expected_numbered_positions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "intentionally_absent": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "archive_note": {
+      "type": "string"
+    }
+  }
+}

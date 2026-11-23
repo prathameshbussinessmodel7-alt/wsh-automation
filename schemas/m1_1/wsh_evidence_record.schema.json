@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WSH Evidence Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidence_id",
+    "run_id",
+    "source_id",
+    "dataset_key",
+    "captured_at_utc",
+    "requested_url",
+    "final_url",
+    "media_type",
+    "sha256",
+    "storage_uri",
+    "capture_method"
+  ],
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "source_id": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+    },
+    "dataset_key": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+    },
+    "captured_at_utc": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/dateTime"
+    },
+    "source_timestamp": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "requested_url": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/url"
+    },
+    "final_url": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/url"
+    },
+    "http_status": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 100,
+      "maximum": 599
+    },
+    "media_type": {
+      "type": "string"
+    },
+    "sha256": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/sha256"
+    },
+    "byte_length": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "storage_uri": {
+      "type": "string"
+    },
+    "capture_method": {
+      "enum": [
+        "http",
+        "api",
+        "browser",
+        "download",
+        "manual_evidence"
+      ]
+    },
+    "redactions_applied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "capture_notes": {
+      "type": "string"
+    }
+  }
+}

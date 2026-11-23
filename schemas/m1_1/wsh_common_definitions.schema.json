@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wsh.local/schemas/common-definitions-v0.1.json",
+  "title": "WSH Common Definitions",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "isoDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timezone": {
+      "type": "string",
+      "minLength": 1
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "publicationStatus": {
+      "type": "string",
+      "enum": [
+        "PUBLISHED",
+        "MARKET_CLOSED",
+        "NOT_DUE",
+        "DELAYED",
+        "WITHDRAWN",
+        "UNKNOWN"
+      ]
+    },
+    "extractionStatus": {
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "PARTIAL",
+        "FAILED",
+        "NOT_ATTEMPTED"
+      ]
+    },
+    "validationStatus": {
+      "type": "string",
+      "enum": [
+        "VALID",
+        "PARTIAL",
+        "QUARANTINED",
+        "INVALID",
+        "NOT_RUN"
+      ]
+    },
+    "freshnessStatus": {
+      "type": "string",
+      "enum": [
+        "FRESH",
+        "STALE",
+        "OUT_OF_WINDOW",
+        "UNKNOWN"
+      ]
+    },
+    "reconciliationStatus": {
+      "type": "string",
+      "enum": [
+        "MATCHED",
+        "MISMATCH",
+        "NOT_AVAILABLE",
+        "NOT_RUN"
+      ]
+    },
+    "releaseDecision": {
+      "type": "string",
+      "enum": [
+        "ACCEPT",
+        "ACCEPT_WITH_LIMITATIONS",
+        "HOLD",
+        "REJECT"
+      ]
+    }
+  }
+}

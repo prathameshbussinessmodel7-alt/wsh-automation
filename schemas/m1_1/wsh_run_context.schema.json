@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WSH Run Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "run_started_at_utc",
+    "pipeline_version",
+    "git_commit",
+    "environment",
+    "market_date",
+    "timezone",
+    "source_registry_version",
+    "schema_version",
+    "trigger_type"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "run_started_at_utc": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/dateTime"
+    },
+    "run_completed_at_utc": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "pipeline_version": {
+      "type": "string"
+    },
+    "git_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{7,40}$"
+    },
+    "environment": {
+      "enum": [
+        "development",
+        "test",
+        "staging",
+        "production"
+      ]
+    },
+    "scheduled_window": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "market_date": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/isoDate"
+    },
+    "timezone": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/timezone"
+    },
+    "source_registry_version": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "trigger_type": {
+      "enum": [
+        "scheduled",
+        "manual",
+        "replay",
+        "backfill"
+      ]
+    },
+    "operator_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

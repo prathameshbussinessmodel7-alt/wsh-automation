@@ -1,0 +1,16 @@
+{
+  "package": "WSH M1.1 Common Data Contracts",
+  "version": "0.1",
+  "status": "INITIAL_SCHEMA_BASELINE_REVIEW_REQUIRED",
+  "schema_files": 7,
+  "files_sha256": {
+    "README.md": "f5889fa167d33814269f3304bc4e47ca1e969790300b2050c931f2b8279ee4e1",
+    "wsh_common_definitions.schema.json": "42ee115ae2154873f16c34059a911f7b27b2e5233b26cf88ea2096fc9d9517ea",
+    "wsh_dataset_contract.schema.json": "7abac0679e7a8cb8cae19576a5a5ebd6101a24e11037590e1d24c5ca0c3ad27f",
+    "wsh_dataset_status.schema.json": "426ac511ffde7a2907010015e9ad501e4c2724b481b2d4d408e2b9b87f58e7b8",
+    "wsh_evidence_record.schema.json": "7df5a48944dff88e954de3685b51c084324e3c0b52c25e4fba8e00b7fb1f7e72",
+    "wsh_quality_manifest.schema.json": "49bb7f189f3555be447d4ff82dcef011584e49c2c9a1e72556971c9a335d934b",
+    "wsh_run_context.schema.json": "456307a4147aa49b305e4980b6f0cd8eb660fb9a23718ae72fe4d19309b1bd15",
+    "wsh_source_registry_entry.schema.json": "7e4aee51b3b7d0ec2f4cb897049b48894f726eacf1f39a3fb7c1e77c50d09453"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WSH Dataset Status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "source_id",
+    "dataset_key",
+    "publication_status",
+    "extraction_status",
+    "validation_status",
+    "freshness_status",
+    "reconciliation_status",
+    "release_decision",
+    "updated_at_utc"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "source_id": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+    },
+    "dataset_key": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+    },
+    "publication_status": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/publicationStatus"
+    },
+    "extraction_status": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/extractionStatus"
+    },
+    "validation_status": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/validationStatus"
+    },
+    "freshness_status": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/freshnessStatus"
+    },
+    "reconciliation_status": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/reconciliationStatus"
+    },
+    "release_decision": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/releaseDecision"
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "updated_at_utc": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/dateTime"
+    }
+  }
+}

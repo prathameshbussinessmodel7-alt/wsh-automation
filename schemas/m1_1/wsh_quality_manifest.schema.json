@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WSH Quality Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version",
+    "run_context",
+    "dataset_results",
+    "overall_decision",
+    "generated_at_utc"
+  ],
+  "properties": {
+    "manifest_version": {
+      "type": "string"
+    },
+    "run_context": {
+      "type": "object",
+      "required": [
+        "run_id",
+        "market_date"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "market_date": {
+          "$ref": "wsh_common_definitions.schema.json#/$defs/isoDate"
+        }
+      },
+      "additionalProperties": true
+    },
+    "dataset_results": {
+      "type": "array",
+      "items": {
+        "$ref": "wsh_dataset_status.schema.json"
+      }
+    },
+    "overall_decision": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/releaseDecision"
+    },
+    "generated_at_utc": {
+      "$ref": "wsh_common_definitions.schema.json#/$defs/dateTime"
+    },
+    "evidence_index": {
+      "type": "array",
+      "items": {
+        "$ref": "wsh_evidence_record.schema.json"
+      }
+    },
+    "exception_summary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset_key",
+          "severity",
+          "message"
+        ],
+        "properties": {
+          "dataset_key": {
+            "$ref": "wsh_common_definitions.schema.json#/$defs/identifier"
+          },
+          "severity": {
+            "enum": [
+              "INFO",
+              "WARNING",
+              "ERROR",
+              "CRITICAL"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "evidence_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
