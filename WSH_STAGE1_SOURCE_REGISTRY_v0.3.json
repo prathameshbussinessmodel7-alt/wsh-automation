@@ -1,0 +1,364 @@
+[
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.option_chain",
+    "dataset_segments": [
+      "NIFTY",
+      "BANKNIFTY",
+      "FINNIFTY",
+      "SENSEX"
+    ],
+    "url": "https://web.sensibull.com/",
+    "status": "EXISTING_COMPONENT_FROZEN",
+    "integration_note": "V3.11.1 unchanged; do not edit release code."
+  },
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.oi_vs_strike",
+    "dataset_segments": [
+      "NIFTY"
+    ],
+    "url": "https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=NIFTY",
+    "status": "NEW_SEPARATE_INTEGRATION",
+    "integration_note": "New requirement; separately versioned adapter."
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.economic_calendar",
+    "dataset_segments": [
+      "calendar"
+    ],
+    "url": "https://tradingeconomics.com/calendar",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.baltic_dry_index",
+    "dataset_segments": [
+      "Baltic Dry Index"
+    ],
+    "url": "https://tradingeconomics.com/commodity/baltic",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.us_business_confidence",
+    "dataset_segments": [
+      "United States business confidence"
+    ],
+    "url": "https://tradingeconomics.com/united-states/business-confidence",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.global_bonds",
+    "dataset_segments": [
+      "global bonds and yields"
+    ],
+    "url": "https://tradingeconomics.com/bonds",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.commodities_treemap.default",
+    "dataset_segments": [
+      "commodities treemap",
+      "provider default frequency/view"
+    ],
+    "url": "https://tradingeconomics.com/commodities/treemap",
+    "frequency": "PROVIDER_DEFAULT_UNCONFIRMED",
+    "status": "TO_BUILD",
+    "note": "Default view; do not assume daily frequency until inspected."
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.commodities_treemap.weekly",
+    "dataset_segments": [
+      "commodities treemap",
+      "weekly"
+    ],
+    "url": "https://tradingeconomics.com/commodities/treemap?freq=weekly",
+    "frequency": "WEEKLY",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.commodities_treemap.monthly",
+    "dataset_segments": [
+      "commodities treemap",
+      "monthly"
+    ],
+    "url": "https://tradingeconomics.com/commodities/treemap?freq=monthly",
+    "frequency": "MONTHLY",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.commodities_ytd_treemap",
+    "dataset_segments": [
+      "commodities treemap",
+      "year-to-date"
+    ],
+    "url": "https://tradingeconomics.com/commodities/treemap?freq=ytd",
+    "frequency": "YTD",
+    "status": "TO_BUILD",
+    "integration_note": "Retains the original YTD registry identity while recording it as one frequency-specific view of the commodities treemap."
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.crypto_heatmap",
+    "dataset_segments": [
+      "crypto market cap and 24h change"
+    ],
+    "url": "https://in.tradingview.com/heatmap/crypto/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.us_equity_sector_heatmap",
+    "dataset_segments": [
+      "US equities by sector"
+    ],
+    "url": "https://www.tradingview.com/heatmap/stock/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.eu_equity_sector_heatmap",
+    "dataset_segments": [
+      "European equities by sector"
+    ],
+    "url": "https://in.tradingview.com/heatmap/stock/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.fx_cross_rates_heatmap",
+    "dataset_segments": [
+      "currency cross rates"
+    ],
+    "url": "https://www.tradingview.com/markets/currencies/cross-rates-overview-heat-map/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.nifty_futures_chart",
+    "dataset_segments": [
+      "NIFTY futures chart"
+    ],
+    "url": "https://in.tradingview.com/chart/xik75amh/?symbol=NSE%3ANIFTY1%21#order",
+    "status": "TO_BUILD",
+    "note": "URL was supplied three times; checkpoint intent unconfirmed."
+  },
+  {
+    "source_id": "bloomberg",
+    "dataset_key": "bloomberg.india_news_intelligence",
+    "dataset_segments": [
+      "India daily news and micro/macro monitoring"
+    ],
+    "url": "https://www.bloomberg.com/india",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.index_performances",
+    "dataset_segments": [
+      "index performances"
+    ],
+    "url": "https://www.nseindia.in/market-data/index-performances",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.unchanged_stocks",
+    "dataset_segments": [
+      "unchanged stocks"
+    ],
+    "url": "https://www.nseindia.in/market-data/unchanged",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.top_gainers_losers",
+    "dataset_segments": [
+      "top gainers and losers"
+    ],
+    "url": "https://www.nseindia.in/market-data/top-gainers-losers",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.option_chain",
+    "dataset_segments": [
+      "option chain"
+    ],
+    "url": "https://www.nseindia.in/option-chain",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.fii_dii",
+    "dataset_segments": [
+      "cash and derivatives participant segments as contractually confirmed"
+    ],
+    "url": "https://www.nseindia.com/reports/fii-dii",
+    "status": "EXISTING_RND_REVIEW_REQUIRED"
+  },
+  {
+    "source_id": "research360",
+    "dataset_key": "research360.fo_sector_analysis",
+    "dataset_segments": [
+      "F&O sector analysis"
+    ],
+    "url": "https://www.research360.in/future-and-options/sector-analysis",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "ccil",
+    "dataset_key": "ccil.market_segments",
+    "dataset_segments": [
+      "Money Market",
+      "G-Sec",
+      "Forex",
+      "Derivatives",
+      "settlement datasets as confirmed"
+    ],
+    "url": "https://www.ccilindia.com/",
+    "status": "EXISTING_RND_REVIEW_REQUIRED"
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.market_participants.eod",
+    "dataset_segments": [
+      "EOD Market Participants"
+    ],
+    "url": null,
+    "status": "PARENT_GROUP_ONLY",
+    "note": "Logical parent for the seven independently registered StockEdge view configurations below. Preserve independent extraction, validation, publication state, historical storage and reconciliation; do not merge with Sensibull or CCIL.",
+    "evidence_archive": "STOCKEDGE 20 NOV EOD COMPLETE DATA.zip",
+    "evidence_date": "2026-11-20",
+    "evidence_files_present": 46,
+    "expected_numbered_positions": 48,
+    "intentionally_absent": [
+      "B15",
+      "B16"
+    ],
+    "archive_note": "B15 and B16 are intentionally absent, not extraction failures."
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.fii_activity.daywise",
+    "dataset_segments": [
+      "FII Activity",
+      "Daywise"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=daywise",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING"
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.fii_activity.cm_provisional",
+    "dataset_segments": [
+      "FII Activity",
+      "CM Provisional"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=cm-provisional",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "Provisional publication state must be retained; do not treat as final without source evidence."
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.fii_activity.cm_sebi",
+    "dataset_segments": [
+      "FII Activity",
+      "CM SEBI"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=cm-sebi",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "Inspect reported date and trade date separately where provided."
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.fpi_sectoral_activity.equity",
+    "dataset_segments": [
+      "FPI Sectoral Activity",
+      "Equity"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=fpi-sectoral-activity&asset-type=equity",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "Fortnightly cadence observed in screenshot evidence; confirm against live source contract."
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.derivatives.index_futures",
+    "dataset_segments": [
+      "Derivatives",
+      "Index",
+      "Futures"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=derivatives&underlying-type=index&instrument-type=future",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING"
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.derivatives.futures_gross_oi",
+    "dataset_segments": [
+      "Futures Gross OI"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=futures-gross-oi",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING"
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.derivatives.options_gross_oi",
+    "dataset_segments": [
+      "Options Gross OI"
+    ],
+    "url": "https://web.stockedge.com/fii-activity?section=options-gross-oi",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING"
+  },
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.market_participants.fii_dii.core",
+    "dataset_segments": [
+      "FII/DII Market Participants",
+      "Core"
+    ],
+    "url": "https://web.sensibull.com/fii-dii-data",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "Core FII/DII Market Participants view. Inspect fields, observation period, publication timing and data semantics before implementation."
+  },
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.market_participants.fii_dii.fno",
+    "dataset_segments": [
+      "FII/DII Market Participants",
+      "F&O"
+    ],
+    "url": "https://web.sensibull.com/fii-dii-data/fno",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "F&O participant activity view. Keep distinct from cash-market and historical views."
+  },
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.market_participants.fii_dii.cash_market",
+    "dataset_segments": [
+      "FII/DII Market Participants",
+      "Cash Market"
+    ],
+    "url": "https://web.sensibull.com/fii-dii-data/cash-market",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "Cash-market participant activity view. Keep distinct from F&O and historical views."
+  },
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.market_participants.fii_dii.history",
+    "dataset_segments": [
+      "FII/DII Market Participants",
+      "History"
+    ],
+    "url": "https://web.sensibull.com/fii-dii-data/history",
+    "status": "SOURCE_REGISTERED_CONTRACT_PENDING",
+    "note": "Historical FII/DII view. Determine date coverage, granularity and overlap with core/F&O/cash views before defining reconciliation."
+  }
+]
