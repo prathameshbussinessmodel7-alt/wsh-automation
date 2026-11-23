@@ -1,0 +1,202 @@
+[
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.option_chain",
+    "dataset_segments": [
+      "NIFTY",
+      "BANKNIFTY",
+      "FINNIFTY",
+      "SENSEX"
+    ],
+    "url": "https://web.sensibull.com/",
+    "status": "EXISTING_COMPONENT_FROZEN",
+    "integration_note": "V3.11.1 unchanged; do not edit release code."
+  },
+  {
+    "source_id": "sensibull",
+    "dataset_key": "sensibull.oi_vs_strike",
+    "dataset_segments": [
+      "NIFTY"
+    ],
+    "url": "https://web.sensibull.com/open-interest/oi-vs-strike?tradingsymbol=NIFTY",
+    "status": "NEW_SEPARATE_INTEGRATION",
+    "integration_note": "New requirement; separately versioned adapter."
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.economic_calendar",
+    "dataset_segments": [
+      "calendar"
+    ],
+    "url": "https://tradingeconomics.com/calendar",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.baltic_dry_index",
+    "dataset_segments": [
+      "Baltic Dry Index"
+    ],
+    "url": "https://tradingeconomics.com/commodity/baltic",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.us_business_confidence",
+    "dataset_segments": [
+      "United States business confidence"
+    ],
+    "url": "https://tradingeconomics.com/united-states/business-confidence",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.global_bonds",
+    "dataset_segments": [
+      "global bonds and yields"
+    ],
+    "url": "https://tradingeconomics.com/bonds",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingeconomics",
+    "dataset_key": "tradingeconomics.commodities_ytd_treemap",
+    "dataset_segments": [
+      "commodities YTD treemap"
+    ],
+    "url": "https://tradingeconomics.com/commodities/treemap?freq=ytd",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.crypto_heatmap",
+    "dataset_segments": [
+      "crypto market cap and 24h change"
+    ],
+    "url": "https://in.tradingview.com/heatmap/crypto/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.us_equity_sector_heatmap",
+    "dataset_segments": [
+      "US equities by sector"
+    ],
+    "url": "https://www.tradingview.com/heatmap/stock/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.eu_equity_sector_heatmap",
+    "dataset_segments": [
+      "European equities by sector"
+    ],
+    "url": "https://in.tradingview.com/heatmap/stock/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.fx_cross_rates_heatmap",
+    "dataset_segments": [
+      "currency cross rates"
+    ],
+    "url": "https://www.tradingview.com/markets/currencies/cross-rates-overview-heat-map/",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "tradingview",
+    "dataset_key": "tradingview.nifty_futures_chart",
+    "dataset_segments": [
+      "NIFTY futures chart"
+    ],
+    "url": "https://in.tradingview.com/chart/xik75amh/?symbol=NSE%3ANIFTY1%21#order",
+    "status": "TO_BUILD",
+    "note": "URL was supplied three times; checkpoint intent unconfirmed."
+  },
+  {
+    "source_id": "bloomberg",
+    "dataset_key": "bloomberg.india_news_intelligence",
+    "dataset_segments": [
+      "India daily news and micro/macro monitoring"
+    ],
+    "url": "https://www.bloomberg.com/india",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.index_performances",
+    "dataset_segments": [
+      "index performances"
+    ],
+    "url": "https://www.nseindia.in/market-data/index-performances",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.unchanged_stocks",
+    "dataset_segments": [
+      "unchanged stocks"
+    ],
+    "url": "https://www.nseindia.in/market-data/unchanged",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.top_gainers_losers",
+    "dataset_segments": [
+      "top gainers and losers"
+    ],
+    "url": "https://www.nseindia.in/market-data/top-gainers-losers",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "research360",
+    "dataset_key": "research360.fo_sector_analysis",
+    "dataset_segments": [
+      "F&O sector analysis"
+    ],
+    "url": "https://www.research360.in/future-and-options/sector-analysis",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.option_chain",
+    "dataset_segments": [
+      "option chain"
+    ],
+    "url": "https://www.nseindia.in/option-chain",
+    "status": "TO_BUILD"
+  },
+  {
+    "source_id": "nse",
+    "dataset_key": "nse.fii_dii",
+    "dataset_segments": [
+      "cash and derivatives participant segments as contractually confirmed"
+    ],
+    "url": "https://www.nseindia.com/reports/fii-dii",
+    "status": "EXISTING_RND_REVIEW_REQUIRED"
+  },
+  {
+    "source_id": "ccil",
+    "dataset_key": "ccil.market_segments",
+    "dataset_segments": [
+      "Money Market",
+      "G-Sec",
+      "Forex",
+      "Derivatives",
+      "settlement datasets as confirmed"
+    ],
+    "url": "https://www.ccilindia.com/",
+    "status": "EXISTING_RND_REVIEW_REQUIRED"
+  },
+  {
+    "source_id": "stockedge",
+    "dataset_key": "stockedge.market_participants.eod",
+    "dataset_segments": [
+      "EOD Market Participants"
+    ],
+    "url": null,
+    "status": "SEPARATE_SOURCE_TO_REGISTER",
+    "note": "Keep independent from Sensibull and CCIL; exact URL/access path to be confirmed from existing source inventory."
+  }
+]

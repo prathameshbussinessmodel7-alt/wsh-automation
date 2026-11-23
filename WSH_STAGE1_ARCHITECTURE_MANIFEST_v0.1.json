@@ -1,0 +1,18 @@
+{
+  "artifact_version": "0.1",
+  "prepared_date": "2026-11-23",
+  "files": {
+    "WSH_STAGE1_ARCHITECTURE_v0.1.md": {
+      "sha256": "c4b5b3e38676c8044fe122ffa6bfd02e472d92b4322d1f6287fd467f43d7b1d6",
+      "bytes": 15359
+    },
+    "WSH_STAGE1_SOURCE_REGISTRY_v0.1.json": {
+      "sha256": "1b4cd1a490d0da7e1e9e5532c809ba5963b61b4c50c091371deebf347ad5d506",
+      "bytes": 5634
+    }
+  },
+  "notes": [
+    "Architecture baseline only; not yet committed to GitHub.",
+    "Repository branch creation was denied by the connected GitHub integration (HTTP 403); no remote changes were made."
+  ]
+}
