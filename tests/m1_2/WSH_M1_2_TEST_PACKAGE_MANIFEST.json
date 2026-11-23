@@ -1,0 +1,23 @@
+﻿{
+    "package":  "WSH M1.2 Schema Validation and Contract Conformance",
+    "version":  "0.1",
+    "baseline":  "WSH M1.1 Common Data Contracts v0.1",
+    "status":  "REPOSITORY_CONFORMANCE_TESTS_PASSED",
+    "schema_baseline_path":  "schemas/m1_1/",
+    "test_cases":  17,
+    "files_sha256":  {
+                         "README.md":  "6a60090abe4d62fe100c777835c94b923e28a52050650864d62d5e224a28621d",
+                         "requirements-test.txt":  "fac4378b80570e6cae019f262e090c15916389e86e9d1acdfc932c5eb561e492",
+                         "test_schema_conformance.py":  "29f2d2a3383c00b96725996db5a5d838877c6a89d73bc159395801f8c86f4e79"
+                     },
+    "execution":  {
+                      "result":  "PASS",
+                      "tests_total":  17,
+                      "tests_passed":  17,
+                      "tests_failed":  0,
+                      "command":  "python -m unittest discover -s .\\tests\\m1_2 -p \"test_*.py\" -v",
+                      "python_version":  "Python 3.15.0",
+                      "jsonschema_version":  "4.26.0",
+                      "executed_at_utc":  "2026-11-23T10:06:02.9557118Z"
+                  }
+}
