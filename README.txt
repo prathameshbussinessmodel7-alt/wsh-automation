@@ -7,20 +7,44 @@ payload representations through Chrome DevTools Protocol (CDP), records
 capture metadata and integrity information, and performs hardened
 cross-session comparison.
 
-## 2. Validated environment
+## 2. Environments and compatibility evidence
+
+### Historical live-capture environment (November 20, 2026)
+
+The canonical November 20 A/B/C_RELOAD live captures were recorded in the
+following environment:
 
 - Python: 3.15.0 (64-bit)
 - Selenium: 4.51.0
 - Chrome: 157.0.8103.79
 - ChromeDriver: 157.0.8103.78
-- Dependency declaration: requirements.txt
+
+These versions describe the historical live-capture environment. They are
+not a requirement to use those exact browser patch versions for subsequent
+runs. Chrome and a compatible ChromeDriver are required for live capture.
+Selenium Manager is used for driver resolution.
+
+### Independent fresh-clone regression environment (November 22, 2026)
+
+The published release branch was independently cloned and tested using:
+
+- Python: 3.12.10 (64-bit)
+- Selenium: 4.51.0
+- BeautifulSoup4 and pandas as declared in requirements.txt
+- Regression tests: 15/15 passed across the two included test suites
+
+A separate Selenium headless-browser compatibility check resolved:
+
+- Chrome: 158.0.8127.37
+- ChromeDriver: 158.0.8127.36
+
+This confirms Selenium Manager could start the detected Chrome/ChromeDriver
+pair. It was not a live Sensibull capture and does not establish that the
+A/B/C_RELOAD live-capture sequence was repeated under Python 3.12.10.
 
 Install dependencies:
 
 python -m pip install -r requirements.txt
-
-Chrome and a compatible ChromeDriver are required for live capture.
-Selenium Manager is used for driver resolution.
 
 ## 3. V3.11.1 release package contents
 
@@ -41,7 +65,7 @@ than the manifest itself.
 Historical test scripts, live-test orchestrators, audit files, browser
 logs, raw captures and local evidence packages are not included.
 
-## 4. November 20, 2026 local validation
+## 4. November 20, 2026 local operational validation
 
 Three canonical capture sessions were compared locally:
 
@@ -71,19 +95,27 @@ provider or exchange verification.
 
 ## 5. Regression testing
 
-The local regression run completed 15 tests across two suites:
+The included regression test files are:
+
+- test_wsh_v3_11.py
+- test_wsh_v3_11_compare_hardened_V311_COMPAT.py
+
+The original local regression run completed 15 tests:
 
 - Original capture and compatibility suite: 3/3 passed.
 - Hardened comparator and V3.11.1 compatibility suite: 12/12 passed.
 - Total: 15/15 passed; zero failures.
 
-The included test files are:
+An independent fresh-clone regression run was subsequently completed on
+November 22, 2026, using Python 3.12.10:
 
-- test_wsh_v3_11.py
-- test_wsh_v3_11_compare_hardened_V311_COMPAT.py
+- Core capture and compatibility suite: 3/3 passed.
+- Hardened comparator and V3.11.1 compatibility suite: 12/12 passed.
+- Total: 15/15 passed; zero failures.
 
-The test results describe the local validation run. They should not be
-interpreted as an independent CI execution or GitHub Actions result.
+The fresh-clone run verifies the included automated regression tests under
+Python 3.12.10. It does not constitute a new live Sensibull capture or a
+repeat of the November 20 A/B/C_RELOAD operational exercise.
 
 ## 6. Historical local validation evidence
 
@@ -103,8 +135,8 @@ The earlier C_RELOAD attempt at 11:01 is historical evidence and is
 not the canonical C_RELOAD session.
 
 These evidence files are not included in this eight-file release
-package. Reproduction of the November 20 comparison requires access
-to those separately retained local files.
+package. Reproduction of the November 20 comparison requires access to
+those separately retained local files.
 
 ## 7. Reproduce the comparator run
 
@@ -126,22 +158,25 @@ The capture JSON files are not supplied in this release package.
   original wire bytes.
 - Local UTC and monotonic clocks measure browser-side observation,
   not provider timestamps.
-- Underlying and expiry are operator attestations, not independent
-  provider verification.
+- Underlying and expiry identity are operator attestations, not independent provider verification.
 - Hash overlap is descriptive and does not prove freshness or
   provider sequence continuity.
 - A successful integrity gate does not establish exchange authenticity.
 - The comparator does not independently prove instrument selection.
 
-## 9. Release status
+## 9. Release and publication status
 
 - November 20 local capture and comparator acceptance criteria: PASS.
-- Original capture and compatibility tests: 3/3 PASS.
-- Hardened comparator and compatibility tests: 12/12 PASS.
-- Combined local regression result: 15/15 PASS.
-- Local acceptance report: generated and verified.
-- GitHub publication: not yet completed.
-- Workflow deployment: not yet completed.
+- Original regression tests: 15/15 PASS.
+- Independent fresh-clone regression tests on Python 3.12.10: 15/15 PASS.
+- Fresh-clone release SHA256 manifest verification: 7/7 PASS.
+- Selenium Manager browser/driver compatibility check: PASS.
+- GitHub release branch: published as release/wsh-sensibull-v3.11.1.
+- Corrective manifest commit: 8f380a3.
+- Pull request: #2, release/wsh-sensibull-v3.11.1 into main; open and not merged.
+- No claim is made here that the release has been merged into main.
+- GitHub Actions workflow deployment is separate from this eight-file
+  release package and is not established by the checks recorded here.
 
 The release SHA256 manifest is WSH_V3_11_1_RELEASE_SHA256.json.
 The historical PACKAGE_SHA256.json is not part of this release.
