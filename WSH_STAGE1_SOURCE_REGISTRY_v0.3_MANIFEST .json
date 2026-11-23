@@ -1,0 +1,30 @@
+{
+  "artifact": "WSH_STAGE1_SOURCE_REGISTRY_v0.3.json",
+  "version": "0.3",
+  "entry_count": 35,
+  "source_families": [
+    "bloomberg",
+    "ccil",
+    "nse",
+    "research360",
+    "sensibull",
+    "stockedge",
+    "tradingeconomics",
+    "tradingview"
+  ],
+  "sha256": "1eb39b81a4445967b2cdc471e7582ca25305f6459635e872c68a32f36cef98ff",
+  "changes_from_v0.2": [
+    "Added Sensibull FII/DII Market Participants core view.",
+    "Added Sensibull FII/DII Market Participants F&O view.",
+    "Added Sensibull FII/DII Market Participants Cash Market view.",
+    "Added Sensibull FII/DII Market Participants History view.",
+    "Kept all four views under source_id sensibull with separate dataset keys and URLs.",
+    "Kept Sensibull V3.11.1 option-chain component freeze boundary unchanged."
+  ],
+  "governance": {
+    "Sensibull_V3_11_1": "FROZEN_UNCHANGED",
+    "Sensibull_FII_DII_views": "NEW_SEPARATE_SOURCE_ADAPTER_CONTRACTS_PENDING",
+    "StockEdge": "INDEPENDENT_SOURCE_IDENTITY",
+    "CCIL": "INDEPENDENT_SOURCE_IDENTITY"
+  }
+}
