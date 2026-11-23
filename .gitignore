@@ -1,0 +1,27 @@
+﻿# Python generated files
+__pycache__/
+*.py[cod]
+
+# Browser profiles and authentication
+WSH_V3_11_Chrome_Profile/
+**/Default/Cookies
+**/Local State
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Raw capture and diagnostic evidence
+WSH_V3_11_Captures/
+WSH_V3_11_EMERGENCY_LIVE_TEST/
+
+# Historical and backup files
+*BACKUP*
+* - Copy.py
+*REPAIRED_OLD.py
+README_PRE_V311_FINAL_UPDATE_BACKUP.txt
+
+# Historical package manifest
+PACKAGE_SHA256.json
