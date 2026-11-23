@@ -1,0 +1,35 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WSH M1.3 Policy Validation Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["package", "policy_version", "generated_at_utc", "execution", "integrity", "release_eligibility", "findings"],
+  "properties": {
+    "package": {"const": "WSH M1.3 Semantic and Policy Validation"},
+    "policy_version": {"const": "0.1"},
+    "generated_at_utc": {"type": "string", "format": "date-time"},
+    "execution": {
+      "type": "object",
+      "required": ["result", "policies_evaluated", "passed", "failed", "warnings"],
+      "properties": {
+        "result": {"enum": ["PASS", "FAIL"]},
+        "policies_evaluated": {"type": "integer", "minimum": 0},
+        "passed": {"type": "integer", "minimum": 0},
+        "failed": {"type": "integer", "minimum": 0},
+        "warnings": {"type": "integer", "minimum": 0}
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["source_identity", "evidence_provenance", "hash_verification", "calendar_validation"],
+      "properties": {
+        "source_identity": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]},
+        "evidence_provenance": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]},
+        "hash_verification": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]},
+        "calendar_validation": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]}
+      }
+    },
+    "release_eligibility": {"enum": ["ACCEPT", "ACCEPT_WITH_LIMITATIONS", "HOLD", "REJECT", "NOT_EVALUATED"]},
+    "findings": {"type": "array", "items": {"type": "object"}}
+  }
+}
