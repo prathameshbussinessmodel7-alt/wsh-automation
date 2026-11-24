@@ -4,24 +4,18 @@
     "passed": 1,
     "policies_evaluated": 1,
     "result": "PASS",
-    "warnings": 1
+    "warnings": 0
   },
-  "findings": [
-    {
-      "code": "MARKET_DATE_MISSING",
-      "dataset_key": "sensibull.market_participants.fii_dii.core",
-      "message": "Run market_date is absent; freshness label cannot be cross-checked against run context.",
-      "severity": "WARNING"
-    }
-  ],
-  "generated_at_utc": "2026-11-23T10:43:46.858996Z",
+  "findings": [],
+  "generated_at_utc": "2026-11-23T03:10:00Z",
   "integrity": {
-    "calendar_validation": "NOT_EVALUATED",
-    "evidence_provenance": "NOT_EVALUATED",
-    "hash_verification": "NOT_EVALUATED",
+    "calendar_validation": "NOT_REQUIRED",
+    "evidence_provenance": "NOT_REQUIRED",
+    "freshness_verification": "PASS",
+    "hash_verification": "NOT_REQUIRED",
     "source_identity": "PASS"
   },
   "package": "WSH M1.3 Semantic and Policy Validation",
-  "policy_version": "0.1",
+  "policy_version": "0.1.4",
   "release_eligibility": "ACCEPT"
 }

@@ -1,1 +1,1 @@
-﻿jsonschema[format]>=4.18,<5
+jsonschema[format]>=4.18,<5

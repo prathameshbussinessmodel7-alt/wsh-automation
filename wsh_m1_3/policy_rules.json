@@ -1,48 +1,135 @@
-﻿{
-  "package": "WSH M1.3 Semantic and Policy Validation",
-  "policy_version": "0.1",
-  "baseline": {
-    "m1_1": "0.1",
-    "m1_2": "0.1",
-    "m1_2_test_cases": 17
-  },
-  "status_dimensions": [
-    "publication_status",
-    "extraction_status",
-    "validation_status",
-    "freshness_status",
-    "reconciliation_status",
-    "release_decision"
-  ],
-  "release_policy": {
-    "ACCEPT": {
-      "publication_status": ["PUBLISHED"],
-      "extraction_status": ["SUCCESS"],
-      "validation_status": ["VALID"],
-      "freshness_status": ["FRESH"],
-      "reconciliation_status": ["MATCHED", "NOT_AVAILABLE"],
-      "evidence_required_when_contract_requires_raw_capture": true
-    },
-    "ACCEPT_WITH_LIMITATIONS": {
-      "requires_documented_limitations": true,
-      "forbidden_validation_status": ["INVALID", "QUARANTINED", "NOT_RUN"],
-      "forbidden_extraction_status": ["FAILED", "NOT_ATTEMPTED"],
-      "forbidden_freshness_status": ["STALE", "OUT_OF_WINDOW", "UNKNOWN"],
-      "forbidden_reconciliation_status": ["MISMATCH", "NOT_RUN"]
-    },
-    "HOLD": ["PARTIAL", "NOT_RUN", "UNKNOWN", "NOT_ATTEMPTED"],
-    "REJECT": ["INVALID", "MISMATCH"]
-  },
-  "identity_policy": {
-    "source_id_and_dataset_key_must_match_across_status_contract_registry_and_evidence": true
-  },
-  "evidence_policy": {
-    "sha256_format": "^[a-f0-9]{64}$",
-    "verify_digest_against_bytes_when_bytes_are_supplied": true,
-    "future_capture_tolerance_seconds": 300
-  },
-  "calendar_policy": {
-    "market_calendar_must_be_explicit_for_calendar_dependent_decisions": true,
-    "do_not_infer_market_open_or_closed_from_weekday_alone": true
-  }
+{
+    "package":  "WSH M1.3 Semantic and Policy Validation",
+    "policy_version":  "0.1.4",
+    "baseline":  {
+                     "m1_1":  "0.1",
+                     "m1_2":  "0.1",
+                     "m1_2_test_cases":  17
+                 },
+    "status_dimensions":  {
+                              "publication_status":  [
+                                                         "PUBLISHED",
+                                                         "MARKET_CLOSED",
+                                                         "NOT_DUE",
+                                                         "DELAYED",
+                                                         "WITHDRAWN",
+                                                         "UNKNOWN"
+                                                     ],
+                              "extraction_status":  [
+                                                        "SUCCESS",
+                                                        "PARTIAL",
+                                                        "FAILED",
+                                                        "NOT_ATTEMPTED",
+                                                        "NOT_RUN",
+                                                        "UNKNOWN"
+                                                    ],
+                              "validation_status":  [
+                                                        "VALID",
+                                                        "INVALID",
+                                                        "QUARANTINED",
+                                                        "NOT_RUN",
+                                                        "UNKNOWN"
+                                                    ],
+                              "freshness_status":  [
+                                                       "FRESH",
+                                                       "STALE",
+                                                       "OUT_OF_WINDOW",
+                                                       "UNKNOWN",
+                                                       "NOT_EVALUATED"
+                                                   ],
+                              "reconciliation_status":  [
+                                                            "MATCHED",
+                                                            "MISMATCH",
+                                                            "NOT_AVAILABLE",
+                                                            "NOT_RUN",
+                                                            "UNKNOWN"
+                                                        ],
+                              "release_decision":  [
+                                                       "ACCEPT",
+                                                       "ACCEPT_WITH_LIMITATIONS",
+                                                       "HOLD",
+                                                       "REJECT"
+                                                   ]
+                          },
+    "release_policy":  {
+                           "ACCEPT":  {
+                                          "publication_status":  [
+                                                                     "PUBLISHED"
+                                                                 ],
+                                          "extraction_status":  [
+                                                                    "SUCCESS"
+                                                                ],
+                                          "validation_status":  [
+                                                                    "VALID"
+                                                                ],
+                                          "freshness_status":  [
+                                                                   "FRESH"
+                                                               ],
+                                          "reconciliation_status":  [
+                                                                        "MATCHED",
+                                                                        "NOT_AVAILABLE"
+                                                                    ],
+                                          "requires_verified_identity":  true,
+                                          "requires_verified_freshness":  true
+                                      },
+                           "ACCEPT_WITH_LIMITATIONS":  {
+                                                           "publication_status":  [
+                                                                                      "PUBLISHED"
+                                                                                  ],
+                                                           "extraction_status":  [
+                                                                                     "SUCCESS",
+                                                                                     "PARTIAL"
+                                                                                 ],
+                                                           "validation_status":  [
+                                                                                     "VALID"
+                                                                                 ],
+                                                           "freshness_status":  [
+                                                                                    "FRESH"
+                                                                                ],
+                                                           "reconciliation_status":  [
+                                                                                         "MATCHED",
+                                                                                         "NOT_AVAILABLE"
+                                                                                     ],
+                                                           "requires_documented_limitations":  true,
+                                                           "requires_verified_identity":  true,
+                                                           "requires_verified_freshness":  true
+                                                       },
+                           "HOLD":  [
+                                        "PARTIAL",
+                                        "NOT_RUN",
+                                        "UNKNOWN",
+                                        "NOT_ATTEMPTED"
+                                    ],
+                           "REJECT":  [
+                                          "INVALID",
+                                          "MISMATCH"
+                                      ]
+                       },
+    "identity_policy":  {
+                            "independent_contract_or_registry_required_for_release":  true,
+                            "all_supplied_references_must_match":  true
+                        },
+    "evidence_policy":  {
+                            "raw_capture_required_when_contract_says_so":  true,
+                            "sha256_format":  "^[a-f0-9]{64}$",
+                            "verify_digest_against_exact_bytes":  true,
+                            "future_capture_tolerance_seconds":  300
+                        },
+    "freshness_policy":  {
+                             "requires_contract_max_age_seconds":  true,
+                             "requires_run_context_market_date":  true,
+                             "future_timestamp_tolerance_seconds":  300
+                         },
+    "calendar_policy":  {
+                            "required_when_contract_declares_calendar_rule":  true,
+                            "requires_explicit_boolean_market_open":  true,
+                            "requires_canonical_market_date":  true,
+                            "do_not_infer_market_open_or_closed_from_weekday_alone":  true
+                        },
+    "integrity_states":  [
+                             "PASS",
+                             "FAIL",
+                             "NOT_REQUIRED",
+                             "NOT_EVALUATED"
+                         ]
 }
