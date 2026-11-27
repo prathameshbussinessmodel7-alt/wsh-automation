@@ -1,0 +1,213 @@
+{
+    "execution_timestamp": "2026-11-27T23:15:41.175232",
+    "datasets": {
+        "option_chain_nifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_banknifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_finnifty": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "option_chain_sensex": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "strike",
+                "call_oi",
+                "put_oi",
+                "call_change_oi",
+                "put_change_oi"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Zero valid strike rows found; extracted UI controls or empty grid"
+            ]
+        },
+        "fii_dii_summary": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "VALID",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 7,
+            "failure_reasons": []
+        },
+        "fii_dii_futures_and_options": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: Identical table leaked across tabs."
+            ]
+        },
+        "fii_dii_cash_market": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: Identical table leaked across tabs."
+            ]
+        },
+        "fii_dii_fii_history": {
+            "source": "Sensibull",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "QUARANTINED",
+            "expected_fields": [
+                "participant",
+                "net_flow",
+                "date"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Cross-tab fingerprint match: Identical table leaked across tabs."
+            ]
+        },
+        "ccil_money_market": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \nStacktrace:\n#0 0x5a9905b60f7a <unknown>\n#1 0x5a9905354935 <unknown>\n#2 0x5a9905395dd1 <unknown>\n#3 0x5a9905395fc1 <unknown>\n#4 0x5a99053d4464 <unknown>\n#5 0x5a99053d2ae3 <unknown>\n#6 0x5a99053d23f1 <unknown>\n#7 0x5a990538cc27 <unknown>\n#8 0x5a990538bf3e <unknown>\n#9 0x5a990538ca11 <unknown>\n#10 0x5a9905b2292c <unknown>\n#11 0x5a9905b2116b <unknown>\n#12 0x5a9905b0be15 <unknown>\n#13 0x5a9905b21d9a <unknown>\n#14 0x5a9905af42d9 <unknown>\n#15 0x5a9905b4a648 <unknown>\n#16 0x5a9905b4a7e5 <unknown>\n#17 0x5a9905b5f812 <unknown>\n#18 0x7e39bd8abdeb <unknown>\n#19 0x7e39bd93f4dc <unknown>\n"
+            ]
+        },
+        "ccil_gsec": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \nStacktrace:\n#0 0x5a9905b60f7a <unknown>\n#1 0x5a9905354935 <unknown>\n#2 0x5a9905395dd1 <unknown>\n#3 0x5a9905395fc1 <unknown>\n#4 0x5a99053d4464 <unknown>\n#5 0x5a99053d2ae3 <unknown>\n#6 0x5a99053d23f1 <unknown>\n#7 0x5a990538cc27 <unknown>\n#8 0x5a990538bf3e <unknown>\n#9 0x5a990538ca11 <unknown>\n#10 0x5a9905b2292c <unknown>\n#11 0x5a9905b2116b <unknown>\n#12 0x5a9905b0be15 <unknown>\n#13 0x5a9905b21d9a <unknown>\n#14 0x5a9905af42d9 <unknown>\n#15 0x5a9905b4a648 <unknown>\n#16 0x5a9905b4a7e5 <unknown>\n#17 0x5a9905b5f812 <unknown>\n#18 0x7e39bd8abdeb <unknown>\n#19 0x7e39bd93f4dc <unknown>\n"
+            ]
+        },
+        "ccil_forex": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \nStacktrace:\n#0 0x5a9905b60f7a <unknown>\n#1 0x5a9905354935 <unknown>\n#2 0x5a9905395dd1 <unknown>\n#3 0x5a9905395fc1 <unknown>\n#4 0x5a99053d4464 <unknown>\n#5 0x5a99053d2ae3 <unknown>\n#6 0x5a99053d23f1 <unknown>\n#7 0x5a990538cc27 <unknown>\n#8 0x5a990538bf3e <unknown>\n#9 0x5a990538ca11 <unknown>\n#10 0x5a9905b2292c <unknown>\n#11 0x5a9905b2116b <unknown>\n#12 0x5a9905b0be15 <unknown>\n#13 0x5a9905b21d9a <unknown>\n#14 0x5a9905af42d9 <unknown>\n#15 0x5a9905b4a648 <unknown>\n#16 0x5a9905b4a7e5 <unknown>\n#17 0x5a9905b5f812 <unknown>\n#18 0x7e39bd8abdeb <unknown>\n#19 0x7e39bd93f4dc <unknown>\n"
+            ]
+        },
+        "ccil_derivatives": {
+            "source": "CCIL",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "instrument",
+                "rate"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "Message: \nStacktrace:\n#0 0x5a9905b60f7a <unknown>\n#1 0x5a9905354935 <unknown>\n#2 0x5a9905395dd1 <unknown>\n#3 0x5a9905395fc1 <unknown>\n#4 0x5a99053d4464 <unknown>\n#5 0x5a99053d2ae3 <unknown>\n#6 0x5a99053d23f1 <unknown>\n#7 0x5a990538cc27 <unknown>\n#8 0x5a990538bf3e <unknown>\n#9 0x5a990538ca11 <unknown>\n#10 0x5a9905b2292c <unknown>\n#11 0x5a9905b2116b <unknown>\n#12 0x5a9905b0be15 <unknown>\n#13 0x5a9905b21d9a <unknown>\n#14 0x5a9905af42d9 <unknown>\n#15 0x5a9905b4a648 <unknown>\n#16 0x5a9905b4a7e5 <unknown>\n#17 0x5a9905b5f812 <unknown>\n#18 0x7e39bd8abdeb <unknown>\n#19 0x7e39bd93f4dc <unknown>\n"
+            ]
+        },
+        "gsse_sovereign_bonds": {
+            "source": "TradingEconomics",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "FAILED",
+            "validation_status": "INVALID",
+            "expected_fields": [
+                "indicator"
+            ],
+            "records_extracted": 0,
+            "failure_reasons": [
+                "No tables found"
+            ]
+        },
+        "gsse_macro_calendar": {
+            "source": "TradingEconomics",
+            "publication_status": "PUBLISHED",
+            "extraction_status": "SUCCESS",
+            "validation_status": "VALID",
+            "expected_fields": [
+                "indicator",
+                "actual",
+                "previous"
+            ],
+            "records_extracted": 1,
+            "failure_reasons": []
+        }
+    }
+}
